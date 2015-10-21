@@ -1,0 +1,278 @@
+equate_2.0-4 (2015-10-21)
+
+  o Asymptotic standard errors of equating are now
+    included for Tucker, Levine, chained and
+    frequency estimation equipercentile equating.
+
+  o Equating is now supported with scales having
+    inconsistent score increments.
+
+  o summary method for bootstrap objects fixed to
+    support partial output, e.g., only standard
+    errors.
+    
+  o summary method for equate objects fixed. An
+    error was returned for anything but
+    equipercentile functions.
+
+equate_2.0-3 (2014-11-1)
+
+  o Functionality has been added for equating under
+    a multiple anchor test design. New methods
+    include nominal weights and Tucker multivariate
+    and multivariate frequency estimation for
+    Braun/Holland and equipercentile equating.
+    
+  o The freqtab class has been restructured, with a
+    new, more general approach to the construction
+    and manipulation of multivariate frequency
+    tables. A freqtab object is now a simple table
+    array rather than a data.frame.
+
+  o formula method added for loglinear
+    presmoothing via the presmoothing function.
+  
+  o Loglinear presmoothing supports multivariate
+    frequency distributions, e.g., distributions
+    with multiple anchor tests. Polynomials and
+    interactions can be specified using a matrix
+    of power terms, in addition to the score function
+    or the degree (now 'degrees') argument.
+    
+  o Impossible scores can be removed before loglinear
+    presmoothing using the 'rmimpossible' argument.
+
+  o Model comparisons for loglinear presmoothing
+    are based on the 'models' argument, which is
+    a numeric vector with different levels specifying
+    the sequential models to be fitted. Also, when
+    'stepup' is TRUE, the default models are now chosen
+    based on common powers across variables.
+
+  o The default legend for plotting bootstrap output
+    was fixed.
+    
+  o Summary method for bootstrap output can take
+    a subset of the score scale. The method was also
+    updated to include weighted mean RMSE.
+
+equate_2.0-2 (2014-2-21)
+
+  o Some minor cleanup.
+
+  o plot.bootstrap was fixed for objects
+    containing output for only one equating.
+
+  o print method was added for bootstrap objects.
+
+equate_2.0-1 (2014-2-1)
+
+  o points.freqtab fixed to handle plotting
+    frequencies that are all the same.
+
+  o Bug fixed in printing and summarizing
+    equipercentile output.
+    
+  o Score conversion with chained equipercentile
+    output now works. Previously, there was an 
+    error in how the smoothing method was
+    interpreted.
+
+  o Score conversion with equipercentile now
+    works when x only contains values with
+    percentile ranks of 0 or 1. Previously, this
+    produced an error.
+
+equate_2.0-0 (2014-1-7)
+
+  o New "general linear" equating type.
+    
+  o Single-group equating is now supported,
+    where "x" is bivariate and "y" is missing.
+
+  o Equipercentile equating will accept a
+    rescaled "y" scale, e.g., with non-integer
+    scores. The score increment still must be
+    constant across the scale.
+
+  o The identity linking function is modified
+    using the arguments "lowp" and "highp", which
+    were previously only used in circle-arc
+    equating.
+  
+  o "highp" is now used to find "Ky" in
+    equipercentile equating. The "Ky" argument is
+    no longer used.
+
+  o Identity equating is now considered a linear
+    equating type, though it is still specified
+    with type = "identity".
+    
+  o New "composite" object class is used to create
+    composite equatings, i.e., weighted combinations
+    of two or more other equating functions.
+    Synthetic equating, combining an identity
+    function with another function, is no longer
+    supported within the equate function.
+
+  o "px" and "fx" are now internal, meaning a help
+    file is no longer included.
+
+  o "yx" is no longer included separately in equating
+    output. Equated scores can be accessed through
+    "concordance$yx" instead.
+
+  o Analytical standard errors are under
+    construction and not currently included in
+    equating output.
+
+  o For loglinear smoothing within the equate
+    function, a single "scorefun" argument has
+    replaced the separate "xscorefun" and "yscorefun"
+    arguments. The equate function cannot be used
+    to smooth "x" and "y" with different score
+    functions.
+
+  o Bug in the calculation of the intercept in
+    chained mean and linear equating was fixed.
+
+  o Circle-arc equating with nonequivalent groups
+    was fixed.
+
+  o Chained equipercentile score conversion was
+    fixed.
+    
+  o Score conversion with frequency estimation
+    equipercentile was fixed.
+
+  o "summary" method replaces "descript" for
+    summarizing frequency tables.
+
+  o Additional descriptive statistics are now
+    included in equating output.
+
+  o Levine true score equating printed output
+    was fixed.
+  
+  o Bootstrap standard error calculation was fixed
+    for scales of different lengths.
+  
+  o "plot.equate" was function modified.
+  
+  o "plot.freqtab" was function updated to improve
+    plotting logliner presmoothing results.
+    
+  o "freqtab" function was updated to handle missing
+    data.
+
+equate_1.2-0 (2013-9-20)
+  
+  o Package vignette updated
+  
+  o freqtab function updated to accept item response
+    data
+    
+  o loglinear function updated - original estimation
+    algorithm has been dropped, and the function is
+    now a wrapper for 'glm'
+    
+  o new function plot.equate, for plotting and
+    comparing equating results
+    
+  o equate and other functions modified to handle
+    linking of forms with different score scales
+  
+  o Bug fixed in the frequency estimation method,
+    where marginal frequencies are zero 
+  
+  o Help files updated
+
+equate_1.1-4 (2011-8-23)
+
+  o Package vignette updated
+
+  o Print method fixed
+
+  o equate function fixed for equipercentile
+    conversion of a vector of scores to the scale
+    defined in a previous equating
+
+equate_1.1-3 (2011-2-10)
+
+  o verbose option added to loglinear smoothing
+
+  o equate function updated to support conversion
+    of a vector of scores to the scale defined
+    in a previous equating
+
+equate_1.1-2 (2011-1-7)
+
+  o Circle-arc equating fixed
+
+  o Package vignette updated
+
+equate_1.1-1 (2010-12-15)
+
+  o New equating type: synthetic,
+    a combination of any other equating type and
+    identity equating
+
+  o Circle-arc equating fixed
+
+  o skew.freqtab and kurt.freqtab fixed
+
+equate_1.1-0 (2010-11-15)
+
+  o plot.freqtab updated
+
+  o New equating type: nominal weights
+
+  o loglinear smoothing function fixed
+
+equate_1.0-0 (2010-03-24)
+
+  o New package vignette introduces concepts and
+    demonstrates basic functionality
+
+  o New equating type: circle-arc
+
+  o New equating methods: Levine true score,
+    Braun/Holland, and chained equating
+
+  o equate function converts a vector of scores
+    to another scale based on output from a 
+    previous equating
+
+  o Proportional weighting when estimating the
+    synthetic distribution, using argument 'w'
+
+  o Layout of freqtab function changed
+
+  o Simple plotting method added for univariate
+    and bivariate frequency tables
+
+  o se.boot function returns matrix of bootstrap
+    replications
+
+  o Equipercentile equating updated to handle
+    frequency tables missing substantial amounts
+    of data
+
+  o Functions added for descriptive statistcs of
+    frequency tables
+
+  o Rd files updated and consolidated
+
+equate_0.1-1 (2009-11-05)
+
+  o Functions loglinear and freqbump extended to 
+    handle smoothing of bivariate distributions
+
+  o equating functions accept scores only as 
+    frequency tables (univariate or bivariate)
+
+  o Updated DESCRIPTION and Rd files
+
+equate_0.1-0 (2009-11-01)
+
+  o initial release on CRAN

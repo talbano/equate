@@ -1,0 +1,81 @@
+\name{composite}
+\alias{composite}
+\alias{composite.default}
+\alias{composite.equate.list}
+\alias{composite.list}
+\alias{is.composite}
+\alias{as.composite}
+\alias{print.composite}
+\title{Composite Linking and Equating}
+\description{
+This function creates a composite linking or equating as a combination of two or more other linking or equating functions.
+}
+\usage{
+\method{composite}{default}(x, wc, ...)
+
+\method{composite}{equate.list}(x, wc, name, symmetric = FALSE, p = 1,
+  verbose = TRUE, ...) 
+
+\method{composite}{list}(x, wc, name, symmetric = FALSE, p = 1,
+  verbose = TRUE, ...)
+}
+\arguments{
+  \item{x}{
+for the default method, \code{x} is a matrix of equating functions, with one function per column. Otherwise, \code{x} is a list of equatings, where each element is an object of class \dQuote{\code{\link{equate}}}.
+}
+  \item{wc}{
+vector of weights for creating the composite. \code{length(wc)} should match either \code{ncol(x)} for the default method or \code{length(x)}.
+}
+  \item{name}{
+an optional name, used to label the output. If missing, a name will be created using \code{x}.
+}
+  \item{p}{
+integer specifying the type of circle used to define symmetry.
+}
+  \item{symmetric}{
+logical, with default \code{FALSE}, indicating whether or not weights \code{wc} should be modified to create symmetric weights. Only supported for composites of linear functions.
+}
+  \item{verbose}{
+logical, with default \code{TRUE}, indicating whether or not full output should be returned. When \code{FALSE}, only the equated scores are returned.
+}
+  \item{\dots}{
+further arguments passed to or from other functions.
+}
+}
+\details{
+Composite linking and equating create a single linking or equating function as a weighted combination of two or more other linking or equating functions. See Holland and Strawderman (2011) for details.
+}
+\value{
+For the default method, and when \code{verbose = FALSE}, a vector of composite equated scores is returned. Otherwise, a list of equating output is returned, including output for the composite and each function being combined.
+}
+\references{
+Holland, P. W., and Strawderman, W. E. (2011). How to average equating functions, if you must. In A. A. von Davier (Ed.), Statistical models for test equating, scaling, and linking (pp. 89-107). New York, NY: Springer.
+}
+\author{
+Anthony Albano \email{tony.d.albano@gmail.com}
+}
+\seealso{
+\code{\link{equate}}
+}
+\examples{
+# See vignette("equatevignette") for additional examples
+
+# Example from the equate help file, without the bootstrapping
+# Random groups equating for (1) identity, (2) mean, 
+# (3) linear, (4) equipercentile with loglinear
+# smoothing, and (5) a composite of mean and identity
+rx <- as.freqtab(ACTmath[, 1:2])
+ry <- as.freqtab(ACTmath[, c(1, 3)])
+set.seed(2007)
+
+req1 <- equate(rx, ry, type = "i")
+req2 <- equate(rx, ry, type = "m")
+req3 <- equate(rx, ry, type = "l")
+req4 <- equate(rx, ry, type = "e", smooth = "loglin",
+  degrees = 3)
+req5 <- composite(list(req1, req2), wc = .5, symmetric = TRUE)
+
+# Compare equating functions
+plot(req1, req2, req3, req4, req5[[1]], addident = FALSE)
+}
+\keyword{methods}
