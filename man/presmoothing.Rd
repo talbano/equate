@@ -16,9 +16,9 @@ These functions are used to smooth frequency distributions.
 \method{presmoothing}{formula}(x, data, ...)
 
 loglinear(x, scorefun, degrees = list(4, 2, 2), grid,
-  rmimpossible = FALSE, asfreqtab = TRUE, models,
-  stepup = !missing(models),
-  compare = FALSE, verbose = FALSE,
+  rmimpossible = 0, asfreqtab = TRUE, models,
+  stepup = !missing(models), compare = FALSE,
+  choose = FALSE, verbose = FALSE,
   showWarnings = TRUE, ...)
 }
 \arguments{
@@ -48,16 +48,19 @@ list of integer vectors, each one indicating the maximum polynomial score transf
 matrix with one column per margin in \code{x} and one row per term in the model. See below for details.
 }
   \item{rmimpossible}{
-logical, with default \code{FALSE}, indicating whether or not impossible scores should be removed before smoothing.
+integer vector indicating columns in \code{x} to be used in removing impossible scores before smoothing. Impossible scores are kept with default value of 0. See below.
 }
   \item{models}{
-integer vector indicating which model terms should be grouped together when fitting multiple models.
+integer vector indicating which model terms should be grouped together when fitting multiple nested models. E.g., \code{models = c(1, 1, 2, 3)} will compare three models, with the first two terms in model one, the third term added in model two, and the fourth in model three.
 }
   \item{stepup}{
-logical, with default \code{FALSE}, indicating whether or not multiple (nested) models should be fit. If \code{TRUE} and \code{models} is missing, an attempt will be made to create it using \code{grid} and/or \code{degrees}. Otherwise, in the absence of \code{models}, each column in \code{scorefun} will define a new sequential model.
+logical, with default \code{FALSE}, indicating whether or not multiple nested models should be automatically fit. If \code{TRUE} and \code{models} is missing, an attempt will be made to create it using \code{grid} and/or \code{degrees}. Otherwise, in the absence of \code{models}, each column in \code{scorefun} will define a new sequential model.
 }
   \item{compare}{
 logical, with default \code{FALSE}, indicating whether or not fit for nested models should be compared. If \code{TRUE}, \code{stepup} is also set to \code{TRUE} and only results from the model fit comparison are returned, that is, \code{verbose} is ignored.
+}
+  \item{choose}{
+logical, with default \code{FALSE}, indicating whether or not the model with smallest AIC should be returned after comparing fit of nested models. Useful for automating model selection in simulations.
 }
   \item{verbose}{
 logical, with default \code{FALSE}, indicating whether or not full \code{glm} output should be returned.
@@ -80,7 +83,7 @@ Terms can also be specified with \code{grid}, which is a matrix with each row co
 
 \code{stepup} is used to run nested models based on subsets of the columns in \code{scorefun}. Output will correspond to models based on columns 1 and 2, 1 through 3, 1 through 4, to 1 through \code{ncol(scorefun)}. This list of polynomial terms is then used to create a \code{grid} using \code{expand.grid}. The \code{grid} can also be supplied directly, in which case \code{degrees} will be ignored.
 
-\code{compare} returns output as an \code{anova} table, comparing model fit for all the models run with \code{stepup = TRUE}.
+\code{compare} returns output as an \code{anova} table, comparing model fit for all the models run with \code{stepup = TRUE}, or by specifying more than one model in \code{models}.
 
 The remaining smoothing methods make adjustments to scores with low or zero frequencies. \code{smoothmethod = "bump"} adds the proportion \code{jmin} to each score point and then adjusts the probabilities to sum to 1. \code{smoothmethod = "average"} replaces frequencies falling below the minimum \code{jmin} with averages of adjacent values.
 }
@@ -88,6 +91,7 @@ The remaining smoothing methods make adjustments to scores with low or zero freq
 When \code{smoothmethod = "average"} or \code{smoothmethod = "bump"}, either a smoothed frequency vector or table is returned. Otherwise, \code{loglinear} returns the following:
 \item{}{when \code{compare = TRUE}, an anova table for model fit}
 \item{}{when \code{asfreqtab = TRUE}, a smoothed frequency table}
+\item{}{when \code{choose = TRUE}, a list of length two, with the first element being the smoothed frequency table for the best fitting model, and the second being the model fit table for all models compared}
 \item{}{when \code{verbose = TRUE}, full \code{glm} output, for all nested models when \code{stepup = TRUE}}
 \item{}{when \code{stepup = TRUE} and \code{verbose = FALSE}, a \code{data.frame} of fitted frequencies, with one column per model}
 }

@@ -52,7 +52,7 @@ presmoothing.formula <- function(x, data, ...) {
 
 loglinear <- function(x, scorefun, degrees = list(4, 2, 2), grid,
 	rmimpossible = FALSE, asfreqtab = TRUE, models,
-	stepup = !missing(models), compare = FALSE,
+	stepup = !missing(models), compare = FALSE, choose = FALSE,
 	verbose = FALSE, showWarnings = TRUE, ...) {
 
 	# Powers in higher order interactions should never 
@@ -61,13 +61,15 @@ loglinear <- function(x, scorefun, degrees = list(4, 2, 2), grid,
 	xd <- as.data.frame(x)
 	nx <- ncol(xd) - 1
 	
-	if(rmimpossible & nx > 1) {
-		keepi <- apply(xd, 1, function(y)
-			all(y[-1] <= y[1]))
+	# Remove impossible scores, assuming internal anchors
+	if(length(rmimpossible) > 1 & is.numeric(rmimpossible)) {
+		keepi <- apply(xd[, sort(rmimpossible)], 1,
+			function(y) all(y[-1] <= y[1]))
 		xd <- xd[keepi, ]
 	}
 	else
 		keepi <- rep(TRUE, nrow(xd))
+	if(choose) compare <- TRUE
 	
 	if(missing(scorefun)) {
 		if(missing(grid)) {
@@ -150,11 +152,13 @@ loglinear <- function(x, scorefun, degrees = list(4, 2, 2), grid,
 					family = poisson)))
 		names(out) <- mnames
 	}
-	else if(showWarnings)
-		out <- glm(scorefun, family = poisson)
-	else
-		suppressWarnings(out <- glm(scorefun, family = poisson))
-
+	else {
+		if(showWarnings)
+			out <- glm(scorefun, family = poisson)
+	  	else
+			suppressWarnings(out <- glm(scorefun,
+				family = poisson))
+	}
 	if(compare) {
 		nm <- length(out)
 		resdf <- as.numeric(lapply(out, function(y) y$df.residual))
@@ -171,11 +175,23 @@ loglinear <- function(x, scorefun, degrees = list(4, 2, 2), grid,
 		tab <- stat.anova(tab, test = "Chisq", scale = 1, 
 			df.scale = Inf,
 			n = length(out[[order(resdf)[1]]]$residuals))
-		return(structure(tab,
-			heading = c("Analysis of Deviance Table\n",
-			paste("Model ", format(1:nm), ": ", vars, 
-			sep = "", collapse = "\n")), class = c("anova", 
-			"data.frame")))
+		if(choose) {
+			stab <- as.freqtab(cbind(xd[, 1:nx],
+				out[[which.min(aic)]]$fitted),
+					scales = scales(x, 1:nx))
+			attr(stab, "anova") <- structure(tab,
+				heading = c("Analysis of Deviance Table\n",
+				paste("Model ", format(1:nm), ": ", vars,
+				sep = "", collapse = "\n")),
+				class = c("anova", "data.frame"))
+			return(stab)
+		}
+		else
+			return(structure(tab,
+				heading = c("Analysis of Deviance Table\n",
+				paste("Model ", format(1:nm), ": ", vars,
+				sep = "", collapse = "\n")), class = c("anova",
+				"data.frame")))
 	}
 	else if(verbose)
 		return(out)
