@@ -1,4 +1,4 @@
-equate_2.0-4 (2015-10-21)
+equate_2.0-4 (2016-3-1)
 
   o Asymptotic standard errors of equating are now
     included for Tucker, Levine, chained and
@@ -14,6 +14,13 @@ equate_2.0-4 (2015-10-21)
   o summary method for equate objects fixed. An
     error was returned for anything but
     equipercentile functions.
+
+  o Impossible scores can be removed from loglinear
+    smoothing functions under a NEAT design, reducing
+    the size of output.
+
+  o Support added for automatic selection of best
+    fitting model in loglinear presmoothing function.
 
 equate_2.0-3 (2014-11-1)
 
