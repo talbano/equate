@@ -16,10 +16,9 @@ These functions are used to smooth frequency distributions.
 \method{presmoothing}{formula}(x, data, ...)
 
 loglinear(x, scorefun, degrees = list(4, 2, 2), grid,
-  rmimpossible = 0, asfreqtab = TRUE, models,
+  rmimpossible = FALSE, asfreqtab = TRUE, models,
   stepup = !missing(models), compare = FALSE,
-  choose = FALSE, verbose = FALSE,
-  showWarnings = TRUE, ...)
+  choose = FALSE, verbose = FALSE, ...)
 }
 \arguments{
   \item{x}{
@@ -48,7 +47,7 @@ list of integer vectors, each one indicating the maximum polynomial score transf
 matrix with one column per margin in \code{x} and one row per term in the model. See below for details.
 }
   \item{rmimpossible}{
-integer vector indicating columns in \code{x} to be used in removing impossible scores before smoothing. Impossible scores are kept with default value of 0. See below.
+integer vector indicating columns in \code{x} to be used in removing impossible scores before smoothing. Impossible scores are kept with default value of \code{FALSE}. See below.
 }
   \item{models}{
 integer vector indicating which model terms should be grouped together when fitting multiple nested models. E.g., \code{models = c(1, 1, 2, 3)} will compare three models, with the first two terms in model one, the third term added in model two, and the fourth in model three.
@@ -64,9 +63,6 @@ logical, with default \code{FALSE}, indicating whether or not the model with sma
 }
   \item{verbose}{
 logical, with default \code{FALSE}, indicating whether or not full \code{glm} output should be returned.
-}
-  \item{showWarnings}{
-logical, with default \code{TRUE}, indicating whether or not warnings from \code{glm} should be shown. A warning is common when fitting sparse frequency distributions.
 }
   \item{\dots}{
 further arguments passed to other methods. For \code{presmoothing}, these are passed to \code{loglinear} and include those listed above.

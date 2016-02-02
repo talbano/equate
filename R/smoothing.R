@@ -53,7 +53,7 @@ presmoothing.formula <- function(x, data, ...) {
 loglinear <- function(x, scorefun, degrees = list(4, 2, 2), grid,
 	rmimpossible = FALSE, asfreqtab = TRUE, models,
 	stepup = !missing(models), compare = FALSE, choose = FALSE,
-	verbose = FALSE, showWarnings = TRUE, ...) {
+	verbose = FALSE, ...) {
 
 	# Powers in higher order interactions should never 
 	# be larger than in lower - they will be ignored
@@ -70,68 +70,20 @@ loglinear <- function(x, scorefun, degrees = list(4, 2, 2), grid,
 	else
 		keepi <- rep(TRUE, nrow(xd))
 	if(choose) compare <- TRUE
-	
-	if(missing(scorefun)) {
-		if(missing(grid)) {
-			# Create a grid
-			if(length(degrees) < nx) # must be at least 0 for higher orders
-				degrees[(length(degrees) + 1):nx] <- 0
-			degrees <- lapply(degrees, function(y)
-				rep(y, nx)[1:nx])
-			# Start grid without intercept
-			grid <- cbind(expand.grid(lapply(degrees[[1]],
-				function(y) 0:y))[-1, ])
-			# Remove higher order interactions as necessary
-			if(nx > 1) {
-				for(i in 2:nx) {
-					# Make sure higher orders don't contain larger powers
-					# They're already excluded in grid
-					#degrees[[i]] <- pmin(degrees[[i - 1]],
-					#	degrees[[i]])
-					rm1 <- apply(grid, 1, function(y)
-						sum(y == 0) == (nx - i))
-					rm2 <- apply(sapply(1:nx, function(j)
-						grid[, j] > degrees[[i]][j]), 1, any)
-					grid <- grid[!(rm1 & rm2), ]
-				}
-				# Sort grid by orders
-				grid <- cbind(grid[order(apply(grid, 1, function(y)
-					sum(y == 0)), decreasing = T), ])
-				os <- factor(nx - apply(grid, 1, function(y)
-					sum(y == 0)))
-				grid <- do.call("rbind", by(grid, os,
-					function(y) y[order(apply(y, 1, max)), ]))
-			}
-			else
-				os <- factor(nx - apply(grid, 1, function(y)
-					sum(y == 0)))
-		}
+	if(missing(scorefun))
+		scorefun <- sf(xd, degrees, grid, stepup, compare)
 		if(stepup | compare) {
-			# Create model index
-			models <- as.numeric(factor(paste(os,
-				apply(grid, 1, max), sep = ".")))
-			mnames <- unique(paste(os, apply(grid, 1, max),
-				sep = "."))
+			models <- attributes(scorefun)$models
+			mnames <- attributes(scorefun)$mnames
 		}
-		scorefun <- NULL
-		for(j in 1:nrow(grid)) {
-			tempfun <- sapply(1:nx, function(k)
-				xd[, k]^grid[j, k])
-			scorefun <- cbind(scorefun,
-				apply(tempfun, 1, prod))
-		}
-		colnames(scorefun) <- apply(grid, 1, paste,
-			collapse = ".")
-	}
 	else {
+		scorefun <- scorefun[keepi, ]
 		if(stepup | compare) {
 			if(missing(models))
 				models <- 1:ncol(scorefun)
 			mnames <- unique(models)
 		}
-		scorefun <- scorefun[keepi, ]
 	}
-	
 	if(nrow(scorefun) != nrow(xd))
 		stop("'scorefun' must contain the same ",
 			"number of rows as 'x'")
@@ -142,23 +94,13 @@ loglinear <- function(x, scorefun, degrees = list(4, 2, 2), grid,
 			stop(paste("cannot run multiple models with only",
 				ncol(scorefun) - 1, "model terms"))
 		snames <- colnames(scorefun)[-1]
-		if(showWarnings)
-			out <- lapply(unique(models), function(i)
-				glm(scorefun[, c("f", snames[models <= i])],
-					family = poisson))
-		else
-			suppressWarnings(out <- lapply(unique(models), function(i)
-				glm(scorefun[, c("f", snames[models <= i])],
-					family = poisson)))
+		out <- lapply(unique(models), function(i)
+			glm(scorefun[, c("f", snames[models <= i])],
+				family = poisson))
 		names(out) <- mnames
 	}
-	else {
-		if(showWarnings)
-			out <- glm(scorefun, family = poisson)
-	  	else
-			suppressWarnings(out <- glm(scorefun,
-				family = poisson))
-	}
+	else
+		out <- glm(scorefun, family = poisson)
 	if(compare) {
 		nm <- length(out)
 		resdf <- as.numeric(lapply(out, function(y) y$df.residual))
@@ -203,6 +145,65 @@ loglinear <- function(x, scorefun, degrees = list(4, 2, 2), grid,
 			out$fitted), scales = scales(x, 1:nx)))
 	else
 		return(out$fitted)
+}
+
+#----------------------------------------------------------------
+# Internal function for creating score function and models
+
+sf <- function(x, degrees, grid, stepup = FALSE, compare = stepup) {
+	x <- as.data.frame(x)
+	nx <- ncol(x)
+	if(missing(grid)) {
+		if(length(degrees) < nx) # must be at least 0 for higher orders
+			degrees[(length(degrees) + 1):nx] <- 0
+		degrees <- lapply(degrees, function(y)
+			rep(y, nx)[1:nx])
+		# Start grid without intercept
+		grid <- cbind(expand.grid(lapply(degrees[[1]],
+			function(y) 0:y))[-1, ])
+		# Remove higher order interactions as necessary
+		if(nx > 1) {
+			for(i in 2:nx) {
+				# Make sure higher orders don't contain larger powers
+				# They're already excluded in grid
+				#degrees[[i]] <- pmin(degrees[[i - 1]],
+				#	degrees[[i]])
+				rm1 <- apply(grid, 1, function(y)
+					sum(y == 0) == (nx - i))
+				rm2 <- apply(sapply(1:nx, function(j)
+					grid[, j] > degrees[[i]][j]), 1, any)
+				grid <- grid[!(rm1 & rm2), ]
+			}
+			# Sort grid by orders
+			grid <- cbind(grid[order(apply(grid, 1, function(y)
+				sum(y == 0)), decreasing = T), ])
+			os <- factor(nx - apply(grid, 1, function(y)
+				sum(y == 0)))
+			grid <- do.call("rbind", by(grid, os,
+				function(y) y[order(apply(y, 1, max)), ]))
+		}
+		else
+			os <- factor(nx - apply(grid, 1, function(y)
+				sum(y == 0)))
+	}
+	scorefun <- NULL
+	for(j in 1:nrow(grid)) {
+		tempfun <- sapply(1:nx, function(k)
+			x[, k]^grid[j, k])
+		scorefun <- cbind(scorefun,
+			apply(tempfun, 1, prod))
+	}
+	dimnames(scorefun) <- NULL
+	colnames(scorefun) <- apply(grid, 1, paste,
+		collapse = ".")
+	if(stepup | compare) {
+		# Create model index
+		attr(scorefun, "models") <- as.numeric(factor(paste(os,
+			apply(grid, 1, max), sep = ".")))
+		attr(scorefun, "mnames") <- unique(paste(os,
+			apply(grid, 1, max), sep = "."))
+	}
+	return(scorefun)
 }
 
 #----------------------------------------------------------------
