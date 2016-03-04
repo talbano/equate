@@ -18,7 +18,8 @@ These functions are used to smooth frequency distributions.
 loglinear(x, scorefun, degrees = list(4, 2, 2), grid,
   rmimpossible = FALSE, asfreqtab = TRUE, models,
   stepup = !missing(models), compare = FALSE,
-  choose = FALSE, verbose = FALSE, ...)
+  choose = FALSE, choosemethod = c("chi", "aic", "bic"),
+  chip, verbose = FALSE, ...)
 }
 \arguments{
   \item{x}{
@@ -59,7 +60,13 @@ logical, with default \code{FALSE}, indicating whether or not multiple nested mo
 logical, with default \code{FALSE}, indicating whether or not fit for nested models should be compared. If \code{TRUE}, \code{stepup} is also set to \code{TRUE} and only results from the model fit comparison are returned, that is, \code{verbose} is ignored.
 }
   \item{choose}{
-logical, with default \code{FALSE}, indicating whether or not the model with smallest AIC should be returned after comparing fit of nested models. Useful for automating model selection in simulations.
+logical, with default \code{FALSE}, indicating whether or not the best-fitting model should be returned after comparing fit of nested models. Useful for automating model selection in simulations.
+}
+  \item{choosemethod}{
+string, with default \code{"chi"}, indicating the method for selecting a best-fitting model when \code{choose = TRUE}. \code{"chi"} selects the most complex model with chi-square p-value below the criterion in \code{chip}. \code{"aic"} and \code{"bic"} choose the model with lowest AIC and BIC, respectively. See \code{\link{anova.glm}} for details on fit comparisons.
+}
+  \item{chip}{
+proportion specifying the type-I error rate for model selection based on \code{choosemethod = "chi"}.
 }
   \item{verbose}{
 logical, with default \code{FALSE}, indicating whether or not full \code{glm} output should be returned.
@@ -87,7 +94,7 @@ The remaining smoothing methods make adjustments to scores with low or zero freq
 When \code{smoothmethod = "average"} or \code{smoothmethod = "bump"}, either a smoothed frequency vector or table is returned. Otherwise, \code{loglinear} returns the following:
 \item{}{when \code{compare = TRUE}, an anova table for model fit}
 \item{}{when \code{asfreqtab = TRUE}, a smoothed frequency table}
-\item{}{when \code{choose = TRUE}, a list of length two, with the first element being the smoothed frequency table for the best fitting model, and the second being the model fit table for all models compared}
+\item{}{when \code{choose = TRUE}, a smoothed frequency table with attribute "anova" containing the model fit table for all models compared}
 \item{}{when \code{verbose = TRUE}, full \code{glm} output, for all nested models when \code{stepup = TRUE}}
 \item{}{when \code{stepup = TRUE} and \code{verbose = FALSE}, a \code{data.frame} of fitted frequencies, with one column per model}
 }

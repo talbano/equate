@@ -53,6 +53,7 @@ presmoothing.formula <- function(x, data, ...) {
 loglinear <- function(x, scorefun, degrees = list(4, 2, 2), grid,
 	rmimpossible = FALSE, asfreqtab = TRUE, models,
 	stepup = !missing(models), compare = FALSE, choose = FALSE,
+	choosemethod = c("chi", "aic", "bic"), chip,
 	verbose = FALSE, ...) {
 
 	# Powers in higher order interactions should never 
@@ -118,24 +119,24 @@ loglinear <- function(x, scorefun, degrees = list(4, 2, 2), grid,
 			df.scale = Inf,
 			n = length(out[[order(resdf)[1]]]$residuals))
 		if(choose) {
-			stab <- as.freqtab(cbind(xd[, 1:nx],
-				out[[which.min(aic)]]$fitted),
-					scales = scales(x, 1:nx))
-			attr(stab, "anova") <- structure(tab,
+			atab <- structure(tab,
 				heading = c("Analysis of Deviance Table\n",
 				paste("Model ", format(1:nm), ": ", vars,
 				sep = "", collapse = "\n")),
 				class = c("anova", "data.frame"))
+			glmi <- glmselect(atab, choosemethod, chip)
+			stab <- as.freqtab(cbind(xd[, 1:nx],
+				out[[glmi]]$fitted),
+				scales = scales(x, 1:nx))
+			attr(stab, "anova") <- atab
 			return(stab)
-		}
-		else
+		} else
 			return(structure(tab,
 				heading = c("Analysis of Deviance Table\n",
 				paste("Model ", format(1:nm), ": ", vars,
 				sep = "", collapse = "\n")), class = c("anova",
 				"data.frame")))
-	}
-	else if(verbose)
+	} else if(verbose)
 		return(out)
 	else if(stepup)
 		return(data.frame(lapply(out, fitted),
@@ -143,8 +144,29 @@ loglinear <- function(x, scorefun, degrees = list(4, 2, 2), grid,
 	else if(asfreqtab)
 		return(as.freqtab(cbind(xd[, 1:nx],
 			out$fitted), scales = scales(x, 1:nx)))
-	else
-		return(out$fitted)
+	else return(out$fitted)
+}
+
+#----------------------------------------------------------------
+# Internal function for selecting model from anova data.frame
+
+glmselect <- function(x, choosemethod, chip) {
+	if(class(x)[1] != "anova")
+		stop("'x' must be an anova table, output from 'glm'")
+	nm <- nrow(x)
+	choosemethod <- match.arg(choosemethod)
+	if(choosemethod == "chi") {
+		if(missing(chip))
+			chip <-  1 - (1 - .05)^(1/(nm - 1))
+		chib <- x[, 7] < chip
+		out <- ifelse(any(chib, na.rm = T),
+			max(which(chimb)), 1)
+	}
+	else if(choosemethod == "aic")
+		out <- which.min(x$AIC)
+	else if(choosemethod == "bic")
+		out <- which.min(x$BIC)
+	return(out)
 }
 
 #----------------------------------------------------------------
