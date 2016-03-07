@@ -5,6 +5,8 @@
 \alias{loglinear}
 \alias{freqbump}
 \alias{freqavg}
+\alias{glmselect}
+\alias{sf}
 \title{Frequency Distribution Presmoothing}
 \description{
 These functions are used to smooth frequency distributions.
@@ -16,7 +18,7 @@ These functions are used to smooth frequency distributions.
 \method{presmoothing}{formula}(x, data, ...)
 
 loglinear(x, scorefun, degrees = list(4, 2, 2), grid,
-  rmimpossible = FALSE, asfreqtab = TRUE, models,
+  rmimpossible, asfreqtab = TRUE, models,
   stepup = !missing(models), compare = FALSE,
   choose = FALSE, choosemethod = c("chi", "aic", "bic"),
   chip, verbose = FALSE, ...)
@@ -48,7 +50,7 @@ list of integer vectors, each one indicating the maximum polynomial score transf
 matrix with one column per margin in \code{x} and one row per term in the model. See below for details.
 }
   \item{rmimpossible}{
-integer vector indicating columns in \code{x} to be used in removing impossible scores before smoothing. Impossible scores are kept with default value of \code{FALSE}. See below.
+integer vector indicating columns in \code{x} to be used in removing impossible scores before smoothing, assuming internal anchor variables. Impossible scores are kept by default. See below.
 }
   \item{models}{
 integer vector indicating which model terms should be grouped together when fitting multiple nested models. E.g., \code{models = c(1, 1, 2, 3)} will compare three models, with the first two terms in model one, the third term added in model two, and the fourth in model three.
@@ -78,7 +80,7 @@ further arguments passed to other methods. For \code{presmoothing}, these are pa
 \details{
 Loglinear smoothing is a flexible procedure for reducing irregularities in a frequency distribution prior to equating, where the degree of each polynomial term determines the specific moment of the observed distribution that is preserved in the fitted distribution (see below for examples). The \code{loglinear} function is a wrapper for \code{\link{glm}}, and is used to simplify the creation of polynomial score functions and the fitting and comparing of multiple loglinear models.
 
-\code{scorefun}, if supplied, must contain at least one score function of the scale score values. Specifying \code{degrees} is an alternative to supplying \code{scorefun}. Each list element in \code{degrees} should be a vector equal in length to the number of variables contained in \code{x}; there should also be one such vector for each possible level of interaction between the variables in \code{x}.
+\code{scorefun}, if supplied, must contain at least one score function of the scale score values. Specifying a list to \code{degrees} is an alternative to supplying \code{scorefun}. Each list element in \code{degrees} should be a vector equal in length to the number of variables contained in \code{x}; there should also be one such vector for each possible level of interaction between the variables in \code{x}.
 
 For example, the default \code{degrees = list(4, 2, 2)} is recycled to produce \code{list(c(4, 4, 4), c(2, 2, 2), c(2, 2, 2))}, resulting in polynomials to the fourth power for each univariate distribution, to the second power for each two-way interaction, and to the second power for the three-way interaction.
 
@@ -86,7 +88,7 @@ Terms can also be specified with \code{grid}, which is a matrix with each row co
 
 \code{stepup} is used to run nested models based on subsets of the columns in \code{scorefun}. Output will correspond to models based on columns 1 and 2, 1 through 3, 1 through 4, to 1 through \code{ncol(scorefun)}. This list of polynomial terms is then used to create a \code{grid} using \code{expand.grid}. The \code{grid} can also be supplied directly, in which case \code{degrees} will be ignored.
 
-\code{compare} returns output as an \code{anova} table, comparing model fit for all the models run with \code{stepup = TRUE}, or by specifying more than one model in \code{models}.
+\code{compare} returns output as an \code{anova} table, comparing model fit for all the models run with \code{stepup = TRUE}, or by specifying more than one model in \code{models}. When \code{choose = TRUE}, the arguments \code{choosemethod} and \code{chip} are used to automatically select the best-fitting model based on the \code{anova} table from running \code{compare}.
 
 The remaining smoothing methods make adjustments to scores with low or zero frequencies. \code{smoothmethod = "bump"} adds the proportion \code{jmin} to each score point and then adjusts the probabilities to sum to 1. \code{smoothmethod = "average"} replaces frequencies falling below the minimum \code{jmin} with averages of adjacent values.
 }
@@ -102,8 +104,6 @@ When \code{smoothmethod = "average"} or \code{smoothmethod = "bump"}, either a s
 Holland, P. W., and Thayer, D. T. (1987). \emph{Notes on the use of log-linear models for fitting discrete probability distributions} (PSR Technical Rep. No. 87-79; ETS RR-87-31). Princeton, NJ: ETS.
 
 Holland, P. W., and Thayer, D. T. (2000). Univariate and bivariate loglinear models for discrete test score distributions. \emph{Journal of Educational and Behavioral Statistics, 25}, 133--183.
-
-Moses, T. P., and von Davier, A. A. (2006). \emph{A SAS macro for loglinear smoothing: Applications and implications} (ETS Research Rep. No. RR-06-05). Princeton, NJ: ETS.
 
 Moses, T., and Holland, P. W. (2008). \emph{Notes on a general framework for observed score equating} (ETS Research Rep. No. RR-08-59). Princeton, NJ: ETS.
 
@@ -125,10 +125,12 @@ xtab <- freqtab(x, scales = xscale)
 plot(xtab, y = cbind(average = freqavg(xtab),
   bump = freqbump(xtab)))
 
-# Smooth x preserving first 3 moments
-xlog1 <- loglinear(xtab, degrees = 3,
-  asfreqtab = FALSE)
-plot(xtab, y = xlog1, legendtext = "degree = 3")
+# Smooth x up to 8 degrees and choose best fitting model
+# based on aic minimization
+xlog1 <- loglinear(xtab, degrees = 8,
+  choose = T, choosemethod = "aic")
+plot(xtab, as.data.frame(xlog1)[, 2],
+	legendtext = "degree = 3")
 
 # Add "teeth" and "gaps" to x
 # Smooth with formula interface
@@ -165,6 +167,12 @@ wang09 <- equate(xvtab, yvtab, type = "equip",
   method = "chained", smooth = "loglin",
   scorefun = scorefun)
 wang09$concordance
+
+# Removing impossible scores has essentially no impact
+xvlog1 <- loglinear(xvtab, scorefun, asfreqtab = FALSE)
+xvlog2 <- loglinear(xvtab, scorefun, rmimpossible = 1:2)
+plot(xvtab, cbind(xvlog1,
+	xvlog2 = as.data.frame(xvlog2)[, 3]))
 }
 \keyword{smooth}
 \keyword{models}
