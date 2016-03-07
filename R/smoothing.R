@@ -14,15 +14,15 @@ presmoothing.default <- function(x, smoothmethod = c("none",
 	asfreqtab = TRUE, ...) {
 
 	smoothmethod <- match.arg(smoothmethod)
-	if(smoothmethod == "none")
+	if (smoothmethod == "none")
 		return(x)
-	else if(smoothmethod == "average")
+	else if (smoothmethod == "average")
 		return(freqavg(x, jmin = jmin,
 			asfreqtab = asfreqtab))
-	else if(smoothmethod == "bump")
+	else if (smoothmethod == "bump")
 		return(freqbump(x, jmin = jmin,
 			asfreqtab = asfreqtab))
-	else if(smoothmethod == "loglinear")
+	else if (smoothmethod == "loglinear")
 		return(loglinear(x, asfreqtab = asfreqtab, ...))
 }
 
@@ -32,11 +32,11 @@ presmoothing.default <- function(x, smoothmethod = c("none",
 presmoothing.formula <- function(x, data, ...) {
 	
 	formula <- terms(as.formula(x))
-	if(attr(formula, "response") == 0) {
+	if (attr(formula, "response") == 0) {
 		formula <- terms(reformulate(attr(formula,
 			"term.labels"), "count"))
 	}
-	if(attr(formula, "intercept") == 0) {
+	if (attr(formula, "intercept") == 0) {
 		attributes(formula)$intercept <- 1
 		warning("an intercept has been added to the model")
 	}
@@ -51,47 +51,47 @@ presmoothing.formula <- function(x, data, ...) {
 # Internal function for loglinear smoothing
 
 loglinear <- function(x, scorefun, degrees = list(4, 2, 2), grid,
-	rmimpossible = FALSE, asfreqtab = TRUE, models,
+	rmimpossible, asfreqtab = TRUE, models,
 	stepup = !missing(models), compare = FALSE, choose = FALSE,
 	choosemethod = c("chi", "aic", "bic"), chip,
 	verbose = FALSE, ...) {
 
 	# Powers in higher order interactions should never 
 	# be larger than in lower - they will be ignored
-		
+	
 	xd <- as.data.frame(x)
 	nx <- ncol(xd) - 1
 	
 	# Remove impossible scores, assuming internal anchors
-	if(length(rmimpossible) > 1 & is.numeric(rmimpossible)) {
+	if (!missing(rmimpossible) && is.numeric(rmimpossible)) {
 		keepi <- apply(xd[, sort(rmimpossible)], 1,
 			function(y) all(y[-1] <= y[1]))
 		xd <- xd[keepi, ]
 	}
 	else
 		keepi <- rep(TRUE, nrow(xd))
-	if(choose) compare <- TRUE
-	if(missing(scorefun))
+	if (choose) compare <- TRUE
+	if (missing(scorefun))
 		scorefun <- sf(xd, degrees, grid, stepup, compare)
-		if(stepup | compare) {
+		if (stepup | compare) {
 			models <- attributes(scorefun)$models
 			mnames <- attributes(scorefun)$mnames
 		}
 	else {
 		scorefun <- scorefun[keepi, ]
-		if(stepup | compare) {
-			if(missing(models))
+		if (stepup | compare) {
+			if (missing(models))
 				models <- 1:ncol(scorefun)
 			mnames <- unique(models)
 		}
 	}
-	if(nrow(scorefun) != nrow(xd))
+	if (nrow(scorefun) != nrow(xd))
 		stop("'scorefun' must contain the same ",
 			"number of rows as 'x'")
 	scorefun <- data.frame(f = xd[, nx + 1],
 		scorefun, check.names = FALSE)
-	if(stepup | compare) {
-		if(ncol(scorefun) < 3)
+	if (stepup | compare) {
+		if (ncol(scorefun) < 3)
 			stop(paste("cannot run multiple models with only",
 				ncol(scorefun) - 1, "model terms"))
 		snames <- colnames(scorefun)[-1]
@@ -102,7 +102,7 @@ loglinear <- function(x, scorefun, degrees = list(4, 2, 2), grid,
 	}
 	else
 		out <- glm(scorefun, family = poisson)
-	if(compare) {
+	if (compare) {
 		nm <- length(out)
 		resdf <- as.numeric(lapply(out, function(y) y$df.residual))
 		resdev <- as.numeric(lapply(out, function(y) y$deviance))
@@ -118,30 +118,25 @@ loglinear <- function(x, scorefun, degrees = list(4, 2, 2), grid,
 		tab <- stat.anova(tab, test = "Chisq", scale = 1, 
 			df.scale = Inf,
 			n = length(out[[order(resdf)[1]]]$residuals))
-		if(choose) {
-			atab <- structure(tab,
-				heading = c("Analysis of Deviance Table\n",
-				paste("Model ", format(1:nm), ": ", vars,
-				sep = "", collapse = "\n")),
-				class = c("anova", "data.frame"))
+		atab <- structure(tab,
+			heading = c("Analysis of Deviance Table\n",
+			paste("Model ", format(1:nm), ": ", vars,
+			sep = "", collapse = "\n")),
+			class = c("anova", "data.frame"))
+		if (choose) {
 			glmi <- glmselect(atab, choosemethod, chip)
 			stab <- as.freqtab(cbind(xd[, 1:nx],
 				out[[glmi]]$fitted),
 				scales = scales(x, 1:nx))
 			attr(stab, "anova") <- atab
 			return(stab)
-		} else
-			return(structure(tab,
-				heading = c("Analysis of Deviance Table\n",
-				paste("Model ", format(1:nm), ": ", vars,
-				sep = "", collapse = "\n")), class = c("anova",
-				"data.frame")))
-	} else if(verbose)
+		} else return(atab)
+	} else if (verbose)
 		return(out)
-	else if(stepup)
+	else if (stepup)
 		return(data.frame(lapply(out, fitted),
 			check.names = FALSE))
-	else if(asfreqtab)
+	else if (asfreqtab)
 		return(as.freqtab(cbind(xd[, 1:nx],
 			out$fitted), scales = scales(x, 1:nx)))
 	else return(out$fitted)
@@ -150,21 +145,23 @@ loglinear <- function(x, scorefun, degrees = list(4, 2, 2), grid,
 #----------------------------------------------------------------
 # Internal function for selecting model from anova data.frame
 
-glmselect <- function(x, choosemethod, chip) {
-	if(class(x)[1] != "anova")
+glmselect <- function(x, choosemethod = c("chi", "aic", "bic"),
+	chip) {
+	
+	if (class(x)[1] != "anova")
 		stop("'x' must be an anova table, output from 'glm'")
 	nm <- nrow(x)
 	choosemethod <- match.arg(choosemethod)
-	if(choosemethod == "chi") {
-		if(missing(chip))
+	if (choosemethod == "chi") {
+		if (missing(chip))
 			chip <-  1 - (1 - .05)^(1/(nm - 1))
 		chib <- x[, 7] < chip
 		out <- ifelse(any(chib, na.rm = T),
 			max(which(chimb)), 1)
 	}
-	else if(choosemethod == "aic")
+	else if (choosemethod == "aic")
 		out <- which.min(x$AIC)
-	else if(choosemethod == "bic")
+	else if (choosemethod == "bic")
 		out <- which.min(x$BIC)
 	return(out)
 }
@@ -174,9 +171,9 @@ glmselect <- function(x, choosemethod, chip) {
 
 sf <- function(x, degrees, grid, stepup = FALSE, compare = stepup) {
 	x <- as.data.frame(x)
-	nx <- ncol(x)
-	if(missing(grid)) {
-		if(length(degrees) < nx) # must be at least 0 for higher orders
+	nx <- ncol(x) - 1
+	if (missing(grid)) {
+		if (length(degrees) < nx) # must be at least 0 for higher orders
 			degrees[(length(degrees) + 1):nx] <- 0
 		degrees <- lapply(degrees, function(y)
 			rep(y, nx)[1:nx])
@@ -184,7 +181,7 @@ sf <- function(x, degrees, grid, stepup = FALSE, compare = stepup) {
 		grid <- cbind(expand.grid(lapply(degrees[[1]],
 			function(y) 0:y))[-1, ])
 		# Remove higher order interactions as necessary
-		if(nx > 1) {
+		if (nx > 1) {
 			for(i in 2:nx) {
 				# Make sure higher orders don't contain larger powers
 				# They're already excluded in grid
@@ -218,7 +215,7 @@ sf <- function(x, degrees, grid, stepup = FALSE, compare = stepup) {
 	dimnames(scorefun) <- NULL
 	colnames(scorefun) <- apply(grid, 1, paste,
 		collapse = ".")
-	if(stepup | compare) {
+	if (stepup | compare) {
 		# Create model index
 		attr(scorefun, "models") <- as.numeric(factor(paste(os,
 			apply(grid, 1, max), sep = ".")))
@@ -240,7 +237,7 @@ freqbump <- function(x, jmin = 1e-6, asfreqtab = FALSE, ...) {
 	out <- (f + jmin)/(1 + (max(x[, 1]) + 1)*jmin)
 	out <- ((f + jmin)/sum(f + jmin))*sum(x[, nc])
 	
-	if(asfreqtab)
+	if (asfreqtab)
 		return(as.freqtab(cbind(x[, -nc], out)))
 	else
 		return(out)
@@ -253,7 +250,7 @@ freqavg <- function(x, jmin = 1, asfreqtab = FALSE, ...) {
 	
 	xtab <- x <- as.data.frame(x)
 	nc <- ncol(xtab)
-	if(nc > 2)
+	if (nc > 2)
 		stop("frequency averaging only supported ",
 			"for univariate 'x'")
 		
@@ -273,7 +270,7 @@ freqavg <- function(x, jmin = 1, asfreqtab = FALSE, ...) {
 	ss <- ks + 1
 	tts <- lls - 1
 	for(j in ss:tts) {
-		if(x[j, 2] < jmin) {
+		if (x[j, 2] < jmin) {
 			lls <- j
 			ks <- j
 			while(lls >= 1 & x[lls, 2] < jmin)
@@ -286,10 +283,10 @@ freqavg <- function(x, jmin = 1, asfreqtab = FALSE, ...) {
 	}
 
 	for(p in 1:(nrow(x) - 1)) {
-		if(x[p, 4] > 0 & x[p, 4] == x[p + 1, 3]) {
-			if(x[p, 3] > 0)
+		if (x[p, 4] > 0 & x[p, 4] == x[p + 1, 3]) {
+			if (x[p, 3] > 0)
 				lls <- x[p, 3]
-			if(x[p + 1, 4] > 0)
+			if (x[p + 1, 4] > 0)
 				ks <- x[p + 1, 4]
 			x[lls:ks, 3] <- lls
 			x[lls:ks, 4] <- ks
@@ -298,10 +295,10 @@ freqavg <- function(x, jmin = 1, asfreqtab = FALSE, ...) {
 
 	for(j in 1:nrow(x)) {
 		lls <- x[j, 3]
-		if(lls == 0)
+		if (lls == 0)
 			lls <- j
 		ks <- x[j, 4]
-		if(ks == 0)
+		if (ks == 0)
 			ks <- j
 		sumit <- 0
 		sumit <- sumit + sum(x[lls:ks, 2])
@@ -316,7 +313,7 @@ freqavg <- function(x, jmin = 1, asfreqtab = FALSE, ...) {
 	colnames(x)[c(1, 2, 6, 7)] <-
 		c("score", "count", "b", "acount")
 
-	if(asfreqtab)
+	if (asfreqtab)
 		return(as.freqtab(cbind(xtab[, -nc],
 			x[, 7])))
 	else
