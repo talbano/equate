@@ -548,7 +548,7 @@ kurt.freqtab <- function(x, margin = 1) {
 		xm <- margin(x, i)
 		xsc <- scales(xm)
 		sum(((xsc - mean(xm))^4*xm))/(n)/
-			(sum(((xsc - mean(xm))^2*xm))/(n - 1))^2 - 3})
+			(sum(((xsc - mean(xm))^2*xm))/(n - 1))^2})
 
 	return(out)
 }
