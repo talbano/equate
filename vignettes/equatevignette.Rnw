@@ -1,6 +1,8 @@
-\documentclass[article]{jss}
+\documentclass[article, nojss]{jss}
 \usepackage{amsmath}
 \usepackage{upgreek}
+%%\VignetteIndexEntry{equate vignette}
+%%\VignetteDepends{equate}
 
 \title{\pkg{equate}: An \proglang{R} Package for Observed-Score Linking and Equating}
 \author{Anthony D. Albano\\University of Nebraska-Lincoln}

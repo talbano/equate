@@ -128,7 +128,7 @@ plot(xtab, y = cbind(average = freqavg(xtab),
 # Smooth x up to 8 degrees and choose best fitting model
 # based on aic minimization
 xlog1 <- loglinear(xtab, degrees = 8,
-  choose = T, choosemethod = "aic")
+  choose = TRUE, choosemethod = "aic")
 plot(xtab, as.data.frame(xlog1)[, 2],
 	legendtext = "degree = 3")
 

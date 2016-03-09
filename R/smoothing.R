@@ -157,7 +157,7 @@ glmselect <- function(x, choosemethod = c("chi", "aic", "bic"),
 			chip <-  1 - (1 - .05)^(1/(nm - 1))
 		chib <- x[, 7] < chip
 		out <- ifelse(any(chib, na.rm = T),
-			max(which(chimb)), 1)
+			max(which(chib)), 1)
 	}
 	else if (choosemethod == "aic")
 		out <- which.min(x$AIC)

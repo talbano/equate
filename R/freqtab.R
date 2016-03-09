@@ -17,7 +17,6 @@ freqtab.default <- function(x, scales, items,
 	na.rm = TRUE, ...) {
 
 	x <- data.frame(x)
-	# Create row sums, if items are provided	
 	if(!missing(items)) {
 		if(!is.list(items))
 			items <- list(items)
@@ -28,7 +27,6 @@ freqtab.default <- function(x, scales, items,
 			})
 	}
 
-	# Convert to factors
 	nx <- ncol(x)
 	x <- as.data.frame(x,
 		row.names = seq_len(nrow(x)))
@@ -50,19 +48,14 @@ freqtab.default <- function(x, scales, items,
 # Assign freqtab class and attributes
 # based on scales
 
+# Note drop will drop levels with zero counts across all
+# other factors - you can't drop if x is a vector
+# adding levels with zero counts is achieved by
+# including those values in scales and setting drop
+# to FALSE
+# You can't drop current zeros and then add new ones
+
 as.freqtab <- function(x, scales, drop = FALSE, ...) {
-	# x: either a vector of counts, or a frequency
-	# table as a matrix or data.frame where the last
-	# column contains counts
-	# scales: a list of scales, i.e., factor levels,
-	# for each variable, by default created using unique
-	# values from each. Must be in correct order!
-	# drop: drop levels with zero counts across all
-	# other factors - you can't drop if x is vector
-	# adding levels with zero counts is achieved by
-	# including those values in scales and setting drop
-	# to FALSE
-	# You can't drop current zeros and then add new ones
 	
 	x <- as.data.frame(x)
 	nx <- ncol(x) - 1
@@ -77,7 +70,6 @@ as.freqtab <- function(x, scales, drop = FALSE, ...) {
 	else {
 		if(drop)
 			x <- x[x[, nx + 1] > 0, ]
-
 		# Set scales
 		if(missing(scales)) {
 			if(nx == 1)
