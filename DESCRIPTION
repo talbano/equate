@@ -20,4 +20,4 @@ Description: Contains methods for observed-score linking
   are also provided.
 LazyLoad: yes
 LazyData: yes
-License: MIT + file LICENSE
+License: GPL-3
