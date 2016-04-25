@@ -69,16 +69,15 @@ equip <- function(x, y, ly = min(scales(y)),
 
 	yscale <- scales(y)
 	yn <- sum(y)
-	if(!is.freqtab(x)) {
+	if (!is.freqtab(x)) {
 		prank <- sort(unique(x))
 		xscale <- yscale
 		xn <- 0
-	}
-	else {
+	} else {
 		prank <- round(px(x), 10)
 		xscale <- scales(x)
 		xn <- sum(x)
-		#se <- vector(length = length(prank))
+		#se <- rep(NA, length = length(prank))
 	}
 	sn <- length(yscale)
 	yinc <- round(diff(yscale), 8)
@@ -96,7 +95,7 @@ equip <- function(x, y, ly = min(scales(y)),
 	yx[xnone] <- ly - yincl[1]
 	yx[xone] <- ky + yinch[sn]
 	yx[xyone] <- xscale[xyone]
-	if(any(yx == 0)) {
+	if (any(yx == 0)) {
 		yu <- sapply(yxi, function(i)
 			sum(fy <= prank[i]) + 1)
 		yu2 <- yu - 1
@@ -104,9 +103,9 @@ equip <- function(x, y, ly = min(scales(y)),
 		g0 <- fy[yu] - yu2
 		yx[yxi] <- yscale[yu] - yincl[yu] +
 			((prank[yxi] - yu2)/g0) * (yinch + yincl)[yu]
-		#yx[yxi] <- yscale[yu] - hinc +
-		#	((prank[yxi] - yu2)/g0)*yinc
 		# standard errors
+		#if(xn)
+		#	se[yxi] <- seege(prank[yxi], g0, yu2, xn, yn)
 		if(any(y == 0)) {
 			yxi <- (xbot + sum(prank[!xnone] <= min(fy))):xtop
 			yl <- sapply(yxi, function(i)

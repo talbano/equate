@@ -1,14 +1,208 @@
-#----------------------------------------------------------------
-# Methods for presmoothing frequency distributions
-
-#----------------------------------------------------------------
-# Generic smoothing function
-
+#' Frequency Distribution Presmoothing
+#' 
+#' These functions are used to smooth frequency distributions.
+#' 
+#' Loglinear smoothing is a flexible procedure for reducing irregularities in a
+#' frequency distribution prior to equating, where the degree of each
+#' polynomial term determines the specific moment of the observed distribution
+#' that is preserved in the fitted distribution (see below for examples). The
+#' \code{loglinear} function is a wrapper for \code{\link{glm}}, and is used to
+#' simplify the creation of polynomial score functions and the fitting and
+#' comparing of multiple loglinear models.
+#' 
+#' \code{scorefun}, if supplied, must contain at least one score function of
+#' the scale score values. Specifying a list to \code{degrees} is an
+#' alternative to supplying \code{scorefun}. Each list element in
+#' \code{degrees} should be a vector equal in length to the number of variables
+#' contained in \code{x}; there should also be one such vector for each
+#' possible level of interaction between the variables in \code{x}.
+#' 
+#' For example, the default \code{degrees = list(4, 2, 2)} is recycled to
+#' produce \code{list(c(4, 4, 4), c(2, 2, 2), c(2, 2, 2))}, resulting in
+#' polynomials to the fourth power for each univariate distribution, to the
+#' second power for each two-way interaction, and to the second power for the
+#' three-way interaction.
+#' 
+#' Terms can also be specified with \code{grid}, which is a matrix with each
+#' row containing integers specifying the powers for each variable at each
+#' interaction term, including main effects. For example, the main effect to
+#' the first power for the total score in a bivariate distribution would be
+#' \code{c(1, 0)}; the interaction to the second power would be \code{c(2, 2)}.
+#' 
+#' \code{stepup} is used to run nested models based on subsets of the columns
+#' in \code{scorefun}. Output will correspond to models based on columns 1 and
+#' 2, 1 through 3, 1 through 4, to 1 through \code{ncol(scorefun)}. This list
+#' of polynomial terms is then used to create a \code{grid} using
+#' \code{expand.grid}. The \code{grid} can also be supplied directly, in which
+#' case \code{degrees} will be ignored.
+#' 
+#' \code{compare} returns output as an \code{anova} table, comparing model fit
+#' for all the models run with \code{stepup = TRUE}, or by specifying more than
+#' one model in \code{models}. When \code{choose = TRUE}, the arguments
+#' \code{choosemethod} and \code{chip} are used to automatically select the
+#' best-fitting model based on the \code{anova} table from running
+#' \code{compare}.
+#' 
+#' The remaining smoothing methods make adjustments to scores with low or zero
+#' frequencies. \code{smoothmethod = "bump"} adds the proportion \code{jmin} to
+#' each score point and then adjusts the probabilities to sum to 1.
+#' \code{smoothmethod = "average"} replaces frequencies falling below the
+#' minimum \code{jmin} with averages of adjacent values.
+#' 
+#' @param x either an object of class \dQuote{\code{freqtab}} specifying a
+#' univariate or multivariate score distribution, or a \dQuote{\code{formula}}
+#' object.
+#' @param smoothmethod character string indicating the smoothing method to be
+#' used by \code{presmoothing}. \code{"none"} returns unsmoothed frequencies,
+#' \code{"bump"} adds a small frequency to each score value, \code{"average"}
+#' imputes small frequencies with average values, and \code{"loglinear"} fits
+#' loglinear models. See below for details.
+#' @param jmin for \code{smoothmethod = "average"}, the minimum frequency, as
+#' an integer, below which frequencies will be replaced (default is 1). for
+#' \code{smoothmethod = "bump"}, the value to be added to each score point (as
+#' a probability, with default 1e-6).
+#' @param asfreqtab logical, with default \code{TRUE}, indicating whether or
+#' not a frequency table should be returned. For \code{smoothmethod =
+#' "average"} and \code{smoothmethod = "bump"}, the alternative is a vector of
+#' frequencies. For \code{loglinear}, there are other options.
+#' @param data an object of class \dQuote{\code{freqtab}}.
+#' @param scorefun matrix of score functions used in loglinear presmoothing,
+#' where each column includes a transformation of the score scale or
+#' interactions between score scales. If missing, \code{degrees} and
+#' \code{xdegree} will be used to construct polynomial score functions.
+#' @param degrees list of integer vectors, each one indicating the maximum
+#' polynomial score transformations to be computed for each variable at a given
+#' order of interactions. Defaults (\code{degrees = list(4, 2, 2)}) are
+#' provided for up to trivariate interactions. \code{degrees} are ignored if
+#' \code{scorefun} or \code{grid} are provided. See below for details.
+#' @param grid matrix with one column per margin in \code{x} and one row per
+#' term in the model. See below for details.
+#' @param rmimpossible integer vector indicating columns in \code{x} to be used
+#' in removing impossible scores before smoothing, assuming internal anchor
+#' variables. Impossible scores are kept by default. See below.
+#' @param models integer vector indicating which model terms should be grouped
+#' together when fitting multiple nested models. E.g., \code{models = c(1, 1,
+#' 2, 3)} will compare three models, with the first two terms in model one, the
+#' third term added in model two, and the fourth in model three.
+#' @param stepup logical, with default \code{FALSE}, indicating whether or not
+#' multiple nested models should be automatically fit. If \code{TRUE} and
+#' \code{models} is missing, an attempt will be made to create it using
+#' \code{grid} and/or \code{degrees}. Otherwise, in the absence of
+#' \code{models}, each column in \code{scorefun} will define a new sequential
+#' model.
+#' @param compare logical, with default \code{FALSE}, indicating whether or not
+#' fit for nested models should be compared. If \code{TRUE}, \code{stepup} is
+#' also set to \code{TRUE} and only results from the model fit comparison are
+#' returned, that is, \code{verbose} is ignored.
+#' @param choose logical, with default \code{FALSE}, indicating whether or not
+#' the best-fitting model should be returned after comparing fit of nested
+#' models. Useful for automating model selection in simulations.
+#' @param choosemethod string, with default \code{"chi"}, indicating the method
+#' for selecting a best-fitting model when \code{choose = TRUE}. \code{"chi"}
+#' selects the most complex model with chi-square p-value below the criterion
+#' in \code{chip}. \code{"aic"} and \code{"bic"} choose the model with lowest
+#' AIC and BIC, respectively. See \code{\link{anova.glm}} for details on fit
+#' comparisons.
+#' @param chip proportion specifying the type-I error rate for model selection
+#' based on \code{choosemethod = "chi"}.
+#' @param verbose logical, with default \code{FALSE}, indicating whether or not
+#' full \code{glm} output should be returned.
+#' @param \dots further arguments passed to other methods. For
+#' \code{presmoothing}, these are passed to \code{loglinear} and include those
+#' listed above.
+#' @return When \code{smoothmethod = "average"} or \code{smoothmethod =
+#' "bump"}, either a smoothed frequency vector or table is returned. Otherwise,
+#' \code{loglinear} returns the following: \item{}{when \code{compare = TRUE},
+#' an anova table for model fit} \item{}{when \code{asfreqtab = TRUE}, a
+#' smoothed frequency table} \item{}{when \code{choose = TRUE}, a smoothed
+#' frequency table with attribute "anova" containing the model fit table for
+#' all models compared} \item{}{when \code{verbose = TRUE}, full \code{glm}
+#' output, for all nested models when \code{stepup = TRUE}} \item{}{when
+#' \code{stepup = TRUE} and \code{verbose = FALSE}, a \code{data.frame} of
+#' fitted frequencies, with one column per model}
+#' @author Anthony Albano \email{tony.d.albano@@gmail.com}
+#' @seealso \code{\link{glm}}, \code{\link{loglin}}
+#' @references Holland, P. W., and Thayer, D. T. (1987). \emph{Notes on the use
+#' of log-linear models for fitting discrete probability distributions} (PSR
+#' Technical Rep. No. 87-79; ETS RR-87-31). Princeton, NJ: ETS.
+#' 
+#' Holland, P. W., and Thayer, D. T. (2000). Univariate and bivariate loglinear
+#' models for discrete test score distributions. \emph{Journal of Educational
+#' and Behavioral Statistics, 25}, 133--183.
+#' 
+#' Moses, T., and Holland, P. W. (2008). \emph{Notes on a general framework for
+#' observed score equating} (ETS Research Rep. No. RR-08-59). Princeton, NJ:
+#' ETS.
+#' 
+#' Wang, T. (2009). Standard errors of equating for the percentile rank-based
+#' equipercentile equating with log-linear presmoothing. \emph{Journal of
+#' Educational and Behavioral Statistics, 34}, 7--23.
+#' @keywords smooth models
+#' @examples
+#' 
+#' set.seed(2010)
+#' x <- round(rnorm(1000, 100, 15))
+#' xscale <- 50:150
+#' xtab <- freqtab(x, scales = xscale)
+#' 
+#' # Adjust frequencies
+#' plot(xtab, y = cbind(average = freqavg(xtab),
+#'   bump = freqbump(xtab)))
+#' 
+#' # Smooth x up to 8 degrees and choose best fitting model
+#' # based on aic minimization
+#' xlog1 <- loglinear(xtab, degrees = 8,
+#'   choose = TRUE, choosemethod = "aic")
+#' plot(xtab, as.data.frame(xlog1)[, 2],
+#'   legendtext = "degree = 3")
+#' 
+#' # Add "teeth" and "gaps" to x
+#' # Smooth with formula interface
+#' teeth <- c(.5, rep(c(1, 1, 1, 1, .5), 20))
+#' xttab <- as.freqtab(cbind(xscale, c(xtab) * teeth))
+#' xlog2 <- presmoothing(~ poly(total, 3, raw = TRUE),
+#'   xttab, showWarnings = FALSE)
+#' 
+#' # Smooth xt using score functions that preserve 
+#' # the teeth structure (also 3 moments)
+#' teeth2 <- c(1, rep(c(0, 0, 0, 0, 1), 20))
+#' xt.fun <- cbind(xscale, xscale^2, xscale^3)
+#' xt.fun <- cbind(xt.fun, teeth2, xt.fun * teeth2)
+#' xlog3 <- loglinear(xttab, xt.fun, showWarnings = FALSE)
+#' 
+#' # Plot to compare teeth versus no teeth
+#' op <- par(no.readonly = TRUE)
+#' par(mfrow = c(3, 1))
+#' plot(xttab, main = "unsmoothed", ylim = c(0, 30))
+#' plot(xlog2, main = "ignoring teeth", ylim = c(0, 30))
+#' plot(xlog3, main = "preserving teeth", ylim = c(0, 30))
+#' par(op)
+#' 
+#' # Bivariate example, preserving first 3 moments of total
+#' # and anchor for x and y, and the covariance
+#' # between anchor and total
+#' # see equated scores in Wang (2009), Table 4
+#' xvtab <- freqtab(KBneat$x, scales = list(0:36, 0:12))
+#' yvtab <- freqtab(KBneat$y, scales = list(0:36, 0:12))
+#' Y <- as.data.frame(yvtab)[, 1]
+#' V <- as.data.frame(yvtab)[, 2]
+#' scorefun <- cbind(Y, Y^2, Y^3, V, V^2, V^3, V*Y)
+#' wang09 <- equate(xvtab, yvtab, type = "equip",
+#'   method = "chained", smooth = "loglin",
+#'   scorefun = scorefun)
+#' wang09$concordance
+#' 
+#' # Removing impossible scores has essentially no impact
+#' xvlog1 <- loglinear(xvtab, scorefun, asfreqtab = FALSE)
+#' xvlog2 <- loglinear(xvtab, scorefun, rmimpossible = 1:2)
+#' plot(xvtab, cbind(xvlog1,
+#' 	xvlog2 = as.data.frame(xvlog2)[, 3]))
+#'
+#' @export
 presmoothing <- function(x, ...) UseMethod("presmoothing")
 
-#----------------------------------------------------------------
-# Main presmoothing function
-
+#' @describeIn presmoothing Default method for frequency tables.
+#' @export
 presmoothing.default <- function(x, smoothmethod = c("none",
 	"average", "bump", "loglinear"), jmin,
 	asfreqtab = TRUE, ...) {
@@ -29,6 +223,8 @@ presmoothing.default <- function(x, smoothmethod = c("none",
 #----------------------------------------------------------------
 # Formula method
 
+#' @describeIn presmoothing Method for \dQuote{\code{formula}} objects.
+#' @export
 presmoothing.formula <- function(x, data, ...) {
 	
 	formula <- terms(as.formula(x))
@@ -48,8 +244,10 @@ presmoothing.formula <- function(x, data, ...) {
 
 
 #----------------------------------------------------------------
-# Internal function for loglinear smoothing
+# Exported internal function for loglinear smoothing
 
+#' @rdname presmoothing
+#' @export
 loglinear <- function(x, scorefun, degrees = list(4, 2, 2), grid,
 	rmimpossible, asfreqtab = TRUE, models,
 	stepup = !missing(models), compare = FALSE, choose = FALSE,
@@ -229,6 +427,8 @@ sf <- function(x, degrees, grid, stepup = FALSE, compare = stepup) {
 # Frequency adjustment
 # Bump frequencies upward by a small amount
 
+#' @rdname presmoothing
+#' @export
 freqbump <- function(x, jmin = 1e-6, asfreqtab = FALSE, ...) {
 
 	x <- as.data.frame(x)
@@ -246,6 +446,8 @@ freqbump <- function(x, jmin = 1e-6, asfreqtab = FALSE, ...) {
 #----------------------------------------------------------------
 # Frequency averaging
 
+#' @rdname presmoothing
+#' @export
 freqavg <- function(x, jmin = 1, asfreqtab = FALSE, ...) {
 	
 	xtab <- x <- as.data.frame(x)
@@ -319,5 +521,3 @@ freqavg <- function(x, jmin = 1, asfreqtab = FALSE, ...) {
 	else
 		return(x[, 7])
 }
-
-#----------------------------------------------------------------
