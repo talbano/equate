@@ -58,7 +58,7 @@ For example, \code{PISA$totals$b1$m1} contains the total scores on cluster
 M1 for students taking booklet 1.}
 \source{
 OECD (2012). PISA 2009 Technical Report, PISA, OECD Publishing.
-\url{http://dx.doi.org/10.1787/9789264167872-en}
+http://dx.doi.org/10.1787/9789264167872-en
 
 Addition information can be found at the PISA website:
 \url{http://www.oecd.org/pisa/}

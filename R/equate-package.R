@@ -10,7 +10,7 @@
 #' presmoothing and bootstrap error estimation are also provided.
 #' 
 #' \tabular{ll}{ Package: \tab equate\cr Version: \tab 2.0-4\cr Date: \tab
-#' 2016-5-1\cr Depends: \tab R (>= 3.0.0)\cr License: \tab GPL-3\cr }
+#' 2016-4-25\cr Depends: \tab R (>= 3.0.0)\cr License: \tab GPL-3\cr }
 #' 
 #' Index: \tabular{ll}{
 #' ACTmath \tab ACT Mathematics Test Scores\cr
@@ -38,5 +38,10 @@
 #' @name equate-package
 #' @docType package
 #' @author Anthony Albano <tony.d.albano@@gmail.com>
+#' @importFrom stats AIC BIC as.formula coef fitted formula glm lm median
+#' model.matrix poisson reformulate sd stat.anova terms
+#' @importFrom graphics layout legend lines matlines par plot plot.default
+#' points segments
+#' @importFrom grDevices col2rgb rainbow rgb
 #' @keywords package
 NULL

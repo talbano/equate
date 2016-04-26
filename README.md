@@ -1,13 +1,23 @@
 # equate
+
 The R package *equate* provides methods for linking and equating measurements scales.
 
-The process is divided into three main steps:
+Install from CRAN with:
+```R
+install.packages("equate")
+```
+
+Or install the latest development version from Github using the *devtools* package:
+```R
+install.packages("devtools")
+devtools::install_github("talbano/equate")
+```
+
+The general process of equating or linking is divided into three main steps:
 
 1. Data prep, using the `freqtab` and `presmoothing` functions.
 2. Linking and equating score scales, using the `equate` and `composite` functions.
 3. Evaluating results, using `summary` methods, `plot` methods, and `bootstrap` standard errors. 
-
-Install from CRAN with `install.packages("equate")`.
 
 Some basic instructions on using the package are included below. For a detailed intro, see the main package vignette with `vignette("equatevignette", package = "equate")`. 
 

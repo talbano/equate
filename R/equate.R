@@ -52,37 +52,40 @@
 #' (Braun and Holland, 1982), a weighted combination of \code{x} and \code{y}.
 #' 
 #' Depending on the equating method, the following additional arguments may be
-#' required: \describe{ \item{list("midp")}{ coordinates for the midpoint of
+#' required:
+#' \describe{ \item{midp}{ coordinates for the midpoint of
 #' the equating line, used in general linear and circle-arc equating. }
-#' \item{list("cx, cy, sx, sy")}{ parameters used in general linear equating.
-#' See below for details. } \item{list("wax, way, wbx, wby")}{ weights used
+#' \item{cx, cy, sx, sy}{ parameters used in general linear equating.
+#' See below for details. } \item{wax, way, wbx, wby}{ weights used
 #' when finding the slope and intercept in general linear equating. See below.
-#' } \item{list("ws")}{ value between 0 and 1 specifying the weight applied to
+#' } \item{ws}{ value between 0 and 1 specifying the weight applied to
 #' form X scores (and implicitly specifying the form Y weight as \code{1 - ws})
 #' when estimating the synthetic population. When set to -1 (the default),
 #' proportional weights are calculated for X and Y based on sample size. }
-#' \item{list("internal")}{ logical indicating whether or not the anchor item
+#' \item{internal}{ logical indicating whether or not the anchor item
 #' scores are included in the total scores. This applies only to the Levine
 #' method, as all other methods assume an internal anchor test. Default is
-#' \code{TRUE}. } \item{list("lts")}{ logical indicating whether or not to use
+#' \code{TRUE}. } \item{lts}{ logical indicating whether or not to use
 #' levine true score (\dQuote{lts}) equating. Default is \code{FALSE}. }
-#' \item{list("smoothmethod")}{ string indicating one of four smoothing methods
+#' \item{smoothmethod}{ string indicating one of four smoothing methods
 #' to be used in equipercentile equating: \code{"none"} (default),
 #' \code{"average"}, \code{"bump"}, and \code{"loglinear"} (see below). }
-#' \item{list("chainmidp")}{ string specifying the type of chained linear
+#' \item{chainmidp}{ string specifying the type of chained linear
 #' equating used to obtain the midpoint in chained circle-arc equating, whether
-#' \code{"mean"} (default) or \code{"linear"}. } \item{list("simple")}{
+#' \code{"mean"} (default) or \code{"linear"}. } \item{simple}{
 #' logical, with default \code{TRUE}, indicating whether or not simplified
-#' circle-arc equating should be used (see below). } \item{list("reps")}{ the
+#' circle-arc equating should be used (see below). } \item{reps}{ the
 #' number of replications to use in bootstrapping. Passed to
-#' \code{\link{bootstrap}}. } \item{list("xp, yp")}{ optional parametric
+#' \code{\link{bootstrap}}. } \item{xp, yp}{ optional parametric
 #' distributions, as frequency tables, replacing \code{x} and \code{y} when
-#' bootstrapping. } \item{list("xn, yn")}{ sample sizes to be drawn from
+#' bootstrapping. } \item{xn, yn}{ sample sizes to be drawn from
 #' \code{x} and \code{y}, or \code{xp} and \code{yp}, at each bootstrap
 #' replication. These default to the observed sample sizes. }
-#' \item{list("crit")}{ a vector of equated scores serving as the criterion
+#' \item{crit}{ a vector of equated scores serving as the criterion
 #' equating function when calculating bootstrap bias and RMSE; both are
-#' returned when \code{crit} is specified. } } General linear equating is a new
+#' returned when \code{crit} is specified. } }
+#' 
+#' General linear equating is a new
 #' approach to estimating a linear linking or equating function. The slope and
 #' intercept of the line are estimated based on multiple sources of
 #' information, including the means and standard deviations of X and Y, and
@@ -193,7 +196,7 @@
 #' \item{xsmooth, ysmooth}{smoothed frequency tables for X and Y}
 #' \item{bootstraps}{list of bootstrap standard errors, and, optionally, bias
 #' and RMSE}
-#' The summary method 
+#' The summary method returns
 #' @author Anthony Albano \email{tony.d.albano@@gmail.com}
 #' @seealso \code{\link{freqbump}}, \code{\link{freqavg}},
 #' \code{\link{loglinear}}, \code{\link{bootstrap}}
@@ -589,17 +592,8 @@ summary.equate <- function(object, ...) {
       yx = yxtab)),
     stats = list(list(x = xstats, y = ystats,
       yx = yxstats)))
-  if(!is.null(object$bootstraps)) {
-    xw <- xtab[, 2]/sum(xtab[, 2])
-    out$error <- data.frame(
-      bias = mean(object$bootstraps$bias),
-      abs.bias = mean(abs(object$bootstraps$bias)),
-      w.bias = mean(object$bootstraps$bias*xw),
-      wabs.bias = mean(abs(object$bootstraps$bias*xw)),
-      se = mean(object$bootstraps$se),
-      w.se = mean(object$bootstraps$se*xw),
-      rmse = mean(object$bootstraps$rmse))
-  }
+  if(!is.null(object$bootstraps))
+    out$error <- summary(object$bootstraps)
   if(object$design == "nonequivalent groups") {
     out$freqtab <- c(out$freqtab, list(xv = xvtab,
       yv = yvtab))

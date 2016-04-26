@@ -1,26 +1,30 @@
-equate_2.0-4 (2016-3-1)
+equate_2.0-4 (2016-4-25)
 
-  o Asymptotic standard errors of equating are now
-    included for Tucker, Levine, chained and
-    frequency estimation equipercentile equating.
-
-  o Equating is now supported with scales having
+  o Support for equating scales that have
     inconsistent score increments.
 
-  o summary method for bootstrap objects fixed to
-    support partial output, e.g., only standard
+  o summary method for equate and bootstrap objects fixed
+    to support partial output, e.g., only standard
     errors.
+    
+  o The equating design can be specified when creating
+    a frequency table object. See the design argument
+    in the freqtab functions.
     
   o summary method for equate objects fixed. An
     error was returned for anything but
     equipercentile functions.
 
-  o Impossible scores can be removed from loglinear
-    smoothing functions under a NEAT design, reducing
-    the size of output.
-
   o Support added for automatic selection of best
     fitting model in loglinear presmoothing function.
+    See the choose argument.
+
+  o Small tweaks and improvements to help files.
+
+  o Development version of package now available at
+    https://github.com/talbano/equate
+
+  o Package is now built using RStudio and roxygen2
 
 equate_2.0-3 (2014-11-1)
 
