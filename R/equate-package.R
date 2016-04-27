@@ -10,7 +10,7 @@
 #' presmoothing and bootstrap error estimation are also provided.
 #' 
 #' \tabular{ll}{ Package: \tab equate\cr Version: \tab 2.0-4\cr Date: \tab
-#' 2016-4-25\cr Depends: \tab R (>= 3.0.0)\cr License: \tab GPL-3\cr }
+#' 2016-4-26\cr Depends: \tab R (>= 3.0.0)\cr License: \tab GPL-3\cr }
 #' 
 #' Index: \tabular{ll}{
 #' ACTmath \tab ACT Mathematics Test Scores\cr

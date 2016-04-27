@@ -1,5 +1,5 @@
 ## Test environments
-* local OS X install, R 3.1.5
+* local OS X install, R Under development (unstable) (2016-04-24 r70544)
 * win-builder (devel and release)
 
 ## R CMD check results
@@ -14,4 +14,4 @@ These have been checked and are correct.
     presmoothing (20:18)
 
 ## Downstream dependencies
-There are no downstream dependencies.
+Downstream dependency SGP has been checked.

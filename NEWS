@@ -1,23 +1,26 @@
-equate_2.0-4 (2016-4-25)
+equate_2.0-5
+
+equate_2.0-4 (2016-4-26)
 
   o Support for equating scales that have
     inconsistent score increments.
 
-  o summary method for equate and bootstrap objects fixed
-    to support partial output, e.g., only standard
+  o summary methods for equate and bootstrap objects
+    fixed to support partial output, e.g., only standard
     errors.
     
   o The equating design can be specified when creating
     a frequency table object. See the design argument
     in the freqtab functions.
     
-  o summary method for equate objects fixed. An
-    error was returned for anything but
+  o Another bug in summary method for equate objects
+    fixed. An error was returned for anything but
     equipercentile functions.
 
   o Support added for automatic selection of best
     fitting model in loglinear presmoothing function.
-    See the choose argument.
+    See the choose argument in presmoothing and
+    loglinear.
 
   o Small tweaks and improvements to help files.
 
