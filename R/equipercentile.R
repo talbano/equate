@@ -25,11 +25,11 @@ equipercentile <- function(x, y, method = "none",
 	}
 
 	if(method == "none")
-		yxs <- equip(xtab, ytab, highp[2])
+		yxs <- equip(xtab, ytab, ly = lowp[2], ky = highp[2])
 	else if(method == "frequency estimation") {
 		stabs <- synthetic(xtab, ytab, ws, method)
 		yxs <- equip(margin(stabs$xsynthetic),
-			margin(stabs$ysynthetic), highp[2])
+			margin(stabs$ysynthetic), ly = lowp[2], ky = highp[2])
 	}
 	else if(method == "chained") {
 		vx <- equip(margin(xtab),
