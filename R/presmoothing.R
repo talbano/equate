@@ -269,12 +269,13 @@ loglinear <- function(x, scorefun, degrees = list(4, 2, 2), grid,
 	else
 		keepi <- rep(TRUE, nrow(xd))
 	if (choose) compare <- TRUE
-	if (missing(scorefun))
+	if (missing(scorefun)) {
 		scorefun <- sf(xd, degrees, grid, stepup, compare)
 		if (stepup | compare) {
 			models <- attributes(scorefun)$models
 			mnames <- attributes(scorefun)$mnames
 		}
+	}
 	else {
 		scorefun <- scorefun[keepi, ]
 		if (stepup | compare) {
