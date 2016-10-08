@@ -81,7 +81,7 @@ synthetic <- function(x, y, ws = .5, method, internal = TRUE,
 				ysynthetic = ys))
 		if(method != "frequency estimation") {
 			out$synthstats <- data.frame(mean = c(msx, msy),
-				sd = c(sdsx, sdsy))
+				sd = c(sdsx, sdsy), g = c(g1, g2))
 			rownames(out$synthstats) <-
 				c("xsynthetic", "ysynthetic")
 		}
