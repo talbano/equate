@@ -96,8 +96,7 @@ equip <- function(x, y, ly = min(scales(y)),
 	yx[xone] <- ky + yinch[sn]
 	yx[xyone] <- xscale[xyone]
 	if (any(yx == 0)) {
-		yu <- sapply(yxi, function(i)
-			sum(fy <= prank[i]) + 1)
+		yu <- sapply(yxi, function(i) sum(fy <= prank[i]) + 1)
 		yu2 <- yu - 1
 		yu2[yu2 > 0] <- fy[yu2]
 		g0 <- fy[yu] - yu2
@@ -107,14 +106,13 @@ equip <- function(x, y, ly = min(scales(y)),
 		#if(xn)
 		#	se[yxi] <- seege(prank[yxi], g0, yu2, xn, yn)
 		if(any(y == 0)) {
-			yxi <- (xbot + sum(prank[!xnone] <= min(fy))):xtop
-			yl <- sapply(yxi, function(i)
-				sum(fy < prank[i]))
+			yxil <- (xbot + sum(prank[!xnone] <= min(fy))):xtop
+			yl <- sapply(yxil, function(i) sum(fy < prank[i]))
 			yl2 <- fy[yl + 1]
-			yxtemp <- yscale[yl] + yincl[yu] +
-				((prank[yxi] - fy[yl])/(yl2 - fy[yl])) *
-				(yinch + yincl)[yu]
-			yx[yxi] <- (yx[yxi] + yxtemp)/2
+			yxtemp <- yscale[yl] + yincl[yl] +
+				((prank[yxil] - fy[yl])/(yl2 - fy[yl])) *
+				(yinch + yincl)[yl]
+			yx[yxil] <- (yx[yxil] + yxtemp)/2
 		}
 	}
 
