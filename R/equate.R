@@ -134,9 +134,13 @@
 #' result is an equating function based only on the circle-arc that passes
 #' through the points \code{lowp}, \code{highp}, and the estimated midpoint.
 #' 
-#' Analytical standard errors are not currently returned. With \code{boot =
-#' TRUE}, bootstrap standard errors are estimated using a default of \code{reps
-#' = 100} replications, sampling the maximum amount from each score
+#' Analytical standard errors are currently returned for linear
+#' equating under equivalent groups and chained, Tucker, and Levine
+#' equating with nonequivalent groups. Chained, Tucker, and Levine
+#' standard errors are provided with and without assumptions of
+#' normality, as shown in Zu (2012). With \code{boot = TRUE},
+#' bootstrap standard errors are estimated using a default of
+#' \code{reps = 100} replications, sampling the maximum amount from each score
 #' distribution (controlled by the arguments \code{xn} and \code{yn}). See
 #' \code{\link{bootstrap}} for details and examples, including how to obtain
 #' bootstrap bias and RMSE.
@@ -177,26 +181,36 @@
 #' @return When \code{y} contains output from an equating, a vector of equated
 #' scores is returned. Otherwise, an object of class \dQuote{\code{equate}} is
 #' returned, listing the following components, some of which are dependent on
-#' the equating type, method, and smoothing: \item{name}{\code{name} for the
-#' equating} \item{type}{equating type} \item{method}{equating method}
-#' \item{design}{equating design, inferred from the method} \item{x,
-#' y}{original frequency tables for X and Y} \item{concordance}{conversion
-#' table containing scores on X with their form Y equivalents.}
-#' \item{points}{low and high points defining the identity line, and midpoints
-#' for general linear and circle-arc equating} \item{weight}{weights used in
-#' general linear equating} \item{internal, lts, jmin, degree, xdegree,
-#' scorefun}{additional arguments, as supplied in \dots{}}
-#' \item{coefficients}{conversion coefficients intercept and slope; for
-#' circle-arc equating, circle center points and radius are also included; for
-#' general linear equating, slope and intercept components are included}
+#' the equating type, method, and smoothing:
+#' \item{name}{\code{name} for the equating}
+#' \item{type}{equating type}
+#' \item{method}{equating method}
+#' \item{design}{equating design, as specified in \code{x}}
+#' \item{x, y}{original frequency tables for X and Y}
+#' \item{concordance}{conversion table containing scores on X with
+#' their form Y equivalents, and standard errors, when available.}
+#' \item{points}{low and high points defining the identity line,
+#' and midpoints for general linear and circle-arc equating}
+#' \item{weight}{weights used in general linear equating}
+#' \item{internal, lts, jmin, degree, xdegree, scorefun}{additional
+#' arguments, as supplied in \dots{}}
+#' \item{coefficients}{conversion coefficients intercept and slope;
+#' for circle-arc equating, circle center points and radius are also
+#' included; for general linear equating, slope and intercept
+#' components are included}
 #' \item{ws}{weight applied to X in synthetic estimation}
 #' \item{synthstats}{means and standard deviations for the synthetic
-#' distributions} \item{xsynthetic, ysynthetic}{frequency tables for the
-#' synthetic distributions} \item{smoothmethod}{smoothing method}
+#' distributions}
+#' \item{xsynthetic, ysynthetic}{frequency tables for the
+#' synthetic distributions}
+#' \item{smoothmethod}{smoothing method}
 #' \item{xsmooth, ysmooth}{smoothed frequency tables for X and Y}
-#' \item{bootstraps}{list of bootstrap standard errors, and, optionally, bias
-#' and RMSE}
-#' The summary method returns
+#' \item{bootstraps}{list containing bootstrap standard errors, and,
+#' optionally, other bootstrap output}
+#' The summary method returns a list with the name, type, method,
+#' design, and synthetic weight, along with frequency tables for
+#' the total, anchor, and equated score distributions and
+#' descriptive statistics for each.
 #' @author Anthony Albano \email{tony.d.albano@@gmail.com}
 #' @seealso \code{\link{freqbump}}, \code{\link{freqavg}},
 #' \code{\link{loglinear}}, \code{\link{bootstrap}}
@@ -205,6 +219,12 @@
 #' 
 #' Livingston, S. A., and Kim, S. (2009). The circle-arc method for equating in
 #' small samples, \emph{Journal of Educational Measurement, 46}, 330--343.
+#' 
+#' Zu, J., and Yuan, K. H. (2012). Standard error of linear 
+#' observed-score equating for the NEAT design with nonnormally
+#' distributed data. \emph{Journal of Educational Measurement, 49},
+#' 190--213.
+#' 
 #' @keywords methods
 #' @examples
 #' 
