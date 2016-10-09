@@ -394,8 +394,10 @@ equate.freqtab <- function(x, y, type = c("identity",
 		out <- c(list(name = name, type = type,
 			method = method, design = des), eqout)
 		out <- as.equate(out)
-		if(boot)
-			out$bootstraps <- bootstrap.equate(out, ...)
+		if(boot) {
+		  out$bootstraps <- bootstrap.equate(out, ...)
+		  out$concordance$se.b <- out$bootstraps$se
+		}
 	}
 	else out <- eqout
 
