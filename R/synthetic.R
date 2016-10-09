@@ -8,25 +8,23 @@
 synthetic <- function(x, y, ws = .5, method, internal = TRUE,
 	lts = FALSE) {
 
-	if(ws == -1)
+	if (ws == -1)
 		ws <- sum(x)/sum(x, y)
 	yws <- 1 - ws
 
-	if(method == "frequency estimation" |
-		method == "braun/holland") {
+	if (method %in% c("frequency estimation", "braun/holland")) {
 		synth <- pse(x, y, ws)
 		xs <- synth$xs
 		ys <- synth$ys
-		if(method == "braun/holland") {
+		if (method == "braun/holland") {
 			msx <- mean(xs)
 			msy <- mean(ys)
 			sdsx <- sd.freqtab(xs)
 			sdsy <- sd.freqtab(ys)
 		}
-	}
-	else {
-		nx <- ifelse(method %in% c("tucker",
-			"nominal weights"), margins(x), 2)
+	}	else {
+		nx <- ifelse(method %in% c("tucker", "nominal weights"),
+		  margins(x), 2)
 		mx <- mean(x)
 		varx <- var.freqtab(x)
 		mxv <- mean(x, 2:nx)
@@ -36,13 +34,12 @@ synthetic <- function(x, y, ws = .5, method, internal = TRUE,
 		myv <- mean(y, 2:nx)
 		varyv <- var.freqtab(y, 2:nx)
 
-		if(method == "nominal weights") {
+		if (method == "nominal weights") {
 			g1 <- max(scales(x))/(sapply(scales(x, 1:nx),
 				max)[-1]*(nx - 1))
 			g2 <- max(scales(y))/(sapply(scales(y, 1:nx),
 				max)[-1]*(nx - 1))
-		}
-		else if(method == "tucker") {
+		}	else if (method == "tucker") {
 			g1 <- coef(lm(total ~ . - total - count,
 				data = as.data.frame(x),
 				weights = c(x)))[-1]
@@ -50,17 +47,17 @@ synthetic <- function(x, y, ws = .5, method, internal = TRUE,
 				data = as.data.frame(y),
 				weights = c(y)))[-1]
 		}
-		else if(method == "levine" & internal) {
+		else if (method == "levine" & internal) {
 			g1 <- varx/cov.freqtab(x, 2)
 			g2 <- vary/cov.freqtab(y, 2)
 		}
-		else if(method == "levine" & !internal) {
+		else if (method == "levine" & !internal) {
 			g1 <- (varx + cov.freqtab(x, 2))/
 				(varxv[1] + cov.freqtab(x, 2))
 			g2 <- (vary + cov.freqtab(y, 2))/
 				(varyv[1] + cov.freqtab(y, 2))
 		}
-		if(!lts) {
+		if (!lts) {
 			msx <- mx - yws * (mxv - myv) %*% g1
 			msy <- my + ws * (mxv - myv) %*% g2
 			sdsx <- sqrt(varx -
@@ -71,20 +68,19 @@ synthetic <- function(x, y, ws = .5, method, internal = TRUE,
 				ws * yws * (mxv - myv)^2 %*% g2^2)
 		}
 	}
-	if(lts)
+	if (lts)
 		out <- list(gamma = c(g1, g2))
 	else {
 		out <- list(ws = ws)
-		if(method == "frequency estimation" |
-			method == "braun/holland")
-			out <- c(out, list(xsynthetic = xs,
-				ysynthetic = ys))
-		if(method != "frequency estimation") {
+		if (method != "frequency estimation") {
 			out$synthstats <- data.frame(mean = c(msx, msy),
-				sd = c(sdsx, sdsy), g = c(g1, g2))
-			rownames(out$synthstats) <-
-				c("xsynthetic", "ysynthetic")
+				sd = c(sdsx, sdsy))
+			rownames(out$synthstats) <- c("xsynthetic", "ysynthetic")
 		}
+		if (method %in% c("frequency estimation", "braun/holland"))
+		  out <- c(out, list(xsynthetic = xs, ysynthetic = ys))
+		else
+		  out$synthstats$g <- c(g1, g2)
 	}
 	return(out)
 }
