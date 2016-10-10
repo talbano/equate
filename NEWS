@@ -1,4 +1,11 @@
-equate_2.0-5
+equate_2.0-5 (2016-10-20)
+
+  o Fix bug in equipercentile equating for scores with
+    zero frequencies.
+
+  o Missing bracket fixed in loglinear function
+    
+  o Analytic standard errors added for linear equating
 
 equate_2.0-4 (2016-4-26)
 

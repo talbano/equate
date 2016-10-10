@@ -392,7 +392,7 @@ neat.x <- freqtab(KBneat$x, scales = list(0:36, 0:12))
 neat.y <- freqtab(KBneat$y, scales = list(0:36, 0:12))
 @
 
-Finally, \code{freqtab} can also be used to sum scored item responses, and then tabulate the resulting total scores. In this case, the list \code{items} must contain vectors of the columns over which total scores should be calculated. For example, the following syntax creates a frequency table using four reading clusters from PISA booklet 6, with clusters R3 and R6 containing the unique items and clusters R5 and R7 containing the anchor items.
+Finally, \code{freqtab} can also be used to sum scored item responses, and then tabulate the resulting total scores. In this case, the list \code{items} must contain vectors of the columns over which total scores should be calculated. For example, the following syntax creates a frequency table using four reading clusters from PISA booklet 6, with clusters R3 and R6 containing the unique items and clusters R5 and R7 containing the anchor items. The \code{design} argument is used to specify the single-group equating design, as the default when creating a bivariate frequency table is the nonequivalent-groups design.
 <<>>=
 attach(PISA)
 r3items <- paste(items$itemid[items$clusterid == "r3a"])
@@ -401,7 +401,7 @@ r5items <- paste(items$itemid[items$clusterid == "r5"])
 r7items <- paste(items$itemid[items$clusterid == "r7"])
 pisa <- freqtab(students[students$book == 6, ],
 	items = list(c(r3items, r6items), c(r5items, r7items)),
-	scales = list(0:31, 0:29))
+	scales = list(0:31, 0:29), design = "sg")
 round(data.frame(summary(pisa),
 	row.names = c("r3r6", "r5r7")), 2)
 @
