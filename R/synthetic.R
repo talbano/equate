@@ -35,10 +35,10 @@ synthetic <- function(x, y, ws = .5, method, internal = TRUE,
 		varyv <- var.freqtab(y, 2:nx)
 
 		if (method == "nominal weights") {
-			g1 <- max(scales(x))/(sapply(scales(x, 1:nx),
-				max)[-1]*(nx - 1))
-			g2 <- max(scales(y))/(sapply(scales(y, 1:nx),
-				max)[-1]*(nx - 1))
+			g1 <- max(scales(x))/(sapply(scales(x, 1:nx), max)[-1] *
+			  (nx - 1))
+			g2 <- max(scales(y))/(sapply(scales(y, 1:nx), max)[-1] *
+			  (nx - 1))
 		}	else if (method == "tucker") {
 			g1 <- coef(lm(total ~ . - total - count,
 				data = as.data.frame(x),
@@ -80,7 +80,7 @@ synthetic <- function(x, y, ws = .5, method, internal = TRUE,
 		if (method %in% c("frequency estimation", "braun/holland"))
 		  out <- c(out, list(xsynthetic = xs, ysynthetic = ys))
 		else
-		  out$synthstats$g <- c(g1, g2)
+		  out$gamma <- c(g1, g2)
 	}
 	return(out)
 }
