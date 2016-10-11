@@ -30,10 +30,17 @@ linear <- function(x, y, type = "linear", method = "none",
 		slope <- slope1*slope2
 	} else {
 		if (method == "none") {
-			sigmax <- sd.freqtab(x)
-			sigmay <- sd.freqtab(y)
-			mux <- mean(x)
-			muy <- mean(y)
+		  if (is.design(x, "cb") & is.design(y, "cb")) {
+		    sigmax <- sqrt((var.freqtab(x, 1) + var.freqtab(y, 1))/2)
+		    sigmay <- sqrt((var.freqtab(x, 2) + var.freqtab(y, 2))/2)
+		    mux <- (mean(x, 1) + mean(y, 1))/2
+		    muy <- (mean(x, 2) + mean(y, 2))/2
+		  } else {
+			  sigmax <- sd.freqtab(x)
+			  sigmay <- sd.freqtab(y)
+			  mux <- mean(x)
+			  muy <- mean(y)
+		  }
 		} else {
 			synth <- synthetic(x, y, ws, method, internal, lts)
 			stats <- synth$synthstats
@@ -127,11 +134,13 @@ lse <- function(x, type, method) {
     out <- NULL
   } else if (type == "linear") {
     if (method == "none") {
-      if (design(x$x) == "sg")
+      if (is.design(x$x, "sg"))
         out <- sglse(x$x, x$y)
-      else if (design(x$x) == "eg" && design(x$y) == "eg")
+      else if (is.design(x$x, "eg") && is.design(x$y, "eg"))
         out <- eglse(x$x, x$y)
-      else out <- rep(0, length(scales(x$x)))
+      else if (is.design(x$x, "cb") && is.design(x$y, "cb")) {
+        out <- cblse(x$x, x$y)
+      } else out <- rep(0, length(scales(x$x)))
     } else if (method %in% c("chained", "tucker", "levine")) {
       ox <- omeg(x$x)
       oy <- omeg(x$y)
@@ -207,6 +216,20 @@ eglse <- function(x, y) {
 # Single group
 sglse <- function(x, y) {
   return(NULL)
+}
+
+# Counterbalanced
+cblse <- function(x, y) {
+  xscale <- scales(x, 1)
+  sigmax <- sqrt((var.freqtab(x, 1) + var.freqtab(y, 1))/2)
+  sigmay <- (var.freqtab(x, 2) + var.freqtab(y, 2))/2
+  mux <- (mean(x, 1) + mean(y, 1))/2
+  muy <- (mean(x, 2) + mean(y, 2))/2
+  z <- (xscale - mux)/sigmax
+  ns <- sum(x) + sum(y)
+  rho <- cor.freqtab(x)[2]
+  n <- sigmay^2 * (1 - rho) * ((z^2 * (1 + rho) + 2)/ns)
+  return(n)
 }
 
 # Linear derivatives
