@@ -11,27 +11,25 @@ equipercentile <- function(x, y, method = "none",
 	verbose = FALSE, ...) {
 
 	smoothmethod <- match.arg(smoothmethod)
-	if(missing(y))
+	if (missing(y))
 		y <- margin(x, 2)
-	if(margins(y) < margins(x)) {
+	if (margins(y) < margins(x)) {
 		xtab <- presmoothing(x, smoothmethod, ...)
 		ytab <- margin(xtab, 2)
 		xtab <- margin(xtab)
 		x <- margin(x)
-	}
-	else {
+	} else {
 		xtab <- presmoothing(x, smoothmethod, ...)
 		ytab <- presmoothing(y, smoothmethod, ...)
 	}
 
-	if(method == "none")
+	if (method == "none")
 		yxs <- equip(xtab, ytab, ly = lowp[2], ky = highp[2])
-	else if(method == "frequency estimation") {
+	else if (method == "frequency estimation") {
 		stabs <- synthetic(xtab, ytab, ws, method)
 		yxs <- equip(margin(stabs$xsynthetic),
 			margin(stabs$ysynthetic), ly = lowp[2], ky = highp[2])
-	}
-	else if(method == "chained") {
+	} else if (method == "chained") {
 		vx <- equip(margin(xtab),
 			margin(xtab, 2))$yx
 		pvyx <- px(vx, margin(ytab, 2))
@@ -39,7 +37,7 @@ equipercentile <- function(x, y, method = "none",
 	}
 	yx <- yxs$yx
 	
-	if(!verbose)
+	if (!verbose)
 		out <- yx
 	else {
 		out <- c(list(x = x, y = y, concordance =
@@ -48,12 +46,14 @@ equipercentile <- function(x, y, method = "none",
 				row.names = c("x", "y")),
 			smoothmethod = smoothmethod), list(...)[names(list(...))
 				%in% c("jmin", "degree", "xdegree", "scorefun")])
-		if(method == "frequency estimation")
+		if (method == "frequency estimation")
 			out <- c(out, stabs)
-		if(smoothmethod != "none") {
+		if (smoothmethod != "none") {
 			out$xsmooth <- xtab
 			out$ysmooth <- ytab
 		}
+		if (method == "none" & is.design(x, "eg") & is.design(y, "eg"))
+		  out$concordance$se <- yxs$se
 	}
 	return(out)
 }
@@ -64,8 +64,7 @@ equipercentile <- function(x, y, method = "none",
 # Does it work for shrunken or stretched scales? Yes, now.
 # Previously, it is assumed that scores were in 1 point increments
 
-equip <- function(x, y, ly = min(scales(y)),
-	ky = max(scales(y))) {
+equip <- function(x, y, ly = min(scales(y)), ky = max(scales(y))) {
 
 	yscale <- scales(y)
 	yn <- sum(y)
@@ -77,7 +76,7 @@ equip <- function(x, y, ly = min(scales(y)),
 		prank <- round(px(x), 10)
 		xscale <- scales(x)
 		xn <- sum(x)
-		#se <- rep(NA, length = length(prank))
+		se <- rep(0, length = length(prank))
 	}
 	sn <- length(yscale)
 	yinc <- round(diff(yscale), 8)
@@ -100,12 +99,12 @@ equip <- function(x, y, ly = min(scales(y)),
 		yu2 <- yu - 1
 		yu2[yu2 > 0] <- fy[yu2]
 		g0 <- fy[yu] - yu2
-		yx[yxi] <- yscale[yu] - yincl[yu] +
-			((prank[yxi] - yu2)/g0) * (yinch + yincl)[yu]
+		yx[yxi] <- yscale[yu] - yincl[yu] + ((prank[yxi] - yu2)/g0) *
+		  (yinch + yincl)[yu]
 		# standard errors
-		#if(xn)
-		#	se[yxi] <- seege(prank[yxi], g0, yu2, xn, yn)
-		if(any(y == 0)) {
+		if (xn)
+			se[yxi] <- egese(prank[yxi], g0, yu2, xn, yn)
+		if (any(y == 0)) {
 			yxil <- (xbot + sum(prank[!xnone] <= min(fy))):xtop
 			yl <- sapply(yxil, function(i) sum(fy < prank[i]))
 			yl2 <- fy[yl + 1]
@@ -116,14 +115,21 @@ equip <- function(x, y, ly = min(scales(y)),
 		}
 	}
 
-	if(xn) {
+	if (xn) {
 		out <- list(yx = yx)
-		#out$se <- se
-	}
-	else
+		out$se <- se
+	} else
 		out <- list(yx = yx[match(x, prank)])
 
 	return(out)
+}
+
+#----------------------------------------------------------------
+# Standard errors
+
+egese <- function(q, g0, gm, xn, yn) {
+  return(((1 - q) * q/(xn * g0^2) + (1/(yn * g0^2)) *
+  (gm - q^2 + ((q - gm)^2)/g0))^.5)
 }
 
 #----------------------------------------------------------------
