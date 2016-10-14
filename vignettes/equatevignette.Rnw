@@ -11,7 +11,7 @@
 \Plaintitle{Observed-Score Linking and Equating}
 
 \Abstract{
-The \proglang{R} package \pkg{equate} \citep{albano2014equate} contains functions for observed-score linking and equating under single-group, equivalent-groups, and nonequivalent-groups with anchor test(s) designs. This paper introduces these designs and provides an overview of observed-score equating with details about each of the supported methods. Examples demonstrate the basic functionality of the \pkg{equate} package.
+The \proglang{R} package \pkg{equate} \citep{albano2016equate} contains functions for observed-score linking and equating under single-group, equivalent-groups, and nonequivalent-groups with anchor test and covariate designs. This paper introduces these designs and provides an overview of observed-score equating with details about each of the supported methods. Examples demonstrate the basic functionality of the \pkg{equate} package.
 }
 \Keywords{equating, linking, psychometrics, testing, \proglang{R}}
 \Plainkeywords{equating, linking, psychometrics, testing, R}
@@ -54,9 +54,9 @@ Equating is a statistical procedure commonly used in testing programs where admi
 
 Equating defines a functional statistical relationship between multiple test score distributions and thereby between multiple score scales. When the test forms have been created according to the same specifications and are similar in statistical characteristics, this functional relationship is referred to as an \emph{equating function}, and it serves to translate scores from one scale directly to their equivalent values on another. The term \emph{linking} refers to test forms which have not been created according to the same specifications, for example, forms which differ in length or content; in this case, the linked scales are considered similar but not interchangeable; they are related to one another via a \emph{linking function}. Specific requirements for equating include equivalent constructs measured with equal reliability across test forms, equity in the equated results, symmetry of the equating function itself, and invariance of the function over examinee populations \citep[for details, see][]{holland2006linking}.
 
-A handful of statistical packages are available for linking and equating test forms. \cite{kolen2004test} demonstrate a suite of free, standalone programs for observed-score and item response theory (IRT) linking and equating. Other packages, like \pkg{equate}, have been developed within the \proglang{R} environment \citep{r2014}. For example, the \proglang{R} package \pkg{kequate} \citep{andersson2013performing} includes observed-score methods, but within a kernel equating framework. The \proglang{R} package \pkg{plink} \citep{weeks2010plink} implements IRT linking under a variety of dichotomous, polytomous, unidimensional, and multidimensional models. The \proglang{R} package \pkg{SNSequate} \citep{burgos2014snsequate} contains some functions for observed-score and kernel equating, along with IRT linking methods.
+A handful of statistical packages are available for linking and equating test forms. \cite{kolen2014test} demonstrate a suite of free, standalone programs for observed-score and item response theory (IRT) linking and equating. Other packages, like \pkg{equate}, have been developed within the \proglang{R} environment \citep{r2016}. For example, the \proglang{R} package \pkg{kequate} \citep{andersson2013performing} includes observed-score methods, but within a kernel equating framework. The \proglang{R} package \pkg{plink} \citep{weeks2010plink} implements IRT linking under a variety of dichotomous, polytomous, unidimensional, and multidimensional models. The \proglang{R} package \pkg{SNSequate} \citep{burgos2014snsequate} contains some functions for observed-score and kernel equating, along with IRT linking methods.
 
-The \pkg{equate} package is designed for observed-score linking and equating. It differs from other packages primarily in its overall structure and usability, its plotting and bootstrapping capabilities, and its inclusion of more recently developed equating and linking functions such as the general-linear, synthetic, and circle-arc functions, and traditional methods such as Levine, Tucker, and Braun/Holland. Equating with multiple anchor tests is also supported, as demonstrated below. Linking and equating are performed using a simple interface, and plotting and summary methods are provided to facilitate the comparison of results and the examination of equating error. Sample data and detailed help files are also included. These features make the package useful in teaching, research, and operational testing contexts.
+The \pkg{equate} package is designed for observed-score linking and equating. It differs from other packages primarily in its overall structure and usability, its plotting and bootstrapping capabilities, and its inclusion of more recently developed equating and linking functions such as the general-linear, synthetic, and circle-arc functions, and traditional methods such as Levine, Tucker, and Braun/Holland. Equating with multiple anchor tests and external covariates is also supported, as demonstrated below. Linking and equating are performed using a simple interface, and plotting and summary methods are provided to facilitate the comparison of results and the examination of equating error. Sample data and detailed help files are also included. These features make the package useful in teaching, research, and operational testing contexts.
 
 This paper presents some basic linking and equating concepts and procedures. Equating designs are first discussed in Section~\ref{sec:designs}. In Section~\ref{sec:functions}, linear and nonlinear observed-score linking and equating functions are reviewed. In Section~\ref{sec:methods}, methods are presented for linking and equating when examinee groups are not equivalent. Finally, in Section~\ref{sec:applications}, the \pkg{equate} package is introduced and its basic functionality is demonstrated using three data sets.
 
@@ -69,9 +69,9 @@ Observed-score linking and equating procedures require data from multiple test a
 
 In the single-group design, one group, sampled from the target population $T$, takes two different test forms $X$ and $Y$, optionally with counterbalancing of administration orders (one group takes $X$ first, the other takes $Y$ first). Any differences in the score distributions on $X$ and $Y$ are attributed entirely to the test forms themselves, as group ability is assumed to be constant; thus, if the distributions are not the same, it is because the test forms differ in difficulty. Related to the single-group design is the equivalent-groups design, where one random sample from $T$ takes $X$ and another takes $Y$. Because the samples are taken randomly, group ability is again assumed to be constant, and any differences in the score distributions are again identified as form difficulty differences.
 
-Without equivalent examinee groups, two related problems arise: 1) the target population must be defined indirectly using samples from two different examinee populations, $P$ and $Q$; and 2) the ability of these groups must then be accounted for, as ability differences will be a confounding factor in the estimation of form difficulty differences. In the nonequivalent-groups design these issues are both addressed through the use of what is referred to as an \emph{anchor test}, $V$, a common measure of ability available for both groups. All non-equivalence in ability is assumed to be controlled or removed via this common measure.
+Without equivalent examinee groups, two related problems arise: 1) the target population must be defined indirectly using samples from two different examinee populations, $P$ and $Q$; and 2) the ability of these groups must then be accounted for, as ability differences will be a confounding factor in the estimation of form difficulty differences. In the nonequivalent-groups design these issues are both addressed through the use of what is referred to as an \emph{anchor test}, $V$, a common measure of ability available for both groups. All non-equivalence in ability is assumed to be controlled or removed via this common measure. External covariates, such as scores from other tests, can also be used to control for group differences.
 
-Equating procedures were initially developed using the single-group and equivalent-groups designs. In this simpler context, the traditional equating functions include mean, linear, and equipercentile equating; these and other equating functions are reviewed in Section~\ref{sec:functions}. More complex procedures have been developed for use with the nonequivalent-groups design; these equating methods are presented in Section~\ref{sec:methods}. Unless otherwise noted, additional details on the functions and methods described below can be found in \cite{kolen2004test}.
+Equating procedures were initially developed using the single-group and equivalent-groups designs. In this simpler context, the traditional equating functions include mean, linear, and equipercentile equating; these and other equating functions are reviewed in Section~\ref{sec:functions}. More complex procedures have been developed for use with the nonequivalent-groups design; these equating methods are presented in Section~\ref{sec:methods}. Unless otherwise noted, additional details on the functions and methods described below can be found in \cite{kolen2014test}.
 
 %----------------------------------------------------------------------------------------------------------------
 % Equating Functions
@@ -173,7 +173,7 @@ Equipercentile linking and equating define a nonlinear relationship between scor
 \begin{equation}
   equip_Y(x) = G^{-1}[F(x)], \label{eqn:equip}
 \end{equation}
-which is also the equipercentile equating function $equipe_Y(x)$. When the score scales are discrete, which is often the case, the cumulative distribution function can be approximated using percentile ranks. This is a simple approach to \emph{continuizing} the discrete score distributions \citep[for details, see][ch.~2]{kolen2004test}. Kernel equating, using Gaussian kernels, offers a more flexible approach to continuization \citep{vondavier2004kernel}, but is not currently supported in the \pkg{equate} package. Instead, the percentile rank method is currently used. The equipercentile equivalent of a form-$X$ score on the $Y$ scale is calculated by finding the percentile rank in $X$ of a particular score, and then finding the form-$Y$ score associated with that form-$Y$ percentile rank.
+which is also the equipercentile equating function $equipe_Y(x)$. When the score scales are discrete, which is often the case, the cumulative distribution function can be approximated using percentile ranks. This is a simple approach to \emph{continuizing} the discrete score distributions \citep[for details, see][ch.~2]{kolen2014test}. Kernel equating, using Gaussian kernels, offers a more flexible approach to continuization \citep{vondavier2004kernel}, but is not currently supported in the \pkg{equate} package. Instead, the percentile rank method is currently used. The equipercentile equivalent of a form-$X$ score on the $Y$ scale is calculated by finding the percentile rank in $X$ of a particular score, and then finding the form-$Y$ score associated with that form-$Y$ percentile rank.
 
 Equipercentile equating is appropriate when $X$ and $Y$ differ nonlinearly in difficulty, that is, when difficulty differences fluctuate across the score scale, potentially at each score point. Each coordinate on the equipercentile curve is estimated using information from the distributions of $X$ and $Y$. Thus, compared to identity, mean, and linear equating, equipercentile equating is more susceptible to sampling error because it involves the estimation of as many parameters as there are unique score points on $X$.
 
@@ -254,7 +254,7 @@ and
   \sigma_{Y}^2 = w_P\sigma_{Y_P}^2 + w_Q\sigma_{Y_Q}^2 + w_Pw_Q(\mu_{Y_P} - \mu_{Y_Q})^2. \label{eqn:synthvy1}
 \end{equation}
 
-Because $X$ is not administered to $Q$ and $Y$ is not administered to $P$, the terms $\mu_{X_Q}$, $\mu_{Y_P}$, $\sigma_{X_Q}^2$, and $\sigma_{X_Q}^2$ in Equations~\eqref{eqn:synthmx1} through \eqref{eqn:synthvy1} are obtained using available information for $X$, $Y$, and the anchor test $V$. This results in the following synthetic parameter estimates \citep[for details, see][]{kolen2004test}:
+Because $X$ is not administered to $Q$ and $Y$ is not administered to $P$, the terms $\mu_{X_Q}$, $\mu_{Y_P}$, $\sigma_{X_Q}^2$, and $\sigma_{X_Q}^2$ in Equations~\eqref{eqn:synthmx1} through \eqref{eqn:synthvy1} are obtained using available information for $X$, $Y$, and the anchor test $V$. This results in the following synthetic parameter estimates \citep[for details, see][]{kolen2014test}:
 \begin{equation}
   \mu_{X} = \mu_{X_P} - w_Q\gamma_P(\mu_{V_P} - \mu_{V_Q}), \label{eqn:synthmx2}
 \end{equation}
@@ -278,7 +278,7 @@ In Tucker equating \citep{levine1955equating} the relationship between total and
   \gamma_P = \frac{\sigma_{X_P,V_P}}{\sigma_{V_P}^2} \eqnspace \text{and} \eqnspace
   \gamma_Q = \frac{\sigma_{Y_Q,V_Q}}{\sigma_{V_Q}^2}. \label{eqn:gammatuck1}
 \end{equation}
-The Tucker method assumes that across populations: 1) the coefficients resulting from a regression of $X$ on $V$ are the same, and 2) the conditional variance of $X$ given $V$ is the same. These assumptions apply to the regression of $Y$ on $V$ and the covariance of $Y$ given $V$ as well. They also apply to the regression of $X$ or $Y$ on multiple anchor tests \cite[e.g.,][]{angoff1984scales}; see Appendix~\ref{sec:appendTucker} for details.
+The Tucker method assumes that across populations: 1) the coefficients resulting from a regression of $X$ on $V$ are the same, and 2) the conditional variance of $X$ given $V$ is the same. These assumptions apply to the regression of $Y$ on $V$ and the covariance of $Y$ given $V$ as well. They also apply to the regression of $X$ or $Y$ on multiple anchor tests and external covariates \cite[e.g.,][]{angoff1984scales}; see Appendix~\ref{sec:appendTucker} for details.
 
 \begin{table}
 \begin{center}
@@ -300,7 +300,7 @@ Multiple anchors & $\surd$ & $\surd$ & & $\surd$ & $\surd$ & \\
 \end{center}
 \caption{Applicable equating types and methods.}
 \label{tab:typesmethods}
-Note: Text in \code{R code} font shows how the equating types and methods are specified in the \code{equate} function. Multiple anchors are currently supported for all equating types but not all methods.
+Note: Text in \code{R code} font shows how the equating types and methods are specified in the \code{equate} function. Multiple anchors and covariates are currently supported for all equating types but not all methods.
 \end{table}
 
 \subsection{Nominal weights}
@@ -320,7 +320,7 @@ which are the inverses of the respective regression slopes for $V$ on $X$ and $V
 \begin{equation}
   lin_Y(x) = \frac{\gamma_Q}{\gamma_P}X(x - \mu_{X_P}) + \mu_{Y_Q} + \gamma_Q(\mu_{V_P} - \mu_{V_Q}),
 \end{equation}
-with $\gamma$ defined by Equation~\eqref{eqn:gammalev1}. \cite{hanson1991note} and \cite{kolen2004test} provide justifications for using the Levine true-score method.
+with $\gamma$ defined by Equation~\eqref{eqn:gammalev1}. \cite{hanson1991note} and \cite{kolen2014test} provide justifications for using the Levine true-score method.
 
 \subsection{Frequency estimation}
 The frequency estimation or poststratification method is used in equipercentile equating under the nonequivalent-groups design. It is similar to the methods described above in that it involves a synthetic population. However, in this method full score distributions for the synthetic population taking forms $X$ and $Y$ are required. When the assumptions are made that 1) the conditional distribution of total scores on $X$ for a given score point in $V$ is the same across populations, and 2) the conditional distribution of total scores on $Y$ for a given score point in $V$ is the same across populations, the synthetic distributions can be obtained as
@@ -331,7 +331,7 @@ and
 \begin{equation}
   \Pr(y) = w_Q\Pr_Q(y) + w_P\sum \Pr_Q(y|v)\Pr_P(v). \label{eqn:synthdisty1}
 \end{equation}
-Here, $\Pr(x)$, $\Pr(y)$, and $\Pr(v)$ denote the distribution functions for forms $X$, $Y$, and $V$ respectively. Percentile ranks can be taken for the cumulative versions of Equations~\eqref{eqn:synthdistx1} and \eqref{eqn:synthdisty1} to obtain Equation~\eqref{eqn:equip}. The frequency estimation method can also accommodate multiple anchor tests; see Appendix~\ref{sec:appendFreq}.
+Here, $\Pr(x)$, $\Pr(y)$, and $\Pr(v)$ denote the distribution functions for forms $X$, $Y$, and $V$ respectively. Percentile ranks can be taken for the cumulative versions of Equations~\eqref{eqn:synthdistx1} and \eqref{eqn:synthdisty1} to obtain Equation~\eqref{eqn:equip}. The frequency estimation method can also accommodate multiple anchors and external covariates; see Appendix~\ref{sec:appendFreq}.
 
 \subsection{Braun/Holland}
 As a kind of extension of the frequency estimation method, the Braun/Holland method \citep{braun1982observed} defines a linear function relating $X$ and $Y$ that is based on the means and standard deviations of the synthetic distributions obtained via frequency estimation. Thus the full synthetic distributions are estimated, as with frequency estimation, but only in order to obtain their means and standard deviations.
@@ -363,9 +363,9 @@ Note that circle-arc equating is defined here as an equating \emph{type}, and eq
 \label{sec:applications}
 \subsection{Sample data}
 \label{sec:data}
-The \pkg{equate} package includes three sample data sets. The first, \code{ACTmath}, comes from two administrations of the ACT mathematics test, and is used throughout \cite{kolen2004test}. The test scores are based on an equivalent-groups design and are contained in a three-column data frame where column one is the 40-point score scale and columns two and three are the number of examinees for $X$ and $Y$ obtaining each score point.
+The \pkg{equate} package includes three sample data sets. The first, \code{ACTmath}, comes from two administrations of the ACT mathematics test, and is used throughout \cite{kolen2014test}. The test scores are based on an equivalent-groups design and are contained in a three-column data frame where column one is the 40-point score scale and columns two and three are the number of examinees for $X$ and $Y$ obtaining each score point.
 
-The second data set, \code{KBneat}, is also used in \cite{kolen2004test}. It contains scores for two forms of a 36-item test administered under a nonequivalent-groups design. A 12-item anchor test is internal to the total test, where anchor scores contribute to an examinee's total score. The number of non-anchor items that are unique to each form is 24, and the highest possible score is 36. \code{KBneat} contains a separate total and anchor score for each examinee. It is a list of length two where the list elements \code{x} and \code{y} each contain a two-column data frame of scores on the total test and scores on the anchor test.
+The second data set, \code{KBneat}, is also used in \cite{kolen2014test}. It contains scores for two forms of a 36-item test administered under a nonequivalent-groups design. A 12-item anchor test is internal to the total test, where anchor scores contribute to an examinee's total score. The number of non-anchor items that are unique to each form is 24, and the highest possible score is 36. \code{KBneat} contains a separate total and anchor score for each examinee. It is a list of length two where the list elements \code{x} and \code{y} each contain a two-column data frame of scores on the total test and scores on the anchor test.
 
 The third data set, \code{PISA}, contains scored cognitive item response data from the 2009 administration of the Programme for International Assessment (PISA). Four data frames are included in \code{PISA}: \code{PISA\$students} contains scores on the cognitive assessment items in math, reading, and science for all 5233 students in the USA cohort; \code{PISA\$booklets} contains information about the structure of the test design, where multiple item sets, or clusters, were administered across 13 test booklets; \code{PISA\$items} contains the cluster, subject, maximum possible score, item format, and number of response options for each item; and \code{PISA\$totals} contains a list of cluster total scores for each booklet, calculated using \code{PISA\$students} and \code{PISA\$booklets}. For additional details, see the \code{PISA} help file which includes references to technical documentation.
 
@@ -438,7 +438,7 @@ plot(neat.x)
 \end{figure}
 
 \subsection{Presmoothing}
-The distributions in Figures~\ref{fig:plotunivar} and \ref{fig:plotbivar} contain irregularities in their shapes that likely result, to some extent, from sampling error. The population distributions that these samples estimate are expected to be smoother, with less jaggedness between adjacent scores. Three methods are available for smoothing sample distributions with the objective of reducing these irregularities. The first, frequency averaging \citep{moses2008notes} replaces scores falling below \code{jmin} with averages based on adjacent scores. This is implemented with \code{smoothmethod = "average"} in the \code{presmoothing} function. The second, adds a small relative frequency (again, \code{jmin}) to each score point while adjusting the probabilities to sum to one \citep[as described by][p.~48]{kolen2004test}. This is implemented using \code{smoothmethod = "bump"} in the \code{presmoothing} function.
+The distributions in Figures~\ref{fig:plotunivar} and \ref{fig:plotbivar} contain irregularities in their shapes that likely result, to some extent, from sampling error. The population distributions that these samples estimate are expected to be smoother, with less jaggedness between adjacent scores. Three methods are available for smoothing sample distributions with the objective of reducing these irregularities. The first, frequency averaging \citep{moses2008notes} replaces scores falling below \code{jmin} with averages based on adjacent scores. This is implemented with \code{smoothmethod = "average"} in the \code{presmoothing} function. The second, adds a small relative frequency (again, \code{jmin}) to each score point while adjusting the probabilities to sum to one \citep[as described by][p.~48]{kolen2014test}. This is implemented using \code{smoothmethod = "bump"} in the \code{presmoothing} function.
 
 The third method of reducing irregularities in sample distributions is polynomial loglinear smoothing. Appendix~\ref{sec:appendLoglin} contains details on the model formula itself. In the \pkg{equate} package, loglinear models are fit using the \code{presmoothing} function with \code{smoothmethod = "loglinear"}, which calls on the generalized linear model (\code{glm}) function in \proglang{R}. Models can be fit in three different ways. The first way is with a \code{formula} object, as follows.
 <<eval=FALSE>>=
@@ -497,11 +497,13 @@ plot(neat.x, neat.xsmat, ylty = 1:5)
 
 The \code{presmoothing} function is used above to compare results from a sequence of nested models. The argument \code{stepup = TRUE} returns a matrix of fitted frequencies for models based on subsets of columns in \code{scorefun}, where the columns for each model can be specified with the argument \code{models}. The \code{presmoothing} function can also infer nested models when the \code{degrees} argument is used. In this case, terms are added sequentially for all variables within each level of interaction. For the example above, the first model in \code{neat.xsmat} includes the total and anchor scales to the first power, the second additionally includes both scales to the second power, and the third includes both to the third power. A fourth model contains the interaction term. The smoothed curves in the marginal distributions of Figure~\ref{fig:plotbivarsmooth2} show the loglinear smoothing results for each nested model that is fit in \code{neat.xsmat}. The legend text defines each smoothing curve using two numbers, the first for the level of interaction (1 for the first three models, and 2 for the fourth), and the second for the highest power included in a model (1, 2, and 3 for the main effects, and 1 for the interaction).
 
-Finally, using the argument \code{compare = TRUE} in \code{presmoothing}, an ANOVA table of deviance statistics is returned for sequentially nested models. Model fit is compared using functions from the base packages in \proglang{R} \citep{r2014}, which provide $AIC$ (Akaike's Information Criterion), $BIC$ (Bayesian Information Criterion), and likelihood ratio $\chi^2$ tests. In the output below, $AIC$ and $BIC$ are smallest for the most complex model, labeled ``Model 4'', which also results in the largest decrease in deviance. The models being compared are the same as those contained in \code{neat.xsmat}.
+Using the argument \code{compare = TRUE} in \code{presmoothing}, an ANOVA table of deviance statistics is returned for sequentially nested models. Model fit is compared using functions from the base packages in \proglang{R} \citep{r2016}, which provide $AIC$ (Akaike's Information Criterion), $BIC$ (Bayesian Information Criterion), and likelihood ratio $\chi^2$ tests. In the output below, $AIC$ and $BIC$ are smallest for the most complex model, labeled ``Model 4'', which also results in the largest decrease in deviance. The models being compared are the same as those contained in \code{neat.xsmat}.
 <<>>=
 presmoothing(neat.x, smooth = "loglinear",
 	degrees = list(c(3, 3), c(1, 1)), compare = TRUE)
 @
+
+Finally, with \code{choose = TRUE}, the \code{presmoothing} function will automatically select the best fitting model and return a smoothed frequency distribution based on that model. The deviance statistic for selection is indicated in the argument \code{choosemethod}, with options chi-square (\code{"chi"}), AIC (\code{"aic"}), and BIC (\code{"bic"}). For \code{"aic"} and \code{"bic"}, the model with the smallest value is chosen. For \code{"chi"}, the most complex model with $p$-value less than the argument \code{chip} is chosen, with default of $1 - (1 - .05)^(1/(# models - 1))$. This automatic model selection is useful in simulation and resampling studies where unique presmoothing models must be fit at each replication.
 
 \subsection[The equate function]{The \code{equate} function}
 Most of the functionality of the \pkg{equate} package can be accessed via the function \code{equate}, which integrates all of the equating types and methods introduced above. The equivalent-groups design provides a simple example: besides the $X$ and $Y$ frequency tables, only the equating \code{type}, i.e., the requested equating function, is required.
@@ -525,7 +527,7 @@ The \code{equate} function can also be used to convert scores from one scale to 
 cbind(newx = c(3, 29, 8, 7, 13),
 	yx = equate(c(3, 29, 8, 7, 13), y = neat.ef))
 @
-Here, the argument \code{y} passed to \code{equate} is the frequency estimation equipercentile equating object from above, which is an object of class \code{"equate"}. Since the equating function from \code{neat.ef} relates scores on $X$ to the scale of $Y$, anchor test scores are not needed for the examinees in \code{newx}. This feature provides a quick way to convert a score vector of any size from $X$ to $Y$. Because this feature does not rely on the discrete concordance table (i.e., conversion table) within the equating output, it can also be utilized with scores on $X$ that were not specified in the original equating, for example, non-integer values on $X$. The discrete concordance table can also be obtained.
+Here, the argument \code{y} passed to \code{equate} is the frequency estimation equipercentile equating object from above, which is an object of class \code{"equate"}. Since the equating function from \code{neat.ef} relates scores on $X$ to the scale of $Y$, anchor test scores are not needed for the examinees in \code{newx}. This feature provides a quick way to convert a score vector of any size from $X$ to $Y$. Because this feature does not rely on the discrete concordance table (i.e., conversion table) within the equating output, it can also be utilized with scores on $X$ that were not specified in the original equating, for example, non-integer values on $X$. The discrete concordance table can also be obtained. For some equating designs and methods, the concordance table will additionally include analytic standard errors.
 <<>>=
 head(neat.ef$concordance)
 @
@@ -587,7 +589,7 @@ plot(pisa.i, pisa.m, pisa.l, pisa.c, pisa.e, addident = F,
 The identity, mean, linear, circle-arc, and equipercentile linking functions are plotted in Figure~\ref{fig:plotstudy2}. With a single-group design the linking lines can be plotted over the observed total scores for each form. In this way, the results can be compared in terms of how well each linking captures the observed difficulty difference from R3R6 to R5R7. Based on the scatterplot in Figure~\ref{fig:plotstudy2}, scores on R5R7 tend to be higher, but this difference is not linear across the score scale. Instead, the difficulty difference appears curvilinear. Circle-arc linking appears to underestimate this nonlinearity, whereas equipercentile linking appears to estimate it well.
 
 \subsection{Linking with multiple anchors}
-The PISA data are used here to demonstrate linking with multiple anchor tests. As noted above, the PISA data come from a cluster rotation design, where different groups of students, organized by test booklet, saw different clusters of math, reading, and science items. Data from booklet 4 are used here to create two pseudo forms for a multi-anchor NEAT design. The unique reading items for each form come from clusters R3 and R4, the first anchor comes from reading cluster R2, and the second from science cluster S2.
+The PISA data are used here to demonstrate linking with multiple anchor tests. As noted above, the PISA data come from a cluster rotation design, where different groups of students, organized by test booklet, saw different clusters of math, reading, and science items. Data from booklet 4 are used here to create two pseudo forms for a NEAT design with an external covariate. The unique reading items for each form come from clusters R3 and R4, the anchor comes from reading cluster R2, and the covariate from science cluster S2.
 <<>>=
 pisa.x <- freqtab(totals$b4[1:200, c("r3a", "r2", "s2")],
 	scales = list(0:15, 0:17, 0:18))
@@ -596,7 +598,7 @@ pisa.y <- freqtab(totals$b4[201:400, c("r4a", "r2", "s2")],
 @
 Note that the first 200 students taking booklet 4 are used in \code{pisa.x} and the second 200 students are in \code{pisa.y}. One student in \code{pisa.x} had missing data and was excluded.
 
-If multiple anchor tests are contained within a frequency table, they are automatically used by the \code{equate} function for any methods that support multi-anchor equating, and they are ignored for methods that do not support them. The following code conducts multi-anchor linking using the nominal weights, Tucker, and frequency estimation methods.
+If multiple anchors and/or covariates are contained within a frequency table, they are automatically used by the \code{equate} function for any methods that support multi-anchor equating, and they are ignored for methods that do not support them. The following code conducts multi-anchor linking using the nominal weights, Tucker, and frequency estimation methods.
 <<>>=
 pisa.mnom <- equate(pisa.x, pisa.y, type = "mean",
 	method = "nom")
@@ -626,7 +628,7 @@ plot(pisa.snom, pisa.stuck, pisa.sfreq,
 <<plotstudy3>>
 @
 \end{center}
-\caption{Comparing single-anchor and multi-anchor linking with PISA.}
+\caption{Comparing single-anchor and covariate linking with PISA.}
 \label{fig:plotstudy3}
 \end{figure}
 
@@ -635,7 +637,7 @@ All but the identity linking and equating functions estimate a statistical relat
 
 With the argument \code{boot = TRUE}, the \code{equate} function will return bootstrap standard errors based on sample sizes of \code{xn} and \code{yn} taken across \code{reps = 100} replications from \code{x} and \code{y}. Individuals are sampled with replacement, and the default sample sizes \code{xn} and \code{yn} will match those observed in \code{x} and \code{y}. Equating is performed at each replication, and the estimated equating functions are saved. $Bias$ and $RMSE$ can be obtained by including a vector of criterion equating scores via \code{crit}. Finally, the matrix of estimated equatings at each replication can be obtained with \code{eqs = TRUE}.
 
-Parametric bootstrapping involves resampling as described above, but from a smoothed score distribution that is assumed to produce more reliable results with small samples \citep{kolen2004test}. In simulation studies this smoothed distribution is sometimes treated as a pseudo-population. Parametric bootstrapping is performed within the \code{equate} function by providing the optional frequency distributions \code{xp} and \code{yp}. These simply replace the sample distributions \code{x} and \code{y} when the bootstrap resampling is performed. Additionally, the \code{bootstrap} function can be used directly to perform multiple equatings at each bootstrap replication. $SE$, $bias$, and $RMSE$ can then be obtained for each equating function using the same bootstrap data.
+Parametric bootstrapping involves resampling as described above, but from a smoothed score distribution that is assumed to produce more reliable results with small samples \citep{kolen2014test}. In simulation studies this smoothed distribution is sometimes treated as a pseudo-population. Parametric bootstrapping is performed within the \code{equate} function by providing the optional frequency distributions \code{xp} and \code{yp}. These simply replace the sample distributions \code{x} and \code{y} when the bootstrap resampling is performed. Additionally, the \code{bootstrap} function can be used directly to perform multiple equatings at each bootstrap replication. $SE$, $bias$, and $RMSE$ can then be obtained for each equating function using the same bootstrap data.
 
 Note that the number of bootstrap replications, specified via the \code{reps} argument, can impact the stability of the results, with error estimates varying noticeably for replications below 100. Bootstrapping studies vary widely in the number of replications utilized. It is recommended that no fewer than 100 be used. For more stable results, 500 to 1000 replications may be necessary, as computing time permits.
 
@@ -677,7 +679,7 @@ plot(neat.y, neat.ypmat)
 \label{fig:plotstudy1y}
 \end{figure}
 
-Next, the number of replications is set to 100, bootstrap sample sizes are set to 100 for $X$ and $Y$, and a criterion equating function is defined as the chained equipercentile equating in the population. Note that the frequency estimation method could have also been used to obtain the criterion function.
+Next, the number of replications is set to 100, bootstrap sample sizes are set to 100 for $X$ and $Y$, and a criterion equating function is defined, for demonstration purposes, as the chained equipercentile equating in the population.
 <<>>=
 set.seed(131031)
 reps <- 100
@@ -779,7 +781,7 @@ options(op)
 \section{Summary}
 This paper presents some basic concepts and procedures for observed-score linking and equating of measurement scales. Linear and nonlinear functions are discussed, and various methods for applying them to nonequivalent groups are reviewed. Finally, the \pkg{equate} package is introduced, and its basic functionality is demonstrated using three data sets.
 
-The \pkg{equate} package is designed to be a resource for teaching, learning, and applying observed-score linking and equating procedures. A simple interface, via the \code{equate} function, can be used to control most of the necessary functionality, including data preparation, presmoothing, linking and equating, and managing output. Summary and plot methods facilitate the comparison of results. Future versions of the \pkg{equate} package will be extended to support additional procedures, for example, postsmoothing \citep[e.g.,][]{kolen1991smoothing}, nonlinear continuization \citep{vondavier2004kernel}, asymptotic standard errors of equating \citep[e.g.,][]{lord1982standard}, and new linking and equating functions as they are developed.
+The \pkg{equate} package is designed to be a resource for teaching, research, and applied observed-score linking and equating procedures. A simple interface, via the \code{equate} function, can be used to control most of the necessary functionality, including data preparation, presmoothing, linking and equating, and managing output. Summary and plot methods facilitate the comparison of results. Future versions of the \pkg{equate} package will be extended to support additional procedures, for example, postsmoothing \citep[e.g.,][]{kolen1991smoothing}, nonlinear continuization \citep{vondavier2004kernel}, additional asymptotic standard errors of equating, and new linking and equating functions as they are developed.
 
 %----------------------------------------------------------------------------------------------------------------
 % References
@@ -845,7 +847,7 @@ The unobserved variance on $Y$ for $P$ can be obtained similarly as
 \begin{equation}
   \sigma_{Y_P}^2 = \sigma_{Y_Q}^2 + \Bgamma_{Y}^{\prime}(\BSigma_{V_P} - \BSigma_{V_Q})\Bgamma_{Y}. \label{eqn:vyp}
 \end{equation}
-Equations~\eqref{eqn:vxq2} and \eqref{eqn:vyp} can then be used within Equations~\eqref{eqn:synthvx2} and \eqref{eqn:synthvy2} to obtain $\sigma_{X}^2$ and $\sigma_{Y}^2$. These derivations for the Tucker method are simple extensions of equations presented for a single anchor \citep[e.g.,][]{kolen2004test}. Tucker equating with multiple anchors was first discussed by \cite{gulliksen1950theory}.
+Equations~\eqref{eqn:vxq2} and \eqref{eqn:vyp} can then be used within Equations~\eqref{eqn:synthvx2} and \eqref{eqn:synthvy2} to obtain $\sigma_{X}^2$ and $\sigma_{Y}^2$. These derivations for the Tucker method are simple extensions of equations presented for a single anchor \citep[e.g.,][]{kolen2014test}. Tucker equating with multiple anchors was first discussed by \cite{gulliksen1950theory}.
 
 %----------------------------------------------------------------------------------------------------------------
 % Nominal weights
@@ -940,7 +942,7 @@ and
 \begin{equation}
 \Pr_P(y, v_1, v_2, \dots, v_m) = \frac{\Pr_Q(y, v_1, v_2, \dots, v_m)}{\Pr_Q(v_1, v_2, \dots, v_m)}\Pr_P(v_1, v_2, \dots, v_m), \label{eqn:yp}
 \end{equation}
-which are used in Equations~\eqref{eqn:synthdistx2} and \eqref{eqn:synthdisty2} to obtain the multivariate synthetic distributions. Note that Equations~\eqref{eqn:xq} and \eqref{eqn:yp} are simple generalizations of equations for equating with one anchor \citep[e.g.,][]{kolen2004test, vondavier2004kernel} and equating with two \citep{moses2010use} and three anchors \citep{angoff1984scales}.
+which are used in Equations~\eqref{eqn:synthdistx2} and \eqref{eqn:synthdisty2} to obtain the multivariate synthetic distributions. Note that Equations~\eqref{eqn:xq} and \eqref{eqn:yp} are simple generalizations of equations for equating with one anchor \citep[e.g.,][]{kolen2014test, vondavier2004kernel} and equating with two \citep{moses2010use} and three anchors \citep{angoff1984scales}.
 
 %----------------------------------------------------------------------------------------------------------------
 % Chained
@@ -990,7 +992,7 @@ Indicator variables may also be included to preserve specific moments for subset
 \begin{equation}
   log(p) = \beta_0 + \beta_1x^1 + \beta_2x^2 + \beta_3x^3 + \beta_{0S}S + \beta_{1S}x^1S + \beta_{2S}x^2S.
 \end{equation}
-An acceptable degree of smoothing is typically achieved by comparing multiple models with different numbers of polynomial terms based on their fit to the data \citep{kolen2004test}. The \code{loglinear} function in \pkg{equate} is a wrapper for the \code{glm} function in the \pkg{stats} package. It can be used to fit and compare nested models up to specified maximum polynomial terms. For additional details, see the \code{presmoothing} help file.
+An acceptable degree of smoothing is typically achieved by comparing multiple models with different numbers of polynomial terms based on their fit to the data \citep{kolen2014test}. The \code{loglinear} function in \pkg{equate} is a wrapper for the \code{glm} function in the \pkg{stats} package. It can be used to fit and compare nested models up to specified maximum polynomial terms. For additional details, see the \code{presmoothing} help file.
 
 %----------------------------------------------------------------------------------------------------------------
 % Error
