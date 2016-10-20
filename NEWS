@@ -1,12 +1,23 @@
 equate_2.0-5 (2016-10-20)
 
+  o Support for linear equating in a single-group
+    design with counterbalancing.
+    
+  o Analytic standard errors added for linear equating
+    under single-group counterbalanced and
+    equivalent-groups designs, and chained, Tucker,
+    and Levine methods with nonequivalent-groups.
+    
+  o Analytic standard errors added for equipercentile
+    equating under equivalent-groups design.
+
   o Fix bug in equipercentile equating for scores with
     zero frequencies.
 
-  o Missing bracket fixed in loglinear function
-    
-  o Analytic standard errors added for linear equating
+  o Missing bracket fixed in loglinear function.
 
+  o Vignette updated to match recent JSS publication.
+  
 equate_2.0-4 (2016-4-26)
 
   o Support for equating scales that have
