@@ -1,0 +1,19 @@
+bibentry(bibtype = "Article",
+  title        = "{equate}: An {R} Package for Observed-Score Linking and Equating",
+  author       = person(given = c("Anthony", "D."),
+                        family = "Albano",
+                        email = "albano@unl.edu"),
+  journal      = "Journal of Statistical Software",
+  year         = "2016",
+  volume       = "74",
+  number       = "8",
+  pages        = "1--36",
+  doi          = "10.18637/jss.v074.i08",
+
+  header       = "To cite equate in publications use:",
+  textVersion  =
+  paste("Anthony D. Albano (2016).",
+        "equate: An R Package for Observed-Score Linking and Equating.",
+        "Journal of Statistical Software, 74(8), 1-36.",
+        "doi:10.18637/jss.v074.i08")
+)

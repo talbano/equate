@@ -56,7 +56,7 @@ Equating defines a functional statistical relationship between multiple test sco
 
 A handful of statistical packages are available for linking and equating test forms. \cite{kolen2014test} demonstrate a suite of free, standalone programs for observed-score and item response theory (IRT) linking and equating. Other packages, like \pkg{equate}, have been developed within the \proglang{R} environment \citep{r2016}. For example, the \proglang{R} package \pkg{kequate} \citep{andersson2013performing} includes observed-score methods, but within a kernel equating framework. The \proglang{R} package \pkg{plink} \citep{weeks2010plink} implements IRT linking under a variety of dichotomous, polytomous, unidimensional, and multidimensional models. The \proglang{R} package \pkg{SNSequate} \citep{burgos2014snsequate} contains some functions for observed-score and kernel equating, along with IRT linking methods.
 
-The \pkg{equate} package is designed for observed-score linking and equating. It differs from other packages primarily in its overall structure and usability, its plotting and bootstrapping capabilities, and its inclusion of more recently developed equating and linking functions such as the general-linear, synthetic, and circle-arc functions, and traditional methods such as Levine, Tucker, and Braun/Holland. Equating with multiple anchor tests and external covariates is also supported, as demonstrated below. Linking and equating are performed using a simple interface, and plotting and summary methods are provided to facilitate the comparison of results and the examination of equating error. Sample data and detailed help files are also included. These features make the package useful in teaching, research, and operational testing contexts.
+The \pkg{equate} package, available on the Comprehensive R Archive Network (CRAN) at \url{https://CRAN.R-project.org/package=equate}, is designed for observed-score linking and equating. It differs from other packages primarily in its overall structure and usability, its plotting and bootstrapping capabilities, and its inclusion of more recently developed equating and linking functions such as the general-linear, synthetic, and circle-arc functions, and traditional methods such as Levine, Tucker, and Braun/Holland. Equating with multiple anchor tests and external covariates is also supported, as demonstrated below. Linking and equating are performed using a simple interface, and plotting and summary methods are provided to facilitate the comparison of results and the examination of bootstrap and analytic equating error. Sample data and detailed help files are also included. These features make the package useful in teaching, research, and operational testing contexts.
 
 This paper presents some basic linking and equating concepts and procedures. Equating designs are first discussed in Section~\ref{sec:designs}. In Section~\ref{sec:functions}, linear and nonlinear observed-score linking and equating functions are reviewed. In Section~\ref{sec:methods}, methods are presented for linking and equating when examinee groups are not equivalent. Finally, in Section~\ref{sec:applications}, the \pkg{equate} package is introduced and its basic functionality is demonstrated using three data sets.
 
@@ -173,7 +173,7 @@ Equipercentile linking and equating define a nonlinear relationship between scor
 \begin{equation}
   equip_Y(x) = G^{-1}[F(x)], \label{eqn:equip}
 \end{equation}
-which is also the equipercentile equating function $equipe_Y(x)$. When the score scales are discrete, which is often the case, the cumulative distribution function can be approximated using percentile ranks. This is a simple approach to \emph{continuizing} the discrete score distributions \citep[for details, see][ch.~2]{kolen2014test}. Kernel equating, using Gaussian kernels, offers a more flexible approach to continuization \citep{vondavier2004kernel}, but is not currently supported in the \pkg{equate} package. Instead, the percentile rank method is currently used. The equipercentile equivalent of a form-$X$ score on the $Y$ scale is calculated by finding the percentile rank in $X$ of a particular score, and then finding the form-$Y$ score associated with that form-$Y$ percentile rank.
+which is also the equipercentile equating function $equipe_Y(x)$. When the score scales are discrete, which is often the case, the cumulative distribution function can be approximated using percentile ranks. This is a simple approach to \emph{continuizing} the discrete score distributions \citep[for details, see][ch.~2]{kolen2014test}. Kernel equating, using Gaussian kernels, offers a more flexible approach to continuization \citep{vondavier2004kernel}, but differences between the methods tend to be negligible. The percentile rank method is currently used in the \pkg{equate} package. The equipercentile equivalent of a form-$X$ score on the $Y$ scale is calculated by finding the percentile rank in $X$ of a particular score, and then finding the form-$Y$ score associated with that form-$Y$ percentile rank.
 
 Equipercentile equating is appropriate when $X$ and $Y$ differ nonlinearly in difficulty, that is, when difficulty differences fluctuate across the score scale, potentially at each score point. Each coordinate on the equipercentile curve is estimated using information from the distributions of $X$ and $Y$. Thus, compared to identity, mean, and linear equating, equipercentile equating is more susceptible to sampling error because it involves the estimation of as many parameters as there are unique score points on $X$.
 
@@ -348,10 +348,10 @@ Finally, chained equating \citep{livingston1990combination} can be applied to bo
 \end{enumerate}
 Chained methods are based on the assumptions that 1) the equating of $X$ to $V$ is the same for $P$ and $Q$, and 2) the equating of $V$ to $Y$ is the same for $P$ and $Q$.
 
-\subsection{Methods for general linear}
+\subsection{Methods for the general linear function}
 The general linear equating function can be utilized with any combination of weighted means and standard deviations from Equations~\ref{eqn:synthmx1} through \ref{eqn:synthvy1}. Thus, any methods for nonequivalent groups that estimate means or means and standard deviations for the synthetic population can be implemented within the general linear function. In the \pkg{equate} package, these methods are currently Tucker, nominal-weights, Levine observed-score, and Braun/Holland. See \cite{albano2015general} for examples. Composites of these methods can also be obtained.
 
-\subsection{Methods for circle-arc}
+\subsection{Methods for the circle-arc function}
 As discussed above, the circle-arc equating function combines a linear with a curvilinear component based on three points in the $X$ and $Y$ score distributions. Although all three points can be obtained using the general linear function, the first and third of these points are typically determined by the score scale whereas the midpoint is estimated. Equating methods used with circle-arc equating in the nonequivalent-groups design apply only to estimation of this midpoint. \cite{livingston2009circle} demonstrated chained linear equating of means, under a nonequivalent-groups design. The midpoint could also be estimated using other linear methods, such as Tucker or Levine.
 
 Note that circle-arc equating is defined here as an equating \emph{type}, and equating \emph{methods} are used to estimate the midpoint. When groups are considered equivalent (i.e., an anchor test is not used) equating at the midpoint is simply mean equating, as mentioned above (replace $x$ with $\mu_X$ in Equation~\eqref{eqn:le1} to see why this is the case). With scores on an anchor test, both Tucker and Levine equating at the midpoint also reduce to mean equating. However, chained linear equating at the midpoint differs from chained mean (see Appendix~\ref{sec:appendChain}).
@@ -371,22 +371,22 @@ The third data set, \code{PISA}, contains scored cognitive item response data fr
 
 \subsection{Preparing score distributions}
 \label{sec:preparing}
-The \pkg{equate} package analyzes score distributions primarily as frequency table objects with class \code{"freqtab"}. For example, to equate the \code{ACTmath} forms, they must first be converted to frequency tables as follows.
+The \pkg{equate} package analyzes score distributions primarily as frequency table objects with class '\code{freqtab}'. For example, to equate the \code{ACTmath} forms, they must first be converted to frequency tables as follows.
 <<echo=FALSE>>=
 op <- options()
-options(prompt = "R>", show.signif.stars = FALSE, warn = -1)
+options(prompt = "R> ", show.signif.stars = FALSE, warn = -1, continue = "+    ")
 @
 <<>>=
 library("equate")
 act.x <- as.freqtab(ACTmath[, 1:2])
 act.y <- as.freqtab(ACTmath[, c(1, 3)])
 @
-The \code{"freqtab"} class stores frequency distributions as table arrays, with a dimension for each of the variables included in the distribution. The function \code{as.freqtab} is used above because \code{ACTmath} already contains tabulated values; this code simply restructures the scales and counts for the two test forms and gives them the appropriate attributes. When printed to the console, \code{"freqtab"} objects are converted to \code{data.frame}s. They are summarized with the \code{summary} method.
+The '\code{freqtab}' class stores frequency distributions as table arrays, with a dimension for each of the variables included in the distribution. The function \code{as.freqtab} is used above because \code{ACTmath} already contains tabulated values; this code simply restructures the scales and counts for the two test forms and gives them the appropriate attributes. When printed to the console, '\code{freqtab}' objects are converted to \code{data.frame}s. They are summarized with the \code{summary} method.
 <<>>=
 head(act.x)
 rbind(x = summary(act.x), y = summary(act.y))
 @
-The constructor \code{freqtab} creates a frequency table from a vector or data frame of observed scores. With an anchor test, this becomes a bivariate frequency table. Bivariate distributions contain counts for all possible score combinations for the total and anchor scores. Multivariate distributions, e.g., containing scores on multiple anchor tests, are also supported.
+The constructor \code{freqtab} creates a frequency table from a vector or data frame of observed scores. With an anchor test, this becomes a bivariate frequency table. Bivariate distributions contain counts for all possible score combinations for the total and anchor scores. Multivariate distributions, e.g., containing scores on multiple anchor tests and external covariates, are also supported.
 <<>>=
 neat.x <- freqtab(KBneat$x, scales = list(0:36, 0:12))
 neat.y <- freqtab(KBneat$y, scales = list(0:36, 0:12))
@@ -400,13 +400,13 @@ r6items <- paste(items$itemid[items$clusterid == "r6"])
 r5items <- paste(items$itemid[items$clusterid == "r5"])
 r7items <- paste(items$itemid[items$clusterid == "r7"])
 pisa <- freqtab(students[students$book == 6, ],
-	items = list(c(r3items, r6items), c(r5items, r7items)),
-	scales = list(0:31, 0:29), design = "sg")
+items = list(c(r3items, r6items), c(r5items, r7items)),
+scales = list(0:31, 0:29), design = "sg")
 round(data.frame(summary(pisa),
-	row.names = c("r3r6", "r5r7")), 2)
+row.names = c("r3r6", "r5r7")), 2)
 @
 
-A basic plot method is provided in the \code{"freqtab"} class. Univariate frequencies are plotted as vertical lines for the argument \code{x}, similar to a bar chart, and as superimposed curves for the argument \code{y}. When \code{y} is a matrix, each column of frequencies is added to the plot as a separate line. This feature is useful when examining smoothed frequency distributions, as demonstrated below. When \code{x} is a bivariate frequency table, a scatter plot with marginal frequency distributions is produced. See Figure~\ref{fig:plotunivar} for an example of a univariate plot, and Figure~\ref{fig:plotbivar} for an example of a bivariate plot.
+A basic plot method is provided in the '\code{freqtab}' class. Univariate frequencies are plotted as vertical lines for the argument \code{x}, similar to a bar chart, and as superimposed curves for the argument \code{y}. When \code{y} is a matrix, each column of frequencies is added to the plot as a separate line. This feature is useful when examining smoothed frequency distributions, as demonstrated below. When \code{x} is a bivariate frequency table, a scatter plot with marginal frequency distributions is produced. See Figure~\ref{fig:plotunivar} for an example of a univariate plot, and Figure~\ref{fig:plotbivar} for an example of a bivariate plot.
 <<include=FALSE>>=
 plot(x = act.x, lwd = 2, xlab = "Score", ylab = "Count")
 plot(neat.x)
@@ -438,22 +438,22 @@ plot(neat.x)
 \end{figure}
 
 \subsection{Presmoothing}
-The distributions in Figures~\ref{fig:plotunivar} and \ref{fig:plotbivar} contain irregularities in their shapes that likely result, to some extent, from sampling error. The population distributions that these samples estimate are expected to be smoother, with less jaggedness between adjacent scores. Three methods are available for smoothing sample distributions with the objective of reducing these irregularities. The first, frequency averaging \citep{moses2008notes} replaces scores falling below \code{jmin} with averages based on adjacent scores. This is implemented with \code{smoothmethod = "average"} in the \code{presmoothing} function. The second, adds a small relative frequency (again, \code{jmin}) to each score point while adjusting the probabilities to sum to one \citep[as described by][p.~48]{kolen2014test}. This is implemented using \code{smoothmethod = "bump"} in the \code{presmoothing} function.
+The distributions in Figures~\ref{fig:plotunivar} and \ref{fig:plotbivar} contain irregularities in their shapes that likely result, to some extent, from sampling error. The population distributions that these samples estimate are expected to be smoother, with less jaggedness between adjacent scores. Three methods are available for smoothing sample distributions with the objective of reducing these irregularities. The first, frequency averaging \citep{moses2008notes} replaces scores falling below \code{jmin} with averages based on adjacent scores. This is implemented with \code{smoothmethod = "average"} in the \code{presmoothing} function. The second, adds a small relative frequency (again, \code{jmin}) to each score point while adjusting the probabilities to sum to one \citep[as described by][p.~46]{kolen2014test}. This is implemented using \code{smoothmethod = "bump"} in the \code{presmoothing} function.
 
 The third method of reducing irregularities in sample distributions is polynomial loglinear smoothing. Appendix~\ref{sec:appendLoglin} contains details on the model formula itself. In the \pkg{equate} package, loglinear models are fit using the \code{presmoothing} function with \code{smoothmethod = "loglinear"}, which calls on the generalized linear model (\code{glm}) function in \proglang{R}. Models can be fit in three different ways. The first way is with a \code{formula} object, as follows.
 <<eval=FALSE>>=
 presmoothing(~ poly(total, 3, raw = T) + poly(anchor, 3, raw = T) +
-	total:anchor, data = neat.x)
+total:anchor, data = neat.x)
 @
 This is similar to the approach used in other modeling functions in \proglang{R}, but with two restrictions: 1) the dependent variable, to the left of the \code{~}, is set to be the score frequencies contained in \code{data}, and it does not need to be specified in the formula; and 2) the intercept is required and will be added if it has been explicitly removed in the formula.
 
 The formula smoothing method is efficient to write for simpler models, but it can be cumbersome for more complex models containing multiple interaction terms. The second way to specify the model is with a matrix of score functions (\code{scorefun}) similar to a \code{model.matrix} in \proglang{R}, where each column is a predictor variable in the model, as follows.
 <<eval=FALSE>>=
 neat.xsf <- with(as.data.frame(neat.x), cbind(total, total^2,
-	total^3, anchor, anchor^2, anchor^3, total*anchor))
+total^3, anchor, anchor^2, anchor^3, total*anchor))
 presmoothing(neat.x, smooth = "loglinear", scorefun = neat.xsf)
 @
-The object \code{neat.xsf} is a matrix containing the total and anchor score scales to the first, second, and third powers, and the interaction between the two. The presmoothing results based on this score function are the same as those for the formula method above. One benefit of creating the score function externally is it can be easily modified and used with other models. It can also include variables not contained within the raw frequency table, \code{neat.x}, in this example. The formula interface is limited in this respect, as the \code{data} argument must be a frequency table, and it cannot include variables besides the total and anchor scores.
+The object \code{neat.xsf} is a matrix containing the total and anchor score scales to the first, second, and third powers, and the interaction between the two. The presmoothing results based on this score function are the same as those for the formula method above. One benefit of creating the score function externally is that it can be easily modified and used with other models. It can also include variables not contained within the raw frequency table, \code{neat.x}, in this example. The formula interface is limited in this respect, as the \code{data} argument must be a frequency table, and it cannot include variables besides the total and anchor scores.
 
 The most efficient approach to specify a loglinear model in the \code{presmoothing} function is by including the degrees of the highest polynomial terms for each variable at each level of interaction. For example, in the formula and score function methods above, terms are included for both the total and anchor tests up to the third power and for the two-way interaction to the first power. This is specified compactly using \code{degrees = list(c(3, 3), c(1, 1))}, which can be reduced to \code{degrees = list(3, 1)}.
 <<>>=
@@ -464,7 +464,7 @@ This functionality extends to multivariate distributions. For example, three way
 For the bivariate example, the smoothed distributions in Figure~\ref{fig:plotbivarsmooth1} can be compared to the unsmoothed ones in Figure~\ref{fig:plotbivar}. Figure~\ref{fig:plotbivarsmooth2} superimposes the smoothed frequencies on the unsmoothed marginal distributions for a more detailed comparison of the different models. Descriptive statistics show that the smoothed distributions match the unsmoothed in the first three moments.
 <<include=FALSE>>=
 neat.xsmat <- presmoothing(neat.x, smooth = "loglinear",
-	degrees = list(3, 1), stepup = TRUE)
+degrees = list(3, 1), stepup = TRUE)
 plot(neat.xs)
 plot(neat.x, neat.xsmat, ylty = 1:4)
 round(rbind(x = summary(neat.x), xs = summary(neat.xs)), 2)
@@ -500,7 +500,7 @@ The \code{presmoothing} function is used above to compare results from a sequenc
 Using the argument \code{compare = TRUE} in \code{presmoothing}, an ANOVA table of deviance statistics is returned for sequentially nested models. Model fit is compared using functions from the base packages in \proglang{R} \citep{r2016}, which provide $AIC$ (Akaike's Information Criterion), $BIC$ (Bayesian Information Criterion), and likelihood ratio $\chi^2$ tests. In the output below, $AIC$ and $BIC$ are smallest for the most complex model, labeled ``Model 4'', which also results in the largest decrease in deviance. The models being compared are the same as those contained in \code{neat.xsmat}.
 <<>>=
 presmoothing(neat.x, smooth = "loglinear",
-	degrees = list(c(3, 3), c(1, 1)), compare = TRUE)
+degrees = list(c(3, 3), c(1, 1)), compare = TRUE)
 @
 
 Finally, with \code{choose = TRUE}, the \code{presmoothing} function will automatically select the best fitting model and return a smoothed frequency distribution based on that model. The deviance statistic for selection is indicated in the argument \code{choosemethod}, with options chi-square (\code{"chi"}), AIC (\code{"aic"}), and BIC (\code{"bic"}). For \code{"aic"} and \code{"bic"}, the model with the smallest value is chosen. For \code{"chi"}, the most complex model with $p$-value less than the argument \code{chip} is chosen, with default of $1 - (1 - .05)^(1/(\# models - 1))$. This automatic model selection is useful in simulation and resampling studies where unique presmoothing models must be fit at each replication.
@@ -513,7 +513,7 @@ equate(act.x, act.y, type = "mean")
 The nonequivalent-groups design is specified with an equating \code{method}, and smoothing with a \code{smoothmethod}.
 <<>>=
 neat.ef <- equate(neat.x, neat.y, type = "equip",
-	method = "frequency estimation", smoothmethod = "log")
+method = "frequency estimation", smoothmethod = "log")
 @
 Table~\ref{tab:typesmethods} lists the equating methods that apply to each equating type in the nonequivalent-groups design. Levine true-score equating (\code{lts}) is performed by including the additional argument \code{lts = TRUE}.
 
@@ -525,9 +525,9 @@ summary(neat.ef)
 The \code{equate} function can also be used to convert scores from one scale to another based on the function defined in a previous equating. For example, scores on $Y$ for a new sample of examinees taking \code{KBneat} form $X$ could be obtained.
 <<>>=
 cbind(newx = c(3, 29, 8, 7, 13),
-	yx = equate(c(3, 29, 8, 7, 13), y = neat.ef))
+yx = equate(c(3, 29, 8, 7, 13), y = neat.ef))
 @
-Here, the argument \code{y} passed to \code{equate} is the frequency estimation equipercentile equating object from above, which is an object of class \code{"equate"}. Since the equating function from \code{neat.ef} relates scores on $X$ to the scale of $Y$, anchor test scores are not needed for the examinees in \code{newx}. This feature provides a quick way to convert a score vector of any size from $X$ to $Y$. Because this feature does not rely on the discrete concordance table (i.e., conversion table) within the equating output, it can also be utilized with scores on $X$ that were not specified in the original equating, for example, non-integer values on $X$. The discrete concordance table can also be obtained. For some equating designs and methods, the concordance table will additionally include analytic standard errors.
+Here, the argument \code{y} passed to \code{equate} is the frequency estimation equipercentile equating object from above, which is an object of class '\code{equate}'. Since the equating function from \code{neat.ef} relates scores on $X$ to the scale of $Y$, anchor test scores are not needed for the examinees in \code{newx}. This feature provides a quick way to convert a score vector of any size from $X$ to $Y$. Because this feature does not rely on the discrete concordance table (i.e., conversion table) within the equating output, it can also be utilized with scores on $X$ that were not specified in the original equating, for example, non-integer values on $X$. The discrete concordance table can also be obtained. For some equating designs and methods, the concordance table will additionally include analytic standard errors.
 <<>>=
 head(neat.ef$concordance)
 @
@@ -536,9 +536,9 @@ Finally, composite linkings are created using the \code{composite} function. For
 <<include=FALSE>>=
 neat.i <- equate(neat.x, neat.y, type = "ident")
 neat.lt <- equate(neat.x, neat.y, type = "linear",
-	method = "tucker")
+method = "tucker")
 neat.comp <- composite(list(neat.i, neat.lt), wc = .5,
-	symmetric = TRUE)
+symmetric = TRUE)
 plot(neat.comp, addident = FALSE)
 @
 <<label=plotcomposite,include=FALSE,echo=FALSE>>=
@@ -559,7 +559,7 @@ plot(neat.comp, addident = FALSE)
 \subsection{Linking with different scale lengths and item types}
 Procedures for linking scales of different lengths and item types are demonstrated here using \code{PISA} data. A frequency table containing four clusters, or item sets, from the PISA reading test was created above as \code{pisa}. This frequency table combines total scores on two item sets to create one form, R3R6, and total scores on two other item sets to create another form, R5R7. Because the same group of examinees took all of the item sets, the forms are contained within a single bivariate frequency table.
 
-The two forms differ in length and item type. R3R6 contains 30 items, one of which has a maximum possible score of 2, and the remainder of which are scored dichotomously. This results in a score scale ranging from 0 to 31. However, 14 of the 30 items in R3R6 were multiple-choice (MC), mostly with four response options. The remaining items were either constructed-response or complex multiple-choice, where examinees were unlikely to guess the correct response. Thus, the lowest score expected by chance for R3R6 is $14/4 = 3.5$. R5R7 contains 29 items, all of which are scored dichotomously. Eight of these items are MC with four response options and the remainder are CR or complex MC, resulting in a lowest expected chance score of $8/4 = 2$. The summary statistics above show that, despite having a slightly smaller score scale, the mean for R5R7 is slightly higher than for R3R5.
+The two forms differ in length and item type. R3R6 contains 30 items, one of which has a maximum possible score of 2, and the remainder of which are scored dichotomously. This results in a score scale ranging from 0 to 31. However, 14 of the 30 items in R3R6 were multiple-choice, mostly with four response options. The remaining items were either constructed-response or complex multiple-choice, where examinees were unlikely to guess the correct response. Thus, the lowest score expected by chance for R3R6 is $14/4 = 3.5$. R5R7 contains 29 items, all of which are scored dichotomously. Eight of these items are multiple-choice with four response options and the remainder are constructed-response or complex multiple-choice, resulting in a lowest expected chance score of $8/4 = 2$. The summary statistics above show that, despite having a slightly smaller score scale, the mean for R5R7 is slightly higher than for R3R5.
 
 Results for linking R3R6 to R5R7 are compared here for five linking types: identity, mean, linear, circle-arc, and equipercentile with loglinear presmoothing (using the default \code{degrees}). By default, the identity linking component of each linear function is based on the minimum and maximum possible points for each scale, that is, $(0, 0)$ and $(31, 29)$. The low points were modified to be $(3.5, 2)$ to reflect the lowest scores expected by chance.
 <<include=FALSE>>=
@@ -568,13 +568,13 @@ pisa.m <- equate(pisa, type = "mean", lowp = c(3.5, 2))
 pisa.l <- equate(pisa, type = "linear", lowp = c(3.5, 2))
 pisa.c <- equate(pisa, type = "circ", lowp = c(3.5, 2))
 pisa.e <- equate(pisa, type = "equip", smooth = "log",
-	lowp = c(3.5, 2))
-plot(pisa.i, pisa.m, pisa.l, pisa.c, pisa.e, addident = F,
-	xpoints = pisa, morepars = list(ylim = c(0, 31)))
+lowp = c(3.5, 2))
+plot(pisa.i, pisa.m, pisa.l, pisa.c, pisa.e, addident = FALSE,
+xpoints = pisa, morepars = list(ylim = c(0, 31)))
 @
 <<label=plotstudy2,include=FALSE,echo=FALSE>>=
-plot(pisa.i, pisa.m, pisa.l, pisa.c, pisa.e, addident = F,
-	xpoints = pisa, morepars = list(ylim = c(0, 31)))
+plot(pisa.i, pisa.m, pisa.l, pisa.c, pisa.e, addident = FALSE,
+xpoints = pisa, morepars = list(ylim = c(0, 31)))
 @
 \begin{figure}
 \begin{center}
@@ -588,39 +588,39 @@ plot(pisa.i, pisa.m, pisa.l, pisa.c, pisa.e, addident = F,
 
 The identity, mean, linear, circle-arc, and equipercentile linking functions are plotted in Figure~\ref{fig:plotstudy2}. With a single-group design the linking lines can be plotted over the observed total scores for each form. In this way, the results can be compared in terms of how well each linking captures the observed difficulty difference from R3R6 to R5R7. Based on the scatterplot in Figure~\ref{fig:plotstudy2}, scores on R5R7 tend to be higher, but this difference is not linear across the score scale. Instead, the difficulty difference appears curvilinear. Circle-arc linking appears to underestimate this nonlinearity, whereas equipercentile linking appears to estimate it well.
 
-\subsection{Linking with multiple anchors}
+\subsection{Linking with multiple anchors and covariates}
 The PISA data are used here to demonstrate linking with multiple anchor tests. As noted above, the PISA data come from a cluster rotation design, where different groups of students, organized by test booklet, saw different clusters of math, reading, and science items. Data from booklet 4 are used here to create two pseudo forms for a NEAT design with an external covariate. The unique reading items for each form come from clusters R3 and R4, the anchor comes from reading cluster R2, and the covariate from science cluster S2.
 <<>>=
 pisa.x <- freqtab(totals$b4[1:200, c("r3a", "r2", "s2")],
-	scales = list(0:15, 0:17, 0:18))
+scales = list(0:15, 0:17, 0:18))
 pisa.y <- freqtab(totals$b4[201:400, c("r4a", "r2", "s2")],
-	scales = list(0:16, 0:17, 0:18))
+scales = list(0:16, 0:17, 0:18))
 @
 Note that the first 200 students taking booklet 4 are used in \code{pisa.x} and the second 200 students are in \code{pisa.y}. One student in \code{pisa.x} had missing data and was excluded.
 
-If multiple anchors and/or covariates are contained within a frequency table, they are automatically used by the \code{equate} function for any methods that support multi-anchor equating, and they are ignored for methods that do not support them. The following code conducts multi-anchor linking using the nominal weights, Tucker, and frequency estimation methods.
+If multiple anchors and/or covariates are contained within a frequency table, they are automatically used by the \code{equate} function for any methods that support multi-anchor equating, and they are ignored for methods that do not support them. The following code conducts linking with covariates using the nominal weights, Tucker, and frequency estimation methods.
 <<>>=
 pisa.mnom <- equate(pisa.x, pisa.y, type = "mean",
-	method = "nom")
+method = "nom")
 pisa.mtuck <- equate(pisa.x, pisa.y, type = "linear",
-	method = "tuck")
+method = "tuck")
 pisa.mfreq <- equate(pisa.x, pisa.y, type = "equip",
-	method = "freq", smooth = "loglin")
+method = "freq", smooth = "loglin")
 @
 Single-anchor linking can also be performed by removing the science test from each frequency table. The \code{margin} function from the \pkg{equate} package is used here to extract only the bivariate distributions for the total and reading test anchor scales.
 <<>>=
 pisa.snom <- equate(margin(pisa.x, 1:2), margin(pisa.y, 1:2),
-	type = "mean", method = "nom")
+type = "mean", method = "nom")
 pisa.stuck <- equate(margin(pisa.x, 1:2), margin(pisa.y, 1:2),
-	type = "linear", method = "tuck")
+type = "linear", method = "tuck")
 pisa.sfreq <- equate(margin(pisa.x, 1:2), margin(pisa.y, 1:2),
-	type = "equip", method = "freq", smooth = "loglin")
+type = "equip", method = "freq", smooth = "loglin")
 @
 Figure~\ref{fig:plotstudy3}, based on the code below, compares the single-anchor functions (solid lines) with the multi-anchor functions for each method (dashed lines).
 <<label=plotstudy3,include=FALSE>>=
 plot(pisa.snom, pisa.stuck, pisa.sfreq,
-	pisa.mnom, pisa.mtuck, pisa.mfreq,
-	col = rep(rainbow(3), 2), lty = rep(1:2, each = 3))
+pisa.mnom, pisa.mtuck, pisa.mfreq,
+col = rep(rainbow(3), 2), lty = rep(1:2, each = 3))
 @
 \begin{figure}
 \begin{center}
@@ -645,10 +645,10 @@ Parametric bootstrapping using the \code{bootstrap} function is demonstrated her
 <<include=FALSE>>=
 neat.xp <- presmoothing(neat.x, "loglinear", degrees = list(4, 2))
 neat.xpmat <- presmoothing(neat.x, "loglinear", degrees = list(4, 2),
-	stepup = TRUE)
+stepup = TRUE)
 neat.yp <- presmoothing(neat.y, "loglinear", degrees = list(4, 2))
 neat.ypmat <- presmoothing(neat.y, "loglinear", degrees = list(4, 2),
-	stepup = TRUE)
+stepup = TRUE)
 plot(neat.x, neat.xpmat)
 plot(neat.y, neat.ypmat)
 @
@@ -690,41 +690,41 @@ crit <- equate(neat.xp, neat.yp, "e", "c")$conc$yx
 Finally, to run multiple equatings in a single bootstrapping study, the arguments for each equating must be combined into a single object. Here, each element in \code{neat.args} is a named list of arguments for each equating. This object is then used in the \code{bootstrap} function, which carries out the bootstrapping.
 <<>>=
 neat.args <- list(i = list(type = "i"),
-	mt = list(type = "mean", method = "t"),
-	mc = list(type = "mean", method = "c"),
-	lt = list(type = "lin", method = "t"),
-	lc = list(type = "lin", method = "c"),
-	ef = list(type = "equip", method = "f", smooth = "log"),
-	ec = list(type = "equip", method = "c", smooth = "log"),
-	ct = list(type = "circ", method = "t"),
-	cc = list(type = "circ", method = "c", chainmidp = "lin"))
+mt = list(type = "mean", method = "t"),
+mc = list(type = "mean", method = "c"),
+lt = list(type = "lin", method = "t"),
+lc = list(type = "lin", method = "c"),
+ef = list(type = "equip", method = "f", smooth = "log"),
+ec = list(type = "equip", method = "c", smooth = "log"),
+ct = list(type = "circ", method = "t"),
+cc = list(type = "circ", method = "c", chainmidp = "lin"))
 bootout <- bootstrap(x = neat.xp, y = neat.yp, xn = xn, yn = yn,
-	reps = reps, crit = crit, args = neat.args)
+reps = reps, crit = crit, args = neat.args)
 @
 A plot method is available for visualizing output from the \code{bootstrap} function, as demonstrated below. Figures~\ref{fig:plotstudy1means} through \ref{fig:plotstudy1rmse} contain the mean equated scores across replications for each method, the $SE$, $bias$, and $RMSE$. In Figure~\ref{fig:plotstudy1means}, the mean equated scores appear to be similar across much of the scale. Chained mean equating (the light orange line) consistently produces the highest mean equated scores. Mean equated scores for the remaining methods fall below those of chained mean and above those of identity equating (the black line). In Figure~\ref{fig:plotstudy1se}, standard errors tend to be highest for the equipercentile methods, especially chained equipercentile (the dark blue line), followed by the linear methods (green lines). $SE$ are lowest for the circle-arc methods (purple and pink), especially in the tails of the score scale where the identity function has more of an influence. In Figure~\ref{fig:plotstudy1bias}, $bias$ is highest for chained mean equating, and is negative for the identity function; otherwise, $bias$ for the remaining methods falls roughly between -0.5 and 0.5. Finally, in Figure~\ref{fig:plotstudy1rmse}, $RMSE$ tends to be highest for chained mean and the linear and equipercentile methods. $RMSE$ for Tucker mean and the circle-arc methods tended to fall at or below 0.5.
 <<include=FALSE>>=
-plot(bootout, addident = F, col = c(1, rainbow(8)))
-plot(bootout, out = "se", addident = F,
-	col = c(1, rainbow(8)), legendplace = "top")
-plot(bootout, out = "bias", addident = F, legendplace = "top",
-	col = c(1, rainbow(8)), morepars = list(ylim = c(-.9, 3)))
-plot(bootout, out = "rmse", addident = F, legendplace = "top",
-	col = c(1, rainbow(8)), morepars = list(ylim = c(0, 3)))
+plot(bootout, addident = FALSE, col = c(1, rainbow(8)))
+plot(bootout, out = "se", addident = FALSE,
+col = c(1, rainbow(8)), legendplace = "top")
+plot(bootout, out = "bias", addident = FALSE, legendplace = "top",
+col = c(1, rainbow(8)), morepars = list(ylim = c(-.9, 3)))
+plot(bootout, out = "rmse", addident = FALSE, legendplace = "top",
+col = c(1, rainbow(8)), morepars = list(ylim = c(0, 3)))
 @
 <<label=plotstudy1means,include=FALSE,echo=FALSE>>=
-plot(bootout, addident = F, col = c(1, rainbow(8)))
+plot(bootout, addident = FALSE, col = c(1, rainbow(8)))
 @
 <<label=plotstudy1se,include=FALSE,echo=FALSE>>=
-plot(bootout, out = "se", addident = F,
-	col = c(1, rainbow(8)), legendplace = "top")
+plot(bootout, out = "se", addident = FALSE,
+col = c(1, rainbow(8)), legendplace = "top")
 @
 <<label=plotstudy1bias,include=FALSE,echo=FALSE>>=
-plot(bootout, out = "bias", addident = F, legendplace = "top",
-	col = c(1, rainbow(8)), morepars = list(ylim = c(-.9, 3)))
+plot(bootout, out = "bias", addident = FALSE, legendplace = "top",
+col = c(1, rainbow(8)), morepars = list(ylim = c(-.9, 3)))
 @
 <<label=plotstudy1rmse,include=FALSE,echo=FALSE>>=
-plot(bootout, out = "rmse", addident = F, legendplace = "top",
-	col = c(1, rainbow(8)), morepars = list(ylim = c(0, 3)))
+plot(bootout, out = "rmse", addident = FALSE, legendplace = "top",
+col = c(1, rainbow(8)), morepars = list(ylim = c(0, 3)))
 @
 \begin{figure}
 \begin{center}
@@ -811,21 +811,21 @@ where $\Bx_P$ is an $n \times 1$ column vector of total scores on $X$ for $n$ in
 
 Note that in Equation~\eqref{eqn:reg1} there are no population subscripts on the regression coefficients $\delta_{X}$ and $\Bgamma_{X}$. The Tucker method assumes that these coefficients are the same in $P$ as in $Q$. As a result, the total score means for $X$ can be expressed as
 \begin{equation}
-  \mu_{X_P} = \delta_{X} - \Bmu_{V_P}^{\prime}\Bgamma_{X} \label{eqn:mxp}
+  \mu_{X_P} = \delta_{X} + \Bmu_{V_P}^{\prime}\Bgamma_{X} \label{eqn:mxp}
 \end{equation}
 and
 \begin{equation}
-  \mu_{X_Q} = \delta_{X} - \Bmu_{V_Q}^{\prime}\Bgamma_{X}, \label{eqn:mxq1}
+  \mu_{X_Q} = \delta_{X} + \Bmu_{V_Q}^{\prime}\Bgamma_{X}, \label{eqn:mxq1}
 \end{equation}
 where the means of $\Be_{X_P}$ and $\Be_{X_Q}$ are 0. The unobserved mean on $X$ for $Q$ can then be obtained through substitution and some rearranging as
 \begin{align}
-  \mu_{X_Q} &= \delta_{X} - \Bmu_{V_Q}^{\prime}\Bgamma_{X} \nonumber \\
-  &= \mu_{X_P} + \Bmu_{V_P}^{\prime}\Bgamma_{X} - \Bmu_{V_Q}^{\prime}\Bgamma_{X} \nonumber \\
-  &= \mu_{X_P} + (\Bmu_{V_P}^{\prime} - \Bmu_{V_Q}^{\prime})\Bgamma_{X}. \label{eqn:mxq2}
+  \mu_{X_Q} &= \delta_{X} + \Bmu_{V_Q}^{\prime}\Bgamma_{X} \nonumber \\
+  &= \mu_{X_P} - \Bmu_{V_P}^{\prime}\Bgamma_{X} + \Bmu_{V_Q}^{\prime}\Bgamma_{X} \nonumber \\
+  &= \mu_{X_P} + (\Bmu_{V_Q}^{\prime} - \Bmu_{V_P}^{\prime})\Bgamma_{X}. \label{eqn:mxq2}
 \end{align}
 The unobserved mean on $Y$ for $P$ is obtained through a similar process as
 \begin{equation}
-\mu_{Y_P} = \mu_{Y_Q} + (\Bmu_{V_Q}^{\prime} - \Bmu_{V_P}^{\prime})\Bgamma_{Y}. \label{eqn:myp}
+\mu_{Y_P} = \mu_{Y_Q} + (\Bmu_{V_P}^{\prime} - \Bmu_{V_Q}^{\prime})\Bgamma_{Y}. \label{eqn:myp}
 \end{equation}
 These values can then be used in Equations~\eqref{eqn:synthmx1} and \eqref{eqn:synthmy1} to estimate $\mu_{X}$ and $\mu_{Y}$.
 
