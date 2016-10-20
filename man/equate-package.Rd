@@ -15,8 +15,8 @@ equating. Plotting and summary methods, and methods for multivariate
 presmoothing and bootstrap error estimation are also provided.
 }
 \details{
-\tabular{ll}{ Package: \tab equate\cr Version: \tab 2.0-4\cr Date: \tab
-2016-4-26\cr Depends: \tab R (>= 3.0.0)\cr License: \tab GPL-3\cr }
+\tabular{ll}{ Package: \tab equate\cr Version: \tab 2.0-5\cr Date: \tab
+2016-10-20\cr Depends: \tab R (>= 3.0.0)\cr License: \tab GPL-3\cr }
 
 Index: \tabular{ll}{
 ACTmath \tab ACT Mathematics Test Scores\cr
@@ -35,8 +35,7 @@ plot.equate \tab Plotting Equating Results\cr}
 Further information is available in the following vignettes:
 \tabular{ll}{
 \code{equatevignette} \tab equate vignette (source, pdf)\cr }
-The package
-vignette provides an introduction to linking and equating and includes
+The package vignette provides an introduction to linking and equating and includes
 descriptions of the supported equating methods and examples. The help page
 for the main function of the package, \code{\link{equate}}, contains
 additional examples.

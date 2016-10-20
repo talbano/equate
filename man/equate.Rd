@@ -261,8 +261,8 @@ and equating output in \code{y}.
 }}
 \examples{
 
-# See vignette("equatevignette") for a description of methods
-# and additional examples
+# See vignette("equatevignette") and Albano (2016) for a
+# description of methods and additional examples
 
 # Random groups equating for (1) identity, (2) mean, 
 # (3) linear, (4) equipercentile with loglinear
@@ -336,6 +336,10 @@ plot(meq1, meq2, meq3, meq4, meq, req[[1]])
 Anthony Albano \email{tony.d.albano@gmail.com}
 }
 \references{
+Albano, A. D. (2016). equate: An R package for
+observed-score linking and equating. \emph{Journal of Statistical
+Software, 74}(8), 1--36.
+
 Kolen, M. J., and Brennan, R. L. (2004). \emph{Test Equating,
 Scaling, and Linking}. (2nd ed.), New York: Springer.
 

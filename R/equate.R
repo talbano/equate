@@ -214,7 +214,11 @@
 #' @author Anthony Albano \email{tony.d.albano@@gmail.com}
 #' @seealso \code{\link{freqbump}}, \code{\link{freqavg}},
 #' \code{\link{loglinear}}, \code{\link{bootstrap}}
-#' @references Kolen, M. J., and Brennan, R. L. (2004). \emph{Test Equating,
+#' @references Albano, A. D. (2016). equate: An R package for
+#' observed-score linking and equating. \emph{Journal of Statistical
+#' Software, 74}(8), 1--36.
+#' 
+#' Kolen, M. J., and Brennan, R. L. (2004). \emph{Test Equating,
 #' Scaling, and Linking}. (2nd ed.), New York: Springer.
 #' 
 #' Livingston, S. A., and Kim, S. (2009). The circle-arc method for equating in
@@ -228,8 +232,8 @@
 #' @keywords methods
 #' @examples
 #' 
-#' # See vignette("equatevignette") for a description of methods
-#' # and additional examples
+#' # See vignette("equatevignette") and Albano (2016) for a
+#' # description of methods and additional examples
 #' 
 #' # Random groups equating for (1) identity, (2) mean, 
 #' # (3) linear, (4) equipercentile with loglinear
