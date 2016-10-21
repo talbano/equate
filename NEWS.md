@@ -1,3 +1,7 @@
+# equate_2.0-6 ()
+
+
+
 # equate_2.0-5 (2016-10-20)
 
 * Support for linear equating in a single-group design with counterbalancing.
