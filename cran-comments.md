@@ -5,7 +5,7 @@
 ## R CMD check results
 There were no ERRORs or WARNINGs.
 
-There was 1 NOTE from win-builder regarding possible mis-spellings,  which have been checked and are correct, and the DOI in the CITATION which is for a new JSS publication that will be registered after publication on CRAN.
+There was 1 NOTE regarding possible mis-spellings, which have been checked and are correct, and the DOI in the CITATION which is for a new JSS publication that will be registered after publication on CRAN.
 
 Possibly mis-spelled words in DESCRIPTION:
   Braun (18:12)
