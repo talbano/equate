@@ -146,7 +146,7 @@ bfreqplot <- function(x, y = NULL, xcol = 1,
   nf <- layout(matrix(c(2, 4, 1, 3), 2, 2,
     byrow = TRUE), c(3, 1), c(1, 3), TRUE)
   par(mar = c(4, 4, 1, 1))
-  plot(range(xtab), range(xvtab), type = "n",
+  plot(range(scales(x, 1)), range(scales(x, 2)), type = "n",
     xlab = xlab, ylab = ylab, ...)
   points(x, xcol = xcol, pch = pch)
   

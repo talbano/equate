@@ -1,5 +1,7 @@
 # equate_2.0-6 ()
 
+* Fix plot axes in plot.freqtab where scales do not match observed score range.
+
 * Legend text fixed for single-group and equivalent-groups designs in plot.equate and plot.bootstrap.
 
 # equate_2.0-5 (2016-10-20)
