@@ -1,6 +1,6 @@
 # equate_2.0-6 ()
 
-
+* Legend text fixed for single-group and equivalent-groups designs in plot.equate and plot.bootstrap.
 
 # equate_2.0-5 (2016-10-20)
 

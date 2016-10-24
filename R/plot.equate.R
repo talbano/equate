@@ -147,26 +147,12 @@ plot.equate <- function(..., elist = NULL, add = FALSE,
   
   if(addlegend) {
     if(missing(legendtext)) {
-      legendtext <- c("identity", "mean", "linear",
-        "general", "circle", "equip", "composite")
-      legendtext <- lapply(x, function(z)
-        legendtext[charmatch(substr(z$type, 1, 2),
-          legendtext)])
-      if(x[[1]]$design == "nonequivalent groups") {
-        methods <- c("nW", "chain", "b/H", "tucker",
-          "levine", "fE")
-        methods <- lapply(x, function(z)
-          methods[charmatch(substr(z$method, 1, 1),
-            methods)])
-        legendtext <- paste(legendtext,
-          methods, sep = ": ")
-        legendtext[grep("ident", legendtext)] <-
-          "identity"
-        legendtext[grep("comp", legendtext)] <-
-          "composite"
-      }
-      legendtext <- gsub("\\b(\\w)", "\\U\\1",
-        legendtext, perl = TRUE)
+      legendtext <- abbrtype(sapply(x, "[[", "type"))
+      mets <- sapply(x, "[[", "method")
+      metsb <- mets != "none" & !sapply(mets, is.null)
+      if(any(metsb))
+        legendtext[metsb] <- paste(legendtext[metsb],
+          abbrmethod(mets[metsb]), sep = ": ")
     }
     if(addident) {
       legendtext <- c("Identity", legendtext)
@@ -185,4 +171,26 @@ plot.equate <- function(..., elist = NULL, add = FALSE,
 plot.equate.list <- function(x, ...) {
   
   plot.equate(elist = x, ...)
+}
+
+# Internal function for abbreviating equating method
+abbrmethod <- function(x) {
+  method <- c("nominal weights", "chained", "braun/holland",
+    "tucker", "levine", "frequency estimation")
+  x <- method[charmatch(x, method)]
+  sapply(x, switch, "", "nominal weights" = "NW",
+    "chained" = "Chain", "braun/holland" = "B/H",
+    "tucker" = "Tucker", "levine" = "Levine",
+    "frequency estimation" = "FE")
+}
+
+# Internal function for abbreviating equating type
+abbrtype <- function(x) {
+  type <- c("identity", "mean", "linear", "general linear",
+    "circle-arc", "equipercentile", "composite")
+  x <- type[charmatch(x, type)]
+  sapply(x, switch, "", "identity" = "Ident", "mean" = "Mean",
+    "linear" = "Linear", "general linear" = "General",
+    "circle-arc" = "Circle", "equipercentile" = "Equip",
+    "composite" = "Comp")
 }

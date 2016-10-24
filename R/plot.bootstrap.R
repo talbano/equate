@@ -121,26 +121,12 @@ plot.bootstrap <- function(x, add = FALSE, out = "mean",
   
   if(addlegend) {
     if(missing(legendtext)) {
-      legendtext <- c("identity", "mean", "linear",
-        "general", "circle", "equip", "composite")
-      legendtext <- lapply(x$args, function(z)
-        legendtext[charmatch(substr(z$type, 1, 2),
-          legendtext)])
-      if(margins(x$x) == 2 & !is.null(x$y)) {
-        methods <- c("nW", "chain", "b/H", "tucker",
-          "levine", "fE")
-        methods <- lapply(x$args, function(z)
-          methods[charmatch(substr(z$method, 1, 1),
-            methods)])
-        legendtext <- paste(legendtext,
-          methods, sep = ": ")
-        legendtext[grep("ident", legendtext)] <-
-          "identity"
-        legendtext[grep("comp", legendtext)] <-
-          "composite"
-      }
-      legendtext <- gsub("\\b(\\w)", "\\U\\1",
-        legendtext, perl = TRUE)
+      legendtext <- abbrtype(sapply(x$args, "[[", "type"))
+      mets <- sapply(x$args, "[[", "method")
+      metsb <- mets != "none" & !sapply(mets, is.null)
+      if(any(metsb))
+        legendtext[metsb] <- paste(legendtext[metsb],
+          abbrmethod(mets[metsb]), sep = ": ")
     }
     if(addident) {
       legendtext <- c("Identity", legendtext)
