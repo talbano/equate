@@ -405,11 +405,12 @@ equate.freqtab <- function(x, y, type = c("identity",
 			xname <- ifelse(exists(deparse(substitute(x)), 1,
 				inherits = FALSE), deparse(substitute(x)), "x")
 			if(margins(y) == margins(x))
-				yname <- ifelse(exists(deparse(substitute(y)), 1,
-					inherits = FALSE), deparse(substitute(y)), "y")
-			else yname <- xname
-			name <- paste(gsub("\\b(\\w)", "\\U\\1", name,
-				perl = TRUE), "Equating:", xname, "to", yname)
+			  name <- paste(gsub("\\b(\\w)", "\\U\\1", name,
+			    perl = TRUE), "Equating:", xname, "to",
+			    ifelse(exists(deparse(substitute(y)), 1,
+			      inherits = FALSE), deparse(substitute(y)), "y"))
+			else name <- paste(gsub("\\b(\\w)", "\\U\\1", name,
+			  perl = TRUE), "Equating:", xname)
 		}
 		des <- switch(design(x), "sg" = "single group",
 			"cb" = "counterbalanced",

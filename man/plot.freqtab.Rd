@@ -8,7 +8,7 @@
 \title{Plotting Frequency Distributions}
 \usage{
 \method{plot}{freqtab}(x, y = NULL, xcol = 1, ycol, pch = 16, ylty = 1,
-  xlab = "Total Test", addlegend = !missing(y), legendtext, ...)
+  xlab = names(dimnames(x))[1], addlegend = !missing(y), legendtext, ...)
 
 \method{points}{freqtab}(x, xcol = 1, pch = 16, ds = 50, dm = 100, ...)
 }

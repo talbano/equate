@@ -55,7 +55,7 @@
 #' 
 #' @export
 plot.freqtab <- function(x, y = NULL, xcol = 1,
-  ycol, pch = 16, ylty = 1, xlab = "Total Test",
+  ycol, pch = 16, ylty = 1, xlab = names(dimnames(x))[1],
   addlegend = !missing(y), legendtext, ...) {
   
   nx <- margins(x)
@@ -74,7 +74,7 @@ plot.freqtab <- function(x, y = NULL, xcol = 1,
 # Internal univariate plot
 
 ufreqplot <- function(x, y = NULL, xcol = 1, ycol,
-  ylty = 1, xlab = "Total Test", ylab = "Count",
+  ylty = 1, xlab = names(dimnames(x))[1], ylab = "count",
   horiz = FALSE, addlegend = FALSE,
   legendtext, ...) {
   
@@ -122,8 +122,8 @@ ufreqplot <- function(x, y = NULL, xcol = 1, ycol,
 # Internal bivariate plot
 
 bfreqplot <- function(x, y = NULL, xcol = 1,
-  ycol, pch = 16, ylty = 1, xlab = "Total Test",
-  ylab = "Anchor Test", addlegend = FALSE,
+  ycol, pch = 16, ylty = 1, xlab = names(dimnames(x))[1],
+  ylab = names(dimnames(x))[2], addlegend = FALSE,
   legendtext, ...) {
   
   xtab <- margin(x)
