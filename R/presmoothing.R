@@ -416,10 +416,10 @@ sf <- function(x, degrees, grid, stepup = FALSE, compare = stepup) {
 		collapse = ".")
 	if (stepup | compare) {
 		# Create model index
-		attr(scorefun, "models") <- as.numeric(factor(paste(os,
-			apply(grid, 1, max), sep = ".")))
-		attr(scorefun, "mnames") <- unique(paste(os,
-			apply(grid, 1, max), sep = "."))
+	  mnames <- unique(paste(os, apply(grid, 1, max), sep = "."))
+	  attr(scorefun, "mnames") <- mnames
+	  attr(scorefun, "models") <- match(paste(os,
+			apply(grid, 1, max), sep = "."), mnames)
 	}
 	return(scorefun)
 }
