@@ -6,6 +6,8 @@
 
 * Algorithm for default model comparison in loglinear presmoothing was fixed to address problem with degrees of 10 or larger.
 
+* Bug in Levine true score equating, introduced in 2.0.5, was fixed.
+
 # equate_2.0-5 (2016-10-20)
 
 * Support for linear equating in a single-group design with counterbalancing.

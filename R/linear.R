@@ -102,7 +102,8 @@ linear <- function(x, y, type = "linear", method = "none",
 		}
 		if (!method %in% c("none", "chained") & !lts)
 			out <- c(out, synth)
-		out$concordance$se <- lse(out, type, method)
+		if(!lts)
+		  out$concordance$se <- lse(out, type, method)
 	}
 	else out <- yx
 
