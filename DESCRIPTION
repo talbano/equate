@@ -6,20 +6,19 @@ Author: Anthony Albano <tony.d.albano@gmail.com>
 Maintainer: Anthony Albano <tony.d.albano@gmail.com>
 URL: https://github.com/talbano/equate
 BugReports: https://github.com/talbano/equate/issues
-Depends:
-    R (>= 3.0.0)
+Depends: R (>= 3.3.1)
 Imports: utils, grDevices, graphics, stats
 Description: Contains methods for observed-score linking
-    and equating under the single-group, equivalent-groups,
-    and nonequivalent-groups with anchor test(s) designs.
-    Equating types include identity, mean, linear, general
-    linear, equipercentile, circle-arc, and composites of
-    these. Equating methods include synthetic, nominal
-    weights, Tucker, Levine observed score, Levine true
-    score, Braun/Holland, frequency estimation, and chained
-    equating. Plotting and summary methods, and methods for
-    multivariate presmoothing and bootstrap error estimation
-    are also provided.
+  and equating under the single-group, equivalent-groups,
+  and nonequivalent-groups with anchor test(s) designs.
+  Equating types include identity, mean, linear, general
+  linear, equipercentile, circle-arc, and composites of
+  these. Equating methods include synthetic, nominal
+  weights, Tucker, Levine observed score, Levine true
+  score, Braun/Holland, frequency estimation, and chained
+  equating. Plotting and summary methods, and methods for
+  multivariate presmoothing and bootstrap error estimation
+  are also provided.
 LazyLoad: yes
 LazyData: yes
 License: GPL-3
