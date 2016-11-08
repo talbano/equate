@@ -1,5 +1,7 @@
 # equate_2.0-6 ()
 
+* New fit statistics for loglinear presmoothing model comparison: likelihood ratio chi-square, Freeman-Tukey chi-square, consistent AIC, Cressie-Read, and Goodman.
+
 * Fix plot axes in plot.freqtab where scales do not match observed score range.
 
 * Legend text fixed for single-group and equivalent-groups designs in plot.equate and plot.bootstrap.

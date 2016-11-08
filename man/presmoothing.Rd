@@ -87,12 +87,10 @@ returned, that is, \code{verbose} is ignored.}
 the best-fitting model should be returned after comparing fit of nested
 models. Useful for automating model selection in simulations.}
 
-\item{choosemethod}{string, with default \code{"chi"}, indicating the method
-for selecting a best-fitting model when \code{choose = TRUE}. \code{"chi"}
+\item{choosemethod}{string, indicating the method for selecting a
+best-fitting model when \code{choose = TRUE}. \code{"chi"}
 selects the most complex model with chi-square p-value below the criterion
-in \code{chip}. \code{"aic"} and \code{"bic"} choose the model with lowest
-AIC and BIC, respectively. See \code{\link{anova.glm}} for details on fit
-comparisons.}
+in \code{chip}. Remaining methods choose the model with lowest value.}
 
 \item{chip}{proportion specifying the type-I error rate for model selection
 based on \code{choosemethod = "chi"}.}
@@ -248,6 +246,11 @@ and Behavioral Statistics, 25}, 133--183.
 
 Moses, T., and Holland, P. W. (2008). \emph{Notes on a general framework for
 observed score equating} (ETS Research Rep. No. RR-08-59). Princeton, NJ:
+ETS.
+
+Moses, T., and Holland, P. W. (2009). Selection strategies for
+univariate loglinear smoothing models and their effect on
+equating function accuracy. \emph{Journal of Educational Measurement, 46}, 159--176.
 ETS.
 
 Wang, T. (2009). Standard errors of equating for the percentile rank-based
