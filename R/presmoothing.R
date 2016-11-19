@@ -354,8 +354,7 @@ aovtab <- function(x, obs) {
 }
 
 #----------------------------------------------------------------
-# Internal function for selecting model from observed
-# frequencies x, anova table y, and list of fitted model objects z
+# Internal function for selecting model from stats in anova table
 
 glmselect <- function(x, choosemethod = c("chi", "g2", "aic",
   "bic", "caic", "ft", "cr", "gm"), chip) {
@@ -374,7 +373,7 @@ glmselect <- function(x, choosemethod = c("chi", "g2", "aic",
 }
 
 # Internal functions for model selection
-# x are observed frequencies, y are expected, object is model output
+# object is model output, obs observed frequencies
 ft <- function(object, obs, ...) {
   fit <- fitted(object)
   out <- sum((sqrt(obs) + sqrt(obs + 1) - sqrt(4 * fit + 1))^2)
