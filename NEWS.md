@@ -1,5 +1,7 @@
 # equate_2.0-6 ()
 
+* bootstrap function can now extract presmoothing arguments, if present, to run presmoothing once for all functions requesting it. Note that, when requested, presmoothed score distributions will be used for all methods.
+
 * New fit statistics for loglinear presmoothing model comparison: likelihood ratio chi-square, Freeman-Tukey chi-square, consistent AIC, Cressie-Read, and Goodman.
 
 * Fix plot axes in plot.freqtab where scales do not match observed score range.

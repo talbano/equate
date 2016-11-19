@@ -15,7 +15,7 @@ bootstrap(x, ...)
 \method{bootstrap}{equate}(x, xp = x$x, yp = x$y, ...)
 
 \method{bootstrap}{freqtab}(x, y, xn = sum(x), yn = sum(y), reps = 100,
-  crit, args, eqs = FALSE, ...)
+  crit, args, eqs = FALSE, sharesmooth = FALSE, ...)
 
 \method{summary}{bootstrap}(object, weights, subset, ...)
 }
@@ -45,6 +45,11 @@ below for details.}
 \item{eqs}{logical, with default \code{FALSE}, indicating whether or not the
 matrices of equating functions (one column per replication, per equating)
 should be returned.}
+
+\item{sharesmooth}{logical, defaulting to \code{FALSE}, indicating whether
+or not loglinear presmoothing should be performed once per replication
+using arguments given in \code{args}. Ignored if
+\code{smoothmethod = "loglinear"} is not given in any \code{args}.}
 
 \item{object}{\code{bootstrap} output to be summarized.}
 

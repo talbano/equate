@@ -41,6 +41,10 @@
 #' @param eqs logical, with default \code{FALSE}, indicating whether or not the
 #' matrices of equating functions (one column per replication, per equating)
 #' should be returned.
+#' @param sharesmooth logical, defaulting to \code{FALSE}, indicating whether
+#' or not loglinear presmoothing should be performed once per replication
+#' using arguments given in \code{args}. Ignored if
+#' \code{smoothmethod = "loglinear"} is not given in any \code{args}.
 #' @param object \code{bootstrap} output to be summarized.
 #' @param weights vector of weights to be used in calculating weighted average
 #' errors with \code{summary}, defaulting to the frequencies in
@@ -94,7 +98,7 @@ bootstrap <- function(x, ...) UseMethod("bootstrap")
 #' @export
 bootstrap.default <- function(x, y, ...) {
 
-	if(!is.freqtab(x) | is.freqtab(y))
+	if (!is.freqtab(x) | is.freqtab(y))
 		stop("'x' and 'y' must be frequency tables")
 	else do.call(bootstrap.freqtab, c(list(x = x, y = y),
 		list(...)))
@@ -108,9 +112,9 @@ bootstrap.default <- function(x, y, ...) {
 bootstrap.equate <- function(x, xp = x$x, yp = x$y, ...) {
 	
 	dots <- list(...)
-	if(is.character(xp))
+	if (is.character(xp))
 		xp <- x[[xp]]
-	if(is.character(yp))
+	if (is.character(yp))
 		yp <- x[[yp]]
 	rmnames <- c("x", "y", "yx", "concordance",
 		"bootstraps", "coefficients", "synthstats",
@@ -131,79 +135,94 @@ bootstrap.equate <- function(x, xp = x$x, yp = x$y, ...) {
 #' @describeIn bootstrap Bootstrap method for \dQuote{\code{\link{freqtab}}}
 #' objects.
 #' @export
-bootstrap.freqtab <- function(x, y, xn = sum(x),
-	yn = sum(y), reps = 100, crit, args,
-	eqs = FALSE, ...) {
-	
-	dots <- list(...)[names(list(...) != "")]
-	if(missing(args)) {
-		args <- list(dots)
-		neq <- 1
-		args[[1]]["verbose"] <- FALSE
-	}
-	else {
-		neq <- length(args)
-		for(i in 1:neq) {
-			args[[i]][names(dots)] <- dots
-			args[[i]]["verbose"] <- FALSE
-		}
-	}
-	if(missing(y)) {
-		yn <- xn
-		y <- NULL
-		xs <- scales(x, 1)
-		ys <- scales(x, 2)
-		xd <- as.data.frame(as.data.frame(x)[x > 0, 1:2])
-		xp <- x[x > 0]/sum(x)
-		xni <- nrow(xd)
-		eqmats <- lapply(rep(NA, neq), matrix,
-			nrow = length(xs), ncol = reps)
-		for(i in 1:reps) {
-			xi <- sample.int(xni, xn, replace = TRUE, prob = xp)
-			xtemp <- freqtab(xd[xi, ], scales = list(xs, ys))
-			for(j in 1:neq)
-				eqmats[[j]][, i] <- do.call("equate",
-					c(list(x = xtemp), args[[j]]))
-		}
-	}
-	else {
-		nx <- margins(x)
-		ny <- margins(y)
-		xs <- scales(x, 1:nx)
-		ys <- scales(y, 1:ny)
-		xd <- as.data.frame(as.data.frame(x)[x > 0, 1:nx])
-		yd <- as.data.frame(as.data.frame(y)[y > 0, 1:ny])
-		xp <- x[x > 0]/sum(x)
-		yp <- y[y > 0]/sum(y)
-		xni <- nrow(xd)
-		yni <- nrow(yd)
-		eqmats <- lapply(rep(NA, neq), matrix,
-			nrow = length(scales(x, 1)), ncol = reps)
-		for(i in 1:reps) {
-			xi <- sample.int(xni, xn, replace = TRUE, prob = xp)
-			xtemp <- freqtab(xd[xi, ], scales = xs)
-			yi <- sample.int(yni, yn, replace = TRUE, prob = yp)
-			ytemp <- freqtab(yd[yi, ], scales = ys)
-			for(j in 1:neq)
-				eqmats[[j]][, i] <- do.call("equate",
-					c(list(x = xtemp, y = ytemp), args[[j]]))
-		}
-	}
-	names(eqmats) <- names(args)
-	out <- list(x = x, y = y, reps = reps, xn = xn, yn = yn,
-		args = args, mean = sapply(eqmats, apply, 1, mean),
-		se = sapply(eqmats, apply, 1, sd))
-	if(!missing(crit)) {
-		out$bias <- sapply(eqmats, apply, 1, mean) - crit
-		out$rmse <- sqrt(out$bias^2 + out$se^2)
-	}
-	if(neq == 1)
-		out[-(1:6)] <- lapply(out[-(1:6)], c)
-	if(eqs)
-		out$eqs <- if(neq == 1) eqmats[[1]] else eqmats
-	out <- as.bootstrap(out)
-
-	return(out)
+bootstrap.freqtab <- function(x, y, xn = sum(x), yn = sum(y), reps = 100,
+  crit, args, eqs = FALSE, sharesmooth = FALSE, ...) {
+  
+  dots <- list(...)[names(list(...) != "")]
+  if (missing(args)) {
+    args <- list(dots)
+    neq <- 1
+    args[[1]]["verbose"] <- FALSE
+  } else {
+    neq <- length(args)
+    for (i in 1:neq) {
+      args[[i]][names(dots)] <- dots
+      args[[i]]["verbose"] <- FALSE
+    }
+  }
+  if (sharesmooth) {
+    scheck <- lapply(lapply(args, names), "%in%", "smoothmethod")
+    smeth <- unlist(lapply(scheck, any))
+    scheck <- all(pmatch(unlist(unlist(args,
+      recursive = FALSE)[unlist(scheck)]),
+      "loglinear", duplicates.ok = TRUE))
+    sargs <- unlist(args[smeth], recursive = FALSE)
+    names(sargs) <- unlist(lapply(args[smeth], names))
+    sargs <- sargs[!duplicated(sargs)]
+    sargs$asfreqtab <- TRUE
+    for(i in seq_along(smeth)[smeth])
+      args[[i]][["smoothmethod"]] <- NULL
+  } else scheck <- FALSE
+  if (missing(y)) {
+    yn <- xn
+    y <- NULL
+    xs <- scales(x, 1)
+    ys <- scales(x, 2)
+    xd <- as.data.frame(as.data.frame(x)[x > 0, 1:2])
+    xp <- x[x > 0]/sum(x)
+    xni <- nrow(xd)
+    eqmats <- lapply(rep(NA, neq), matrix,
+      nrow = length(xs), ncol = reps)
+    for (i in 1:reps) {
+      xi <- sample.int(xni, xn, replace = TRUE, prob = xp)
+      xtemp <- freqtab(xd[xi, ], scales = list(xs, ys))
+      if (scheck) xtemp <- do.call("loglinear", c(list(x = xtemp), sargs))
+      for (j in 1:neq)
+        eqmats[[j]][, i] <- do.call("equate",
+          c(list(x = xtemp), args[[j]]))
+    }
+  } else {
+    nx <- margins(x)
+    ny <- margins(y)
+    xs <- scales(x, 1:nx)
+    ys <- scales(y, 1:ny)
+    xd <- as.data.frame(as.data.frame(x)[x > 0, 1:nx])
+    yd <- as.data.frame(as.data.frame(y)[y > 0, 1:ny])
+    xp <- x[x > 0]/sum(x)
+    yp <- y[y > 0]/sum(y)
+    xni <- nrow(xd)
+    yni <- nrow(yd)
+    eqmats <- lapply(rep(NA, neq), matrix,
+      nrow = length(scales(x, 1)), ncol = reps)
+    for (i in 1:reps) {
+      xi <- sample.int(xni, xn, replace = TRUE, prob = xp)
+      xtemp <- freqtab(xd[xi, ], scales = xs)
+      yi <- sample.int(yni, yn, replace = TRUE, prob = yp)
+      ytemp <- freqtab(yd[yi, ], scales = ys)
+      if (scheck) {
+        xtemp <- do.call("loglinear", c(list(x = xtemp), sargs))
+        ytemp <- do.call("loglinear", c(list(x = ytemp), sargs))
+      }
+      for (j in 1:neq)
+        eqmats[[j]][, i] <- do.call("equate",
+          c(list(x = xtemp, y = ytemp), args[[j]]))
+    }
+  }
+  names(eqmats) <- names(args)
+  out <- list(x = x, y = y, reps = reps, xn = xn, yn = yn,
+    args = args, mean = sapply(eqmats, apply, 1, mean),
+    se = sapply(eqmats, apply, 1, sd))
+  if (!missing(crit)) {
+    out$bias <- sapply(eqmats, apply, 1, mean) - crit
+    out$rmse <- sqrt(out$bias^2 + out$se^2)
+  }
+  if (neq == 1)
+    out[-(1:6)] <- lapply(out[-(1:6)], c)
+  if (eqs)
+    out$eqs <- if (neq == 1) eqmats[[1]] else eqmats
+  out <- as.bootstrap(out)
+  
+  return(out)
 }
 
 #----------------------------------------------------------------
@@ -231,8 +250,8 @@ print.bootstrap <- function(x, ...) {
 	
 	nf <- length(x$args)
 	cat("\nBootstrap Equating Error\n\n")
-	cat("Design:", if(is.null(x$y)) "single group"
-			else if(margins(x$x) == 1) "equivalent groups"
+	cat("Design:", if (is.null(x$y)) "single group"
+			else if (margins(x$x) == 1) "equivalent groups"
 			else "nonequivalent groups", "\n\n")
 	cat("Replications:", x$reps, "\n\n")
 	cat("Sample Sizes: x =", paste(x$xn, "; y =", sep = ""),
@@ -248,15 +267,15 @@ print.bootstrap <- function(x, ...) {
 summary.bootstrap <- function(object, weights,
   subset, ...) {
   
-  if(missing(subset))
+  if (missing(subset))
     subset <- 1:length(scales(object$x))
-  if(missing(weights))
+  if (missing(weights))
     weights <- c(margin(object$x))[subset]/
     sum(margin(object$x)[subset])
   tempse <- cbind(object$se)[subset, , drop = FALSE]
   out <- data.frame(se = apply(tempse, 2, mean),
     w.se = apply(tempse * weights, 2, mean))
-  if(!is.null(object$bias)) {
+  if (!is.null(object$bias)) {
     tempbias <- cbind(object$bias)[subset, , drop = FALSE]
     out$bias <- apply(tempbias, 2, mean)
     out$a.bias <- apply(abs(tempbias), 2, mean)

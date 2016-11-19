@@ -38,7 +38,8 @@
 #' @docType package
 #' @author Anthony Albano <tony.d.albano@@gmail.com>
 #' @importFrom stats AIC BIC as.formula coef fitted formula glm lm median
-#' model.matrix poisson reformulate sd stat.anova terms
+#' model.matrix poisson reformulate sd stat.anova terms deviance df.residual
+#' nobs pchisq
 #' @importFrom graphics layout legend lines matlines par plot plot.default
 #' points segments
 #' @importFrom grDevices col2rgb rainbow rgb
