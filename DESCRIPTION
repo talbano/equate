@@ -1,12 +1,12 @@
 Package: equate
 Type: Package
-Version: 2.0.5.900
+Version: 2.0.6
 Title: Observed-Score Linking and Equating
 Author: Anthony Albano <tony.d.albano@gmail.com>
 Maintainer: Anthony Albano <tony.d.albano@gmail.com>
 URL: https://github.com/talbano/equate
 BugReports: https://github.com/talbano/equate/issues
-Depends: R (>= 3.3.1)
+Depends: R (>= 3.3.2)
 Imports: utils, grDevices, graphics, stats
 Description: Contains methods for observed-score linking
   and equating under the single-group, equivalent-groups,

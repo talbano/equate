@@ -1,4 +1,4 @@
-# equate_2.0-6 ()
+# equate_2.0-6 (2017-01-09)
 
 * bootstrap function can now extract presmoothing arguments, if present, to run presmoothing once for all functions requesting it. Note that, when requested, presmoothed score distributions will be used for all methods.
 
