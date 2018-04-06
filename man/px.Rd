@@ -7,7 +7,7 @@
 \alias{fx}
 \alias{fx.default}
 \alias{fx.freqtab}
-\title{Percentile Ranks and Cumulativie Frequencies}
+\title{Percentile Ranks and Cumulative Frequencies}
 \usage{
 px(x, ...)
 

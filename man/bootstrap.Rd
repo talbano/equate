@@ -28,7 +28,7 @@ function, or a score distribution of class \dQuote{\code{\link{freqtab}}}.}
 \item{y}{score distribution of class \dQuote{\code{\link{freqtab}}}.}
 
 \item{xp, yp}{optional frequency tables replacing those equated in \code{x},
-used for parametric bootsampling.}
+used for parametric bootstrap resampling.}
 
 \item{xn, yn}{integers specifying the number of scores to sample from each
 distribution at each replication (default is the total number observed in
@@ -103,7 +103,7 @@ bias, and rmse, and weighted means, as applicable.
 }
 \section{Methods (by class)}{
 \itemize{
-\item \code{default}: Default boostrap method for
+\item \code{default}: Default bootstrap method for
 \dQuote{\code{\link{freqtab}}} objects.
 
 \item \code{equate}: Method for \dQuote{\code{\link{equate}}} objects.

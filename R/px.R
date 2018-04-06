@@ -1,4 +1,4 @@
-#' Percentile Ranks and Cumulativie Frequencies
+#' Percentile Ranks and Cumulative Frequencies
 #' 
 #' These functions compute percentile ranks and cumulative frequency
 #' distributions for frequency tables.

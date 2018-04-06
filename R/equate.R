@@ -148,7 +148,7 @@
 #' @param x,y for the default method, \code{x} must be a vector of scores and
 #' \code{y} an object of class \dQuote{\code{equate}}, the output of a previous
 #' equating. The standard usage is to provide \code{x} as a frequency table of
-#' class \dQuote{\code{freqtab}}, where \code{y} is also a frequeny table, and
+#' class \dQuote{\code{freqtab}}, where \code{y} is also a frequency table, and
 #' \code{x} is equated to \code{y}; if \code{y} is missing, a single-group
 #' design is assumed. Finally, \code{x} may be a list of two or more frequency
 #' tables, in which case the required arguments for one or more equatings are

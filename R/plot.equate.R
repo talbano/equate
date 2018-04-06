@@ -6,7 +6,7 @@
 #' Equating functions (\code{out = "eqs"}) are plotted as lines based on
 #' the concordance table for each equating object that is supplied. Standard
 #' errors (\code{out = "se"}) default to bootstrap standard errors, if
-#' available, otherwise, analyitical standard errors are plotted. Bias
+#' available, otherwise, analytical standard errors are plotted. Bias
 #' (\code{out = "bias"}) and RMSE (\code{out = "rmse"}) are also taken
 #' from bootstrapping output.
 #' 

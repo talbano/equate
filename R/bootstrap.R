@@ -26,7 +26,7 @@
 #' @param x either an equating object, obtained with the \code{\link{equate}}
 #' function, or a score distribution of class \dQuote{\code{\link{freqtab}}}.
 #' @param xp,yp optional frequency tables replacing those equated in \code{x},
-#' used for parametric bootsampling.
+#' used for parametric bootstrap resampling.
 #' @param y score distribution of class \dQuote{\code{\link{freqtab}}}.
 #' @param xn,yn integers specifying the number of scores to sample from each
 #' distribution at each replication (default is the total number observed in
@@ -93,7 +93,7 @@
 #' @export
 bootstrap <- function(x, ...) UseMethod("bootstrap")
 
-#' @describeIn bootstrap Default boostrap method for
+#' @describeIn bootstrap Default bootstrap method for
 #' \dQuote{\code{\link{freqtab}}} objects.
 #' @export
 bootstrap.default <- function(x, y, ...) {
