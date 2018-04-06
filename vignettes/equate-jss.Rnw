@@ -1,7 +1,7 @@
 \documentclass[article, nojss]{jss}
 \usepackage{amsmath}
 \usepackage{upgreek}
-%%\VignetteIndexEntry{equate vignette}
+%%\VignetteIndexEntry{equate-jss}
 %%\VignetteDepends{equate}
 
 \title{\pkg{equate}: An \proglang{R} Package for Observed-Score Linking and Equating}
