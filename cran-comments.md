@@ -3,7 +3,9 @@
 * win-builder (devel and release)
 
 ## R CMD check results
-There were no errors, warnings, or notes.
+There were no errors or warnings.
+
+There was one note about upgreek.sty, which is being distributed in accordance with the license.
 
 ## Downstream dependencies
 Downstream dependency SGP has been checked.
