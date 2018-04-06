@@ -141,7 +141,7 @@ freqtab.default <- function(x, scales, items, design,
 		row.names = seq_len(nrow(x)))
 	if (missing(scales))
 		scales <- apply(x, 2, function(y)
-			min(y):max(y))
+		  min(y, na.rm = na.rm):max(y, na.rm = na.rm))
 	if (!is.list(scales))
 		scales <- list(scales)
 	for (i in 1:nx)

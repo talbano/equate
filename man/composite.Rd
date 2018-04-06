@@ -22,6 +22,8 @@ composite(x, ...)
 with one function per column. Otherwise, \code{x} is a list of equatings,
 where each element is an object of class \dQuote{\code{\link{equate}}}.}
 
+\item{\dots}{further arguments passed to or from other functions.}
+
 \item{wc}{vector of weights for creating the composite. \code{length(wc)}
 should match either \code{ncol(x)} for the default method or
 \code{length(x)}.}
@@ -38,8 +40,6 @@ supported for composites of linear functions.}
 \item{verbose}{logical, with default \code{TRUE}, indicating whether or not
 full output should be returned. When \code{FALSE}, only the equated scores
 are returned.}
-
-\item{\dots}{further arguments passed to or from other functions.}
 }
 \value{
 For the default method, and when \code{verbose = FALSE}, a vector of
@@ -67,6 +67,7 @@ one per column.
 \item \code{list}: Create composite across functions in
 \dQuote{\code{list}} object.
 }}
+
 \examples{
 # See vignette("equatevignette") for additional examples
 
@@ -89,9 +90,6 @@ req5 <- composite(list(req1, req2), wc = .5, symmetric = TRUE)
 plot(req1, req2, req3, req4, req5[[1]], addident = FALSE)
 
 }
-\author{
-Anthony Albano \email{tony.d.albano@gmail.com}
-}
 \references{
 Holland, P. W., and Strawderman, W. E. (2011). How to average
 equating functions, if you must. In A. A. von Davier (Ed.), Statistical
@@ -101,5 +99,7 @@ Springer.
 \seealso{
 \code{\link{equate}}
 }
+\author{
+Anthony Albano \email{tony.d.albano@gmail.com}
+}
 \keyword{methods}
-

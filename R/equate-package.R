@@ -9,8 +9,8 @@
 #' equating. Plotting and summary methods, and methods for multivariate
 #' presmoothing and bootstrap error estimation are also provided.
 #' 
-#' \tabular{ll}{ Package: \tab equate\cr Version: \tab 2.0-6\cr Date: \tab
-#' 2017-01-09\cr Depends: \tab R (>= 3.3.2)\cr License: \tab GPL-3\cr }
+#' \tabular{ll}{ Package: \tab equate\cr Version: \tab 2.0.7\cr Date: \tab
+#' 2018-04-06\cr Depends: \tab R (>= 3.4.2)\cr License: \tab GPL-3\cr }
 #' 
 #' Index: \tabular{ll}{
 #' ACTmath \tab ACT Mathematics Test Scores\cr

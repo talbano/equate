@@ -23,4 +23,3 @@ mathematics test, as presented in table 2.5 of \emph{Test Equating, Scaling,
 and Linking} (Kolen and Brennan, 2004; p. 50).
 }
 \keyword{datasets}
-

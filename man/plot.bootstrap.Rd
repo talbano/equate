@@ -80,11 +80,10 @@ bootout <- bootstrap(x = neat.x, y = neat.y, args = eqargs,
 plot(bootout, out = "se", legendplace = "top")
 
 }
-\author{
-Anthony Albano \email{tony.d.albano@gmail.com}
-}
 \seealso{
 \code{\link{bootstrap}}, \code{\link{plot.equate}}
 }
+\author{
+Anthony Albano \email{tony.d.albano@gmail.com}
+}
 \keyword{misc}
-

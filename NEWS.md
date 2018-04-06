@@ -1,3 +1,7 @@
+# equate_2.0.7 (2018-04-06)
+
+* Update to summary method for bootstrap output, to correct the calculation of mean standard error, bias, and root mean square error over score points.
+
 # equate_2.0-6 (2017-01-09)
 
 * bootstrap function can now extract presmoothing arguments, if present, to run presmoothing once for all functions requesting it. Note that, when requested, presmoothed score distributions will be used for all methods.

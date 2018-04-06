@@ -27,7 +27,8 @@ linear <- function(x, y, type = "linear", method = "none",
 		}
 		intercept <- slope1 * (mean(x, 2) -
 			slope2 * mean(x) - mean(y, 2)) + mean(y)
-		slope <- slope1*slope2
+		slope <- slope1 * slope2
+		yx <- lin(xscale, intercept, slope)
 	} else {
 		if (method == "none") {
 		  if (is.design(x, "cb") & is.design(y, "cb")) {
@@ -80,13 +81,13 @@ linear <- function(x, y, type = "linear", method = "none",
 		# Put sigma on the scale of s
 		# sigmayr <- sigmay*sx/sigmax
 		# Then, sigmaxr <- sx
-		slope <- (way*sigmay + (1 - way)*sy)/
-			(wax*sigmax + (1 - wax)*sx)
+		slope <- (way * sigmay + (1 - way) * sy)/
+			(wax * sigmax + (1 - wax) * sx)
 		if (is.na(slope)) slope <- 1
-		intercept <- (wby*muy + (1 - wby)*cy) -
-			slope*(wbx*mux + (1 - wbx)*cx)
+		intercept <- (wby * muy + (1 - wby) * cy) -
+			slope * (wbx * mux + (1 - wbx) * cx)
+		yx <- lin(xscale, intercept, slope)
 	}
-	yx <- lin(xscale, intercept, slope)
 
 	if (verbose) {
 		out <- list(x = x, y = y, concordance = data.frame(scale =

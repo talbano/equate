@@ -23,6 +23,8 @@ bootstrap(x, ...)
 \item{x}{either an equating object, obtained with the \code{\link{equate}}
 function, or a score distribution of class \dQuote{\code{\link{freqtab}}}.}
 
+\item{\dots}{further arguments passed to or from other methods.}
+
 \item{y}{score distribution of class \dQuote{\code{\link{freqtab}}}.}
 
 \item{xp, yp}{optional frequency tables replacing those equated in \code{x},
@@ -59,8 +61,6 @@ errors with \code{summary}, defaulting to the frequencies in
 
 \item{subset}{vector indicating a subset of the score scale for which errors
 should be summarized.}
-
-\item{\dots}{further arguments passed to or from other methods.}
 }
 \value{
 With \code{bootstrap}, a list is returned, containing arguments
@@ -73,8 +73,8 @@ provided, and a matrix of equating functions \code{eqs} when
 \code{args} is a list of equating arguments, matrices are returned for the
 mean functions, standard error, bias, and RMSE, and the equating functions
 will be returned as a list of matrices. The \code{summary} method returns a
-data frame of mean standard errors, bias, and rmse, and weighted and
-absolute means, as applicable.
+data frame of mean standard errors, bias, and rmse, and weighted means,
+as applicable.
 }
 \description{
 These functions return bootstrap standard errors, bias, and RMSE of
@@ -99,7 +99,7 @@ When each element in \code{args} is a named list of equating arguments,
 multiple equatings are performed at each replication in the bootstrapping.
 
 The summary method returns a \code{data.frame} of mean standard errors,
-bias, and rmse, and weighted and absolute means, as applicable.
+bias, and rmse, and weighted means, as applicable.
 }
 \section{Methods (by class)}{
 \itemize{
@@ -111,6 +111,7 @@ bias, and rmse, and weighted and absolute means, as applicable.
 \item \code{freqtab}: Bootstrap method for \dQuote{\code{\link{freqtab}}}
 objects.
 }}
+
 \examples{
 
 # Parametric bootstrapping using smoothed
@@ -135,11 +136,10 @@ bootout2 <- bootstrap(eq, xn = 100, yn = 100,
 summary(bootout2)
 
 }
-\author{
-Anthony Albano \email{tony.d.albano@gmail.com}
-}
 \seealso{
 \code{\link{plot.bootstrap}}
 }
+\author{
+Anthony Albano \email{tony.d.albano@gmail.com}
+}
 \keyword{methods}
-

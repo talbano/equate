@@ -27,4 +27,3 @@ and additional examples using this dataset are presented in \emph{Test
 Equating, Scaling, and Linking} (Kolen and Brennan, 2004).
 }
 \keyword{datasets}
-
