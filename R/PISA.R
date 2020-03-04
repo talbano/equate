@@ -2,7 +2,7 @@
 #' 
 #' This dataset contains scored cognitive item response data from the 2009
 #' administration of the Programme for International Student Assessment (PISA),
-#' an international study education systems. The data, along with the license
+#' an international study of education systems. The data, and license
 #' under which they are released, are available online at
 #' \url{http://www.oecd.org/pisa/}.
 #' 
@@ -14,7 +14,8 @@
 #' from the USA PISA data file "INT_COG09_S_DEC11.txt". The remaining variable,
 #' language spoken at home, has been merged in from the student questionnaire
 #' file "INT_STQ09_DEC11.txt". Variable names match those found in the original
-#' files: \describe{ \item{list("stidstd")}{ Unique student ID (one for each of
+#' files:
+#' \describe{ \item{list("stidstd")}{ Unique student ID (one for each of
 #' the 5233 cases); } \item{list("schoolid")}{ School ID (there are 165
 #' different schools); } \item{list("bookid")}{ ID for the test booklet given
 #' to a particular student, of which there were 13; } \item{list("langn")}{
