@@ -1,6 +1,6 @@
 Package: equate
 Type: Package
-Version: 2.0.7
+Version: 2.0.7.9000
 Title: Observed-Score Linking and Equating
 Author: Anthony Albano <tony.d.albano@gmail.com>
 Maintainer: Anthony Albano <tony.d.albano@gmail.com>
@@ -22,4 +22,4 @@ Description: Contains methods for observed-score linking
 LazyLoad: yes
 LazyData: yes
 License: GPL-3
-RoxygenNote: 6.0.1
+RoxygenNote: 7.0.2
