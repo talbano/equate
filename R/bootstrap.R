@@ -163,42 +163,22 @@ bootstrap.freqtab <- function(x, y, xn = sum(x), yn = sum(y), reps = 100,
     for(i in seq_along(smeth)[smeth])
       args[[i]][["smoothmethod"]] <- NULL
   } else scheck <- FALSE
+  eqmats <- lapply(rep(NA, neq), matrix,
+    nrow = length(scales(x, 1)), ncol = reps)
   if (missing(y)) {
     yn <- xn
     y <- NULL
-    xs <- scales(x, 1)
-    ys <- scales(x, 2)
-    xd <- as.data.frame(as.data.frame(x)[x > 0, 1:2])
-    xp <- x[x > 0]/sum(x)
-    xni <- nrow(xd)
-    eqmats <- lapply(rep(NA, neq), matrix,
-      nrow = length(xs), ncol = reps)
     for (i in 1:reps) {
-      xi <- sample.int(xni, xn, replace = TRUE, prob = xp)
-      xtemp <- freqtab(xd[xi, ], scales = list(xs, ys))
+      xtemp <- sample.freqtab(x, xn)
       if (scheck) xtemp <- do.call("loglinear", c(list(x = xtemp), sargs))
       for (j in 1:neq)
         eqmats[[j]][, i] <- do.call("equate",
           c(list(x = xtemp), args[[j]]))
     }
   } else {
-    nx <- margins(x)
-    ny <- margins(y)
-    xs <- scales(x, 1:nx)
-    ys <- scales(y, 1:ny)
-    xd <- as.data.frame(as.data.frame(x)[x > 0, 1:nx])
-    yd <- as.data.frame(as.data.frame(y)[y > 0, 1:ny])
-    xp <- x[x > 0]/sum(x)
-    yp <- y[y > 0]/sum(y)
-    xni <- nrow(xd)
-    yni <- nrow(yd)
-    eqmats <- lapply(rep(NA, neq), matrix,
-      nrow = length(scales(x, 1)), ncol = reps)
     for (i in 1:reps) {
-      xi <- sample.int(xni, xn, replace = TRUE, prob = xp)
-      xtemp <- freqtab(xd[xi, ], scales = xs)
-      yi <- sample.int(yni, yn, replace = TRUE, prob = yp)
-      ytemp <- freqtab(yd[yi, ], scales = ys)
+      xtemp <- sample.freqtab(x, xn)
+      ytemp <- sample.freqtab(y, yn)
       if (scheck) {
         xtemp <- do.call("loglinear", c(list(x = xtemp), sargs))
         ytemp <- do.call("loglinear", c(list(x = ytemp), sargs))
