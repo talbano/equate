@@ -14,8 +14,18 @@ bootstrap(x, ...)
 
 \method{bootstrap}{equate}(x, xp = x$x, yp = x$y, ...)
 
-\method{bootstrap}{freqtab}(x, y, xn = sum(x), yn = sum(y), reps = 100,
-  crit, args, eqs = FALSE, sharesmooth = FALSE, ...)
+\method{bootstrap}{freqtab}(
+  x,
+  y,
+  xn = sum(x),
+  yn = sum(y),
+  reps = 100,
+  crit,
+  args,
+  eqs = FALSE,
+  sharesmooth = FALSE,
+  ...
+)
 
 \method{summary}{bootstrap}(object, weights, subset, ...)
 }

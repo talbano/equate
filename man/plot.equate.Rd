@@ -5,11 +5,29 @@
 \alias{plot.equate.list}
 \title{Plotting Equating Results}
 \usage{
-\method{plot}{equate}(..., elist = NULL, add = FALSE, out = "eqs",
-  xpoints, ypoints, addident = TRUE, identy, identcol = 1, rescale = c(0,
-  1), xlab = "Total Score", ylab, col = rainbow(length(x)), pch, lty = 1,
-  lwd = 1, subset, morepars = NULL, addlegend = TRUE, legendtext,
-  legendplace = "bottomright")
+\method{plot}{equate}(
+  ...,
+  elist = NULL,
+  add = FALSE,
+  out = "eqs",
+  xpoints,
+  ypoints,
+  addident = TRUE,
+  identy,
+  identcol = 1,
+  rescale = c(0, 1),
+  xlab = "Total Score",
+  ylab,
+  col = rainbow(length(x)),
+  pch,
+  lty = 1,
+  lwd = 1,
+  subset,
+  morepars = NULL,
+  addlegend = TRUE,
+  legendtext,
+  legendplace = "bottomright"
+)
 
 \method{plot}{equate.list}(x, ...)
 }

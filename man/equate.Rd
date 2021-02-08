@@ -13,10 +13,20 @@ equate(x, ...)
 
 \method{equate}{list}(x, args, ...)
 
-\method{equate}{freqtab}(x, y, type = c("identity", "mean", "linear",
-  "general linear", "circle-arc", "equipercentile"), method = c("none",
-  "nominal weights", "tucker", "levine", "frequency estimation", "chained",
-  "braun/holland"), name, lowp, highp, boot = FALSE, verbose = TRUE, ...)
+\method{equate}{freqtab}(
+  x,
+  y,
+  type = c("identity", "mean", "linear", "general linear", "circle-arc",
+    "equipercentile"),
+  method = c("none", "nominal weights", "tucker", "levine", "frequency estimation",
+    "chained", "braun/holland"),
+  name,
+  lowp,
+  highp,
+  boot = FALSE,
+  verbose = TRUE,
+  ...
+)
 
 \method{equate}{default}(x, y, ...)
 
@@ -311,7 +321,7 @@ eqargs <- list(r3r5 = list(type = "linear", x = "r3", y = "r5",
   r5r6 = list(type = "linear", x = "r5", y = "r6",
     name = "Linear Linking PISA r5 to r6"),
   r6r7 = list(type = "linear", x = "r6", y = "r7",
-    name = "Linear Linking PISA r5 to r7"))
+    name = "Linear Linking PISA r6 to r7"))
 req <- equate(list(r3 = r3, r5 = r5, r6 = r6, r7 = r7), eqargs)
 
 # Put PISA r3 on the scale of r7 using the linking chain

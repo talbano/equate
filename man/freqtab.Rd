@@ -22,8 +22,7 @@ as.freqtab(x, scales, design, drop = FALSE, ...)
 
 \method{freqtab}{table}(x, design, ...)
 
-\method{as.data.frame}{freqtab}(x, row.names = NULL, optional = FALSE,
-  drop = FALSE, ...)
+\method{as.data.frame}{freqtab}(x, row.names = NULL, optional = FALSE, drop = FALSE, ...)
 
 \method{head}{freqtab}(x, ...)
 

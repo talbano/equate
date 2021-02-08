@@ -5,11 +5,20 @@
 \alias{points.freqtab}
 \alias{bfreqplot}
 \alias{ufreqplot}
-\alias{points.freqtab}
 \title{Plotting Frequency Distributions}
 \usage{
-\method{plot}{freqtab}(x, y = NULL, xcol = 1, ycol, pch = 16, ylty = 1,
-  xlab = names(dimnames(x))[1], addlegend = !missing(y), legendtext, ...)
+\method{plot}{freqtab}(
+  x,
+  y = NULL,
+  xcol = 1,
+  ycol,
+  pch = 16,
+  ylty = 1,
+  xlab = names(dimnames(x))[1],
+  addlegend = !missing(y),
+  legendtext,
+  ...
+)
 
 \method{points}{freqtab}(x, xcol = 1, pch = 16, ds = 50, dm = 100, ...)
 }

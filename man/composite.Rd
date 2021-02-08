@@ -11,11 +11,9 @@ composite(x, ...)
 
 \method{composite}{default}(x, wc, ...)
 
-\method{composite}{equate.list}(x, wc, name, symmetric = FALSE, p = 1,
-  verbose = TRUE, ...)
+\method{composite}{equate.list}(x, wc, name, symmetric = FALSE, p = 1, verbose = TRUE, ...)
 
-\method{composite}{list}(x, wc, name, symmetric = FALSE, p = 1,
-  verbose = TRUE, ...)
+\method{composite}{list}(x, wc, name, symmetric = FALSE, p = 1, verbose = TRUE, ...)
 }
 \arguments{
 \item{x}{for the default method, \code{x} is a matrix of equating functions,

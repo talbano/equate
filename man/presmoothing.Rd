@@ -11,15 +11,32 @@
 \usage{
 presmoothing(x, ...)
 
-\method{presmoothing}{default}(x, smoothmethod = c("none", "average", "bump",
-  "loglinear"), jmin, asfreqtab = TRUE, ...)
+\method{presmoothing}{default}(
+  x,
+  smoothmethod = c("none", "average", "bump", "loglinear"),
+  jmin,
+  asfreqtab = TRUE,
+  ...
+)
 
 \method{presmoothing}{formula}(x, data, ...)
 
-loglinear(x, scorefun, degrees = list(4, 2, 2), grid, rmimpossible,
-  asfreqtab = TRUE, models, stepup = !missing(models), compare = FALSE,
-  choose = FALSE, choosemethod = c("chi", "aic", "bic"), chip,
-  verbose = FALSE, ...)
+loglinear(
+  x,
+  scorefun,
+  degrees = list(4, 2, 2),
+  grid,
+  rmimpossible,
+  asfreqtab = TRUE,
+  models,
+  stepup = !missing(models),
+  compare = FALSE,
+  choose = FALSE,
+  choosemethod = c("chi", "aic", "bic"),
+  chip,
+  verbose = FALSE,
+  ...
+)
 
 freqbump(x, jmin = 1e-06, asfreqtab = FALSE, ...)
 

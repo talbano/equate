@@ -4,11 +4,28 @@
 \alias{plot.bootstrap}
 \title{Plotting Bootstrap Equating Results}
 \usage{
-\method{plot}{bootstrap}(x, add = FALSE, out = "mean", xpoints, ypoints,
-  addident = TRUE, identy, identcol = 1, rescale = c(0, 1),
-  xlab = "Total Score", ylab, col = rainbow(length(x$args)), pch, lty = 1,
-  subset, morepars = NULL, addlegend = TRUE, legendtext,
-  legendplace = "bottomright", ...)
+\method{plot}{bootstrap}(
+  x,
+  add = FALSE,
+  out = "mean",
+  xpoints,
+  ypoints,
+  addident = TRUE,
+  identy,
+  identcol = 1,
+  rescale = c(0, 1),
+  xlab = "Total Score",
+  ylab,
+  col = rainbow(length(x$args)),
+  pch,
+  lty = 1,
+  subset,
+  morepars = NULL,
+  addlegend = TRUE,
+  legendtext,
+  legendplace = "bottomright",
+  ...
+)
 }
 \arguments{
 \item{x}{output from the \code{\link{bootstrap}} function.}
