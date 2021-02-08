@@ -1,6 +1,5 @@
 \documentclass[article, nojss]{jss}
 \usepackage{amsmath}
-\usepackage{upgreek}
 %%\VignetteIndexEntry{equate-jss}
 %%\VignetteDepends{equate}
 
@@ -41,15 +40,13 @@ The \proglang{R} package \pkg{equate} \citep{albano2016equate} contains function
 %\newcommand{\Bb}{\mathbf{b}}
 \newcommand{\BK}{\mathbf{K}}
 \newcommand{\BSigma}{\boldsymbol{\Sigma}}
-%\newcommand{\Bsigma}{\boldsymbol{\upsigma}}
-\newcommand{\Bmu}{\boldsymbol{\upmu}}
-\newcommand{\Bgamma}{\boldsymbol{\upgamma}}
+\newcommand{\Bmu}{\boldsymbol{\mu}}
+\newcommand{\Bgamma}{\boldsymbol{\gamma}}
 \newcommand{\Bone}{\mathbf{1}}
 \def\Pr{\mathop{\rm Pr}\nolimits}
 
 %----------------------------------------------------------------------------------------------------------------
 \begin{document}
-\SweaveOpts{concordance=TRUE}
 \section{Introduction}
 Equating is a statistical procedure commonly used in testing programs where administrations across more than one occasion and more than one examinee group can lead to overexposure of items, threatening the security of the test. In practice, item exposure can be limited by using alternate test forms; however, multiple forms lead to multiple score scales that measure the construct of interest at differing levels of difficulty. The goal of equating is to adjust for these differences in difficulty across alternate forms of a test, so as to produce comparable score scales.
 
