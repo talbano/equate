@@ -17,6 +17,6 @@
 #' 
 #' The dataset can be downloaded as part of the CIPE software, available at the
 #' following link:
-#' \url{https://education.uiowa.edu/centers/casma}
+#' \url{https://education.uiowa.edu/casma}
 #' @keywords datasets
 "KBneat"

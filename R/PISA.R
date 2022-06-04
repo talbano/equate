@@ -4,7 +4,7 @@
 #' administration of the Programme for International Student Assessment (PISA),
 #' an international study of education systems. The data, and license
 #' under which they are released, are available online at
-#' \url{http://www.oecd.org/pisa/}.
+#' \url{https://www.oecd.org/pisa/}.
 #' 
 #' @name PISA
 #' @docType data
@@ -65,6 +65,6 @@
 #' http://dx.doi.org/10.1787/9789264167872-en
 #' 
 #' Addition information can be found at the PISA website:
-#' \url{http://www.oecd.org/pisa/}
+#' \url{https://www.oecd.org/pisa/}
 #' @keywords datasets
 "PISA"
