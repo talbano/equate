@@ -15,7 +15,7 @@ and Linking}. (2nd ed.), New York: Springer.
 
 The dataset can be downloaded as part of the CIPE software, available at the
 following link:
-\url{https://education.uiowa.edu/centers/casma}
+\url{https://education.uiowa.edu/casma}
 }
 \usage{
 KBneat

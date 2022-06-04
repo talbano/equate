@@ -14,7 +14,7 @@ Scaling, and Linking}. (2nd ed.), New York: Springer.
 
 The dataset is also provided with the equating software RAGE, available at
 the following link:
-\url{http://www.education.uiowa.edu/centers/casma/computer-programs}
+\url{https://education.uiowa.edu/casma/computer-programs}
 }
 \usage{
 ACTmath

@@ -64,7 +64,7 @@ OECD (2012). PISA 2009 Technical Report, PISA, OECD Publishing.
 http://dx.doi.org/10.1787/9789264167872-en
 
 Addition information can be found at the PISA website:
-\url{http://www.oecd.org/pisa/}
+\url{https://www.oecd.org/pisa/}
 }
 \usage{
 PISA
@@ -74,6 +74,6 @@ This dataset contains scored cognitive item response data from the 2009
 administration of the Programme for International Student Assessment (PISA),
 an international study of education systems. The data, and license
 under which they are released, are available online at
-\url{http://www.oecd.org/pisa/}.
+\url{https://www.oecd.org/pisa/}.
 }
 \keyword{datasets}

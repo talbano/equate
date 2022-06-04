@@ -2,6 +2,8 @@
 
 * Added sample method for freqtab object, useful for bootstrapping.
 
+* Small updates throughout
+
 # equate_2.0.7 (2018-04-06)
 
 * Update to summary method for bootstrap output, to correct the calculation of mean standard error, bias, and root mean square error over score points.
