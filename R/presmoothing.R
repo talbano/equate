@@ -110,14 +110,14 @@
 #' listed above.
 #' @return When \code{smoothmethod = "average"} or \code{smoothmethod =
 #' "bump"}, either a smoothed frequency vector or table is returned. Otherwise,
-#' \code{loglinear} returns the following: \item{}{when \code{compare = TRUE},
-#' an anova table for model fit} \item{}{when \code{asfreqtab = TRUE}, a
-#' smoothed frequency table} \item{}{when \code{choose = TRUE}, a smoothed
+#' \code{loglinear} returns the following: \itemize{\item{when \code{compare = TRUE},
+#' an anova table for model fit} \item{when \code{asfreqtab = TRUE}, a
+#' smoothed frequency table} \item{when \code{choose = TRUE}, a smoothed
 #' frequency table with attribute "anova" containing the model fit table for
-#' all models compared} \item{}{when \code{verbose = TRUE}, full \code{glm}
-#' output, for all nested models when \code{stepup = TRUE}} \item{}{when
+#' all models compared} \item{when \code{verbose = TRUE}, full \code{glm}
+#' output, for all nested models when \code{stepup = TRUE}} \item{when
 #' \code{stepup = TRUE} and \code{verbose = FALSE}, a \code{data.frame} of
-#' fitted frequencies, with one column per model}
+#' fitted frequencies, with one column per model}}
 #' @author Anthony Albano \email{tony.d.albano@@gmail.com}
 #' @seealso \code{\link{glm}}, \code{\link{loglin}}
 #' @references Holland, P. W., and Thayer, D. T. (1987). \emph{Notes on the use
