@@ -1,11 +1,9 @@
 ## Test environments
-* local OS X install, R Under development (unstable) (2018/04/04, r74529)
+* local OS 12.3.1 install, R version 4.2.0 (2022-04-22, r82229)
 * win-builder (devel and release)
 
 ## R CMD check results
 There were no errors or warnings.
 
-There was one note about upgreek.sty, which is being distributed in accordance with the license.
-
 ## Downstream dependencies
-Downstream dependency SGP has been checked.
+Downstream dependencies PROsetta and SGP have been checked.
