@@ -1,0 +1,1045 @@
+---
+title: "equate Package Vignette"
+author: "Tony Albano"
+output:
+    bookdown::html_document2:
+      base_format: rmarkdown::html_vignette
+header-includes:
+   - \usepackage{amsmath}
+vignette: >
+  %\VignetteIndexEntry{equate Package Vignette}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+bibliography: equatebibfile.bib
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>", out.width = "75%", fig.width = 8, fig.height = 8)
+op <- options()
+options(show.signif.stars = FALSE, warn = -1, continue = "+    ")
+library("equate")
+```
+
+*This vignette is an R markdown version of the following article:*
+
+*Albano, A. D. (2016). equate: An R package for observed-score linking and equating. Journal of Statistical Software, 74(8), 1–36*
+
+# Introduction
+
+Equating is a statistical procedure commonly used in testing programs where administrations across more than one occasion and more than one examinee group can lead to overexposure of items, threatening the security of the test. In practice, item exposure can be limited by using alternate test forms; however, multiple forms lead to multiple score scales that measure the construct of interest at differing levels of difficulty. The goal of equating is to adjust for these differences in difficulty across alternate forms of a test, so as to produce comparable score scales.
+
+Equating defines a functional statistical relationship between multiple test score distributions and thereby between multiple score scales. When the test forms have been created according to the same specifications and are similar in statistical characteristics, this functional relationship is referred to as an *equating function*, and it serves to translate scores from one scale directly to their equivalent values on another. The term *linking* refers to test forms which have not been created according to the same specifications, for example, forms which differ in length or content; in this case, the linked scales are considered similar but not interchangeable; they are related to one another via a *linking function*. Specific requirements for equating include equivalent constructs measured with equal reliability across test forms, equity in the equated results, symmetry of the equating function itself, and invariance of the function over examinee populations [for details, see @holland2006linking].
+
+A handful of statistical packages are available for linking and equating test forms. @kolen2014test demonstrate a suite of free, standalone programs for observed-score and item response theory (IRT) linking and equating. Other packages, like equate, have been developed within the R environment @r2020. For example, the R package kequate [@andersson2013performing] includes observed-score methods, but within a kernel equating framework. The R package plink [@weeks2010plink] implements IRT linking under a variety of dichotomous, polytomous, unidimensional, and multidimensional models. The R package SNSequate [@burgos2014snsequate] contains some functions for observed-score and kernel equating, along with IRT linking methods.
+
+The equate package, available on the Comprehensive R Archive Network (CRAN) at [https://CRAN.R-project.org/package=equate](https://CRAN.R-project.org/package=equate), is designed for observed-score linking and equating. It differs from other packages primarily in its overall structure and usability, its plotting and bootstrapping capabilities, and its inclusion of more recently developed equating and linking functions such as the general-linear, synthetic, and circle-arc functions, and traditional methods such as Levine, Tucker, and Braun/Holland. Equating with multiple anchor tests and external covariates is also supported, as demonstrated below. Linking and equating are performed using a simple interface, and plotting and summary methods are provided to facilitate the comparison of results and the examination of bootstrap and analytic equating error. Sample data and detailed help files are also included. These features make the package useful in teaching, research, and operational testing contexts.
+
+This paper presents some basic linking and equating concepts and procedures. Equating designs are first discussed in Section \@ref(sec:designs). In Section \@ref(sec:functions), linear and nonlinear observed-score linking and equating functions are reviewed. In Section \@ref(sec:methods), methods are presented for linking and equating when examinee groups are not equivalent. Finally, in Section \@ref(sec:applications), the equate package is introduced and its basic functionality is demonstrated using three data sets.
+
+# Equating designs {#sec:designs}
+
+Observed-score linking and equating procedures require data from multiple test administrations. An *equating design* specifies how the test forms and the individuals sampled to take them differ across administrations, if at all. For simplicity, in this paper and in the *equate* package, equating designs are categorized as either involving a *single group*, *equivalent groups*, or *nonequivalent groups* of examinees, and test forms are then constructed based on the type of group(s) sampled.
+
+In the single-group design, one group, sampled from the target population $T$, takes two different test forms $X$ and $Y$, optionally with counterbalancing of administration orders (one group takes $X$ first, the other takes $Y$ first). Any differences in the score distributions on $X$ and $Y$ are attributed entirely to the test forms themselves, as group ability is assumed to be constant; thus, if the distributions are not the same, it is because the test forms differ in difficulty. Related to the single-group design is the equivalent-groups design, where one random sample from $T$ takes $X$ and another takes $Y$. Because the samples are taken randomly, group ability is again assumed to be constant, and any differences in the score distributions are again identified as form difficulty differences.
+
+Without equivalent examinee groups, two related problems arise: 1) the target population must be defined indirectly using samples from two different examinee populations, $P$ and $Q$; and 2) the ability of these groups must then be accounted for, as ability differences will be a confounding factor in the estimation of form difficulty differences. In the nonequivalent-groups design these issues are both addressed through the use of what is referred to as an *anchor test*, $V$, a common measure of ability available for both groups. All non-equivalence in ability is assumed to be controlled or removed via this common measure. External covariates, such as scores from other tests, can also be used to control for group differences.
+
+Equating procedures were initially developed using the single-group and equivalent-groups designs. In this simpler context, the traditional equating functions include mean, linear, and equipercentile equating; these and other equating functions are reviewed in Section \@ref(sec:functions). More complex procedures have been developed for use with the nonequivalent-groups design; these equating methods are presented in Section \@ref(sec:methods). Unless otherwise noted, additional details on the functions and methods described below can be found in @kolen2014test.
+
+# Equating functions {#sec:functions}
+
+Procedures for equating test forms to a common scale are referred to here and in the equate package as different *types* of equating functions. The equating function defines the equation for a line that expresses scores on one scale, or axis, in terms of the other. The available types of equating functions are categorized as straight-linear (i.e., linear), including identity, mean, and linear equating, and curvilinear (i.e., nonlinear), including equipercentile and circle-arc equating. The straight-line types differ from one another in intercept and slope, and the curvilinear lines differ in the number of coordinates on the line that are estimated, whether all of them or only one. Combinations of equating lines, referred to here as composite functions, are also discussed.
+
+The goal of equating is to summarize the difficulty difference between $X$ to $Y$. As shown below, each equating type makes certain assumptions regarding this difference and how it does or does not change across the $X$ and $Y$ score scales. These assumptions are always expressed in the form of a line within the coordinate system for the $X$ and $Y$ scales.
+
+## Identity functions
+
+Linear functions are appropriate when test form difficulties change linearly across the score scale, by a constant $b$ and rate of change $a$. Scores on $X$ are related to $Y$ as
+
+\begin{equation}
+y = ax + b.
+(\#eq:line1)
+\end{equation}
+
+In the simplest application of Equation \@ref(eq:line1), the scales of $X$ and $Y$ define the line. Coordinates for scores of $x$ and $y$ are found based on their relative positions within each scale:
+
+\begin{equation}
+\frac{x - x_1}{x_2 - x_1} = \frac{y - y_1}{y_2 - y_1}.
+(\#eq:id1)
+\end{equation}
+
+Here, $(x_1, y_1)$ and $(x_2, y_2)$ are coordinates for any two points on the line defined by the scales of $X$ and $Y$, for example, the minimum and maximum possible scale values. Solving Equation \@ref(eq:id1) for $y$ results in the identity linking function:
+
+\begin{equation}
+id_Y(x) = y = \frac{\Delta_Y}{\Delta_X}x + y_1 - \frac{\Delta_Y}{\Delta_X}x_1, 
+(\#eq:id2)
+\end{equation}
+
+where $\Delta_Y = y_2 - y_1$ and $\Delta_X = x_2 - x_1$,
+
+\begin{equation}
+a = \frac{\Delta_Y}{\Delta_X},
+(\#eq:idslope1)
+\end{equation}
+
+and
+
+\begin{equation}
+b = y_1  - \frac{\Delta_Y}{\Delta_X}x_1.
+(\#eq:idintercept1)
+\end{equation}
+
+The intercept $b$ can also be defined using the slope $a$ and any pair of $X$ and $Y$ coordinates $(x_j, y_k)$:
+
+\begin{equation}
+b = y_k - ax_j,
+(\#eq:idintercept2)
+\end{equation}
+
+where $j = 1, 2, \dots, J$ indexes the points on scale $X$ and $k = 1, 2, \dots, K$ indexes the points on scale $Y$.
+
+The identity linking function is then expressed as
+
+\begin{equation}
+id_Y(x) =  \frac{\Delta_Y}{\Delta_X}x + y_k - \frac{\Delta_Y}{\Delta_X}x_j.
+(\#eq:id3)
+\end{equation}
+
+When the scales of $X$ and $Y$ are the same, $a = 1$ and $b = 0$, and Equation \@ref(eq:id3) reduces to the identity equating function:
+
+\begin{equation}
+ide_Y(x) = x.
+(\#eq:ide1)
+\end{equation}
+
+## Mean functions
+
+In mean linking and equating, form difficulty differences are estimated by the mean difference $\mu_Y - \mu_X$. Equation \@ref(eq:id3) is used to define a line that passes through the means of $X$ and $Y$, rather than the point $(x_j, y_k)$. The intercept from Equation \@ref(eq:idintercept2) is expressed as
+
+\begin{equation}
+b = \mu_Y - a\mu_X.
+(\#eq:mintercept1)
+\end{equation}
+
+The mean linking function is then
+
+\begin{equation}
+mean_Y(x) =ax + \mu_Y - a\mu_X,
+(\#eq:m1)
+\end{equation}
+
+where $a$ is found using Equation \@ref(eq:idslope1). When the scales of $X$ and $Y$ are the same, the slope $a$ is 1, which leads to the mean equating function:
+
+\begin{equation}
+meane_Y(x) = x + \mu_Y - \mu_X.
+(\#eq:me1)
+\end{equation}
+
+In mean equating, coordinates for the line are based on deviation scores:
+
+\begin{equation}
+x - \mu_X = y - \mu_Y.
+(\#eq:me2)
+\end{equation}
+
+In mean linking, coordinates are based on deviation scores relative to the scales of $X$ and $Y$:
+
+\begin{equation}
+\frac{x - \mu_X}{\Delta_X} = \frac{y - \mu_Y}{\Delta_Y}.
+(\#eq:m2)
+\end{equation}
+
+## Linear functions
+
+The linear linking and equating functions also assume that the difficulty difference between $X$ and $Y$ changes by a constant amount $a$ across the score scale. However, in linear equating the slope is estimated using the standard deviations of $X$ and $Y$ as
+
+\begin{equation}
+a = \frac{\sigma_Y}{\sigma_X}.
+(\#eq:leslope1)
+\end{equation}
+
+The linear linking and equating functions are defined as
+
+\begin{equation}
+lin_Y(x) = \frac{\sigma_Y}{\sigma_X}x + \mu_Y - \frac{\sigma_Y}{\sigma_X}\mu_X.
+(\#eq:le1)
+\end{equation}
+
+In both the linear linking and equating functions, coordinates for the line are based on standardized deviation scores:
+
+\begin{equation}
+\frac{x - \mu_X}{\sigma_X} = \frac{y - \mu_Y}{\sigma_Y}.
+(\#eq:le2)
+\end{equation}
+
+## General linear functions
+
+The identity, mean, and linear linking and equating functions presented above can all be obtained as variations of a general linear function $glin_Y(x)$ [@albano2015general]. The general linear function is defined based on Equation \@ref(eq:line1) as
+
+\begin{equation}
+glin_Y(x) = \frac{\alpha_Y}{\alpha_X}x + \beta_Y - \frac{\alpha_Y}{\alpha_X}\beta_X,
+(\#eq:glin1)
+\end{equation}
+
+where
+
+\begin{equation}
+a = \frac{\alpha_Y}{\alpha_X}
+(\#eq:glinslope1)
+\end{equation}
+
+and
+
+\begin{equation}
+b = \beta_Y - \frac{\alpha_Y}{\alpha_X}\beta_X.
+(\#eq:glinintercept1)
+\end{equation}
+
+Here, $\alpha$ is a general scaling parameter that can be estimated using $\sigma$, $\Delta$, another fixed value, or weighted combinations of these values. $\beta$ is a general centrality parameter that can be estimated using $\mu$, $x_j$ or $y_k$, other values, or weighted combinations of these values. Applications of the general linear function are discussed below and in @albano2015general.
+
+## Equipercentile functions
+
+Equipercentile linking and equating define a nonlinear relationship between score scales by setting equal the cumulative distribution functions for $X$ and $Y$: $F(x) = G(y)$. Solving for $y$ produces the equipercentile linking function:
+
+\begin{equation}
+equip_Y(x) = G^{-1}[F(x)],
+(\#eq:equip)
+\end{equation}
+
+which is also the equipercentile equating function $equipe_Y(x)$. When the score scales are discrete, which is often the case, the cumulative distribution function can be approximated using percentile ranks. This is a simple approach to *continuizing* the discrete score distributions [for details, see @kolen2014test ch. 2]. Kernel equating, using Gaussian kernels, offers a more flexible approach to continuization [@vondavier2004kernel], but differences between the methods tend to be negligible. The percentile rank method is currently used in the equate package. The equipercentile equivalent of a form-$X$ score on the $Y$ scale is calculated by finding the percentile rank in $X$ of a particular score, and then finding the form-$Y$ score associated with that form-$Y$ percentile rank.
+
+Equipercentile equating is appropriate when $X$ and $Y$ differ nonlinearly in difficulty, that is, when difficulty differences fluctuate across the score scale, potentially at each score point. Each coordinate on the equipercentile curve is estimated using information from the distributions of $X$ and $Y$. Thus, compared to identity, mean, and linear equating, equipercentile equating is more susceptible to sampling error because it involves the estimation of as many parameters as there are unique score points on $X$.
+
+Smoothing methods are typically used to reduce irregularities due to sampling error in either the score distributions or the equipercentile equating function itself. Two commonly used smoothing methods include polynomial loglinear presmoothing [@holland2000univariate] and cubic-spline postsmoothing [@kolen1984effectiveness]. The equate package currently supports loglinear presmoothing via the `glm` function. Details are provided below.
+
+## Circle-arc functions
+
+Circle-arc linking and equating [@livingston2009circle] also define a nonlinear relationship between score scales; however, they utilize only three score points in $X$ and $Y$ to do so: the low and high points, as defined above for the identity function, and a midpoint $(x_j, y_k)$. On their own, the low and high points define the identity linking function $id_Y(x)$, a straight line. When $(x_j, y_k)$ does not fall on the identity linking line, it can be connected to $(x_1, y_1)$ and $(x_2, y_2)$ by the circumference of a circle with center $(x_c, y_c)$ and radius $r$.
+
+There are multiple ways of solving for $(x_c, y_c)$ and $r$ based on the three known points $(x_1, y_1)$, $(x_j, y_k)$, and $(x_2, y_2)$. For example, the center coordinates can be found by solving the following system of equations:
+
+\begin{align}
+(x_1 - x_c)^2 + (y_1 - y_c)^2 &= r^2 (\#eq:center1) \\
+(x_j - x_c)^2 + (y_k - y_c)^2 &= r^2 (\#eq:center2) \\
+(x_2 - x_c)^2 + (y_2 - y_c)^2 &= r^2. (\#eq:center3)
+\end{align}
+
+Subtracting Equation \@ref(eq:center3) from \@ref(eq:center1) and \@ref(eq:center2) and rearranging terms leads to the following linear system:
+
+\begin{align}
+2(x_1 - x_2)x_c + 2(y_1 - y_2)y_c &= x_1^2 - x_2^2 + y_1^2 - y_2^2 (\#eq:center4) \\
+2(x_j - x_2)x_c + 2(y_k - y_2)y_c &= x_j^2 - x_2^2 + y_k^2 - y_2^2. (\#eq:center5)
+\end{align}
+
+The center coordinates can then be obtained by plugging in the known values for $(x_1, y_1)$, $(x_j, y_k)$, and $(x_2, y_2)$ and again combining equations. The center and any other coordinate pair, e.g., $(x_1, y_1)$, are then used to find the radius:
+
+\begin{equation}
+r = \sqrt{(x_c - x_1)^2 + (y_c - y_1)^2}.
+(\#eq:radius)
+\end{equation}
+
+Finally, solving Equation \@ref(eq:radius) for $y$ results in the circle-arc linking function:
+
+\begin{equation}
+circ_Y(x) = y_c \pm \sqrt{r^2 - (x - x_c)^2},
+(\#eq:circ1)
+\end{equation}
+
+where the second quantity, under the square root, is added to $y_c$ when $y_k > id_Y(x_j)$ and subtracted when $y_k < id_Y(x_j)$. The circle-arc equating function $circe_Y(x)$ is obtained by using $ide_Y(x_j)$ in place of $id_Y(x_j)$ above.
+
+@livingston2010random refer to the circle connecting $(x_1, y_1)$, $(x_j, y_k)$, and $(x_2, y_2)$ as symmetric circle-arc equating. They also present a simplified approach, where the circle-arc function is decomposed into the linear component defined by $(x_1, y_1)$ and $(x_2, y_2)$, which is the identity function, and the circle defined by the points $(x_1, y_1 - id_Y(x_1))$, $(x_j, y_k - id_Y(x_j))$, and $(x_2, y_2 - id_Y(x_2))$. These low and high points reduce to $(x_1, 0)$ and $(x_2, 0)$, and the center coordinates can then be found as
+
+\begin{equation}
+x^*_c = \frac{(x_2^2-x_1^2)}{2(x_2-x_1)},
+(\#eq:xc)
+\end{equation}
+
+and
+
+\begin{equation}
+y^*_c = \frac{(x_1^2)(x_2 - x_j) - (x_j^2+y_k^{*2})(x_2 - x_1) + (x_2^2)(x_j - x_1)}{2[y_k^{*}(x_1 - x_2)]},
+(\#eq:yc)
+\end{equation}
+
+where $y_k^{*} = y_k - id_Y(x_j)$. Equation \@ref(eq:radius) is used to find the radius. Then, the simplified circle-arc function is the combination of the resulting circle-arc $circ^{*}_Y(x)$ and the identity function:
+
+\begin{equation}
+scirc_Y(x) = circ^*_Y(x) + id_Y(x).
+(\#eq:scirc)
+\end{equation}
+
+## Composite functions
+
+The circle-arc linking and equating functions involve a curvilinear combination of the identity and mean functions, where the circle-arc overlaps with the identity function at the low and high points, and with the mean function at the midpoint $(\mu_X, \mu_Y)$. A circle then defines the coordinates that connect these three points. This is a unique example of what is referred to here as a composite function.
+
+The composite linking function is the weighted combination of any linear and/or nonlinear linking or equating functions:
+
+\begin{equation}
+comp_Y(x) = \displaystyle\sum_{h}w_{h}link_{hY}(x),
+(\#eq:comp)
+\end{equation}
+
+where $w_h$ is a weight specifying the influence of function $link_{hY}(x)$ in determining the composite.
+
+Equation \@ref(eq:comp) is referred to as a linking function, rather than an equating function, because it will typically not meet the symmetry requirement of equating. For symmetry to hold, the inverse of the function that links $X$ to $Y$ must be the same as the function that links $Y$ to $X$, that is, $comp_Y^{-1}(x) = comp_X(y)$, which is generally not true when using Equation \@ref(eq:comp). @holland2011average show how symmetry can be maintained for any combination of two or more linear functions. The weighting system must be adjusted by the slopes for the linear functions being combined, where the adjusted weight $W_h$ is found as
+
+\begin{equation}
+W_h = \frac{w_h(1 + a_h^p)^{-1/p}}{\displaystyle\sum_hw_h(1 + a_h^p)^{-1/p}}. 
+(\#eq:ws)
+\end{equation}
+
+Here, $a_h$ is the slope for a given linear function $link_h$, and $p$ specifies the type of $L_p$-circle with which symmetry is defined. For details, see @holland2011average.
+
+# Equating methods {#sec:methods}
+
+The linking and equating functions presented above are defined in terms of a single target population $T$, and they are assumed to generalize to this population. A subscript, e.g., $X_T$, is omitted for simplicity; it is presumed that $X = X_T$ and $Y = Y_T$. In the nonequivalent-groups design, scores come from two distinct populations, referred to here as populations $P$ and $Q$. Because the target population is not directly sampled, the linking and equating functions are redefined in terms of a weighted combination of $P$ and $Q$, where $T = w_PP + w_QQ$ and $w_P$ and $w_Q$ are proportions that sum to 1. This mixture of $P$ and $Q$ is referred to as the *synthetic population* [@braun1982observed].
+
+Linear equating is presented for the synthetic population first. All of the means and standard deviations in Equation \@ref(eq:le1) are estimated as weighted combinations of estimates from $P$ and $Q$, where
+
+\begin{equation}
+\mu_{X} = w_P\mu_{X_P} + w_Q\mu_{X_Q},
+(\#eq:synthmx1)
+\end{equation}
+
+\begin{equation}
+\mu_{Y} = w_P\mu_{Y_P} + w_Q\mu_{Y_Q},
+(\#eq:synthmy1)
+\end{equation}
+
+\begin{equation}
+\sigma_{X}^2 = w_P\sigma_{X_P}^2 + w_Q\sigma_{X_Q}^2 + w_Pw_Q(\mu_{X_P} - \mu_{X_Q})^2,
+(\#eq:synthvx1)
+\end{equation}
+
+and
+
+\begin{equation}
+\sigma_{Y}^2 = w_P\sigma_{Y_P}^2 + w_Q\sigma_{Y_Q}^2 + w_Pw_Q(\mu_{Y_P} - \mu_{Y_Q})^2.
+(\#eq:synthvy1)
+\end{equation}
+
+Because $X$ is not administered to $Q$ and $Y$ is not administered to $P$, the terms $\mu_{X_Q}$, $\mu_{Y_P}$, $\sigma_{X_Q}^2$, and $\sigma_{X_Q}^2$ in Equations \@ref(eq:synthmx1) through \@ref(eq:synthvy1) are obtained using available information for $X$, $Y$, and the anchor test $V$. This results in the following synthetic parameter estimates [for details, see @kolen2014test]:
+
+\begin{equation}
+\mu_{X} = \mu_{X_P} - w_Q\gamma_P(\mu_{V_P} - \mu_{V_Q}),
+(\#eq:synthmx2)
+\end{equation}
+
+\begin{equation}
+\mu_{Y} = \mu_{Y_Q} + w_P\gamma_Q(\mu_{V_P} - \mu_{V_Q}),
+(\#eq:synthmy2)
+\end{equation}
+
+\begin{equation}
+\sigma_{X}^2 = \sigma_{X_P}^2 - w_Q\gamma_P^2(\sigma_{V_P}^2 - \sigma_{V_Q}^2) + w_Pw_Q\gamma_P^2(\mu_{V_P} - \mu_{V_Q})^2,
+(\#eq:synthvx2)
+\end{equation}
+
+and
+\begin{equation}
+\sigma_{Y}^2 = \sigma_{Y_Q}^2 + w_P\gamma_Q^2(\sigma_{V_P}^2 - \sigma_{V_Q}^2) + w_Pw_Q\gamma_Q^2(\mu_{V_P} - \mu_{V_Q})^2.
+(\#eq:synthvy2)
+\end{equation}
+
+The $\gamma$ terms in Equations \@ref(eq:synthmx2) through \@ref(eq:synthvy2) represent the relationship between total scores on $X$ and $Y$ and the respective anchor scores on $V$. $\gamma_P$ and $\gamma_Q$ are used along with the weights to adjust the observed $\mu$ and $\sigma^2$ for $X$ and $Y$ in order to obtain corresponding estimates for the synthetic population. For example, when $w_P = 0$ and $w_Q = 1$, $\mu_{Y} = \mu_{Y_Q}$, and conversely $\mu_{X_Q}$ will be adjusted the maximum amount when obtaining $\mu_{X}$. The same would occur with the estimation of synthetic variances. Furthermore, the adjustments would be completely removed if populations $P$ and $Q$ did not differ in ability, where $\mu_{V_P} = \mu_{V_Q}$ and $\sigma_{V_P}^2 = \sigma_{V_Q}^2$.
+
+A handful of techniques have been developed for estimating the linear $\gamma$ terms required by Equations \@ref(eq:synthmx2) through \@ref(eq:synthvy2), and the terms required for equipercentile equating, as described below. These techniques all make certain assumptions about the relationships between total scores and anchor scores for populations $P$ and $Q$. The techniques are referred to here as equating *methods*. The equate package supports the Tucker, nominal weights, Levine observed-score, Levine true-score, Braun/Holland, frequency estimation, and chained equating methods (although chained equating does not rely on $\gamma$, it does make assumptions about the relationship between total and anchor scores). The Tucker, nominal weights, Braun/Holland, and frequency estimation methods are also available for use with multiple anchor tests; see Appendix \@ref(sec:appendMulti). Table \@ref(tab:typesmethods) shows the supported methods that apply to each equating type.
+
+## Tucker
+
+In Tucker equating [@levine1955equating] the relationship between total and anchor test scores is defined in terms of regression slopes, where $\gamma_P$ is the slope resulting from the regression of $X$ on $V$ for population $P$, and $\gamma_Q$ the slope from a regression of $Y$ on $V$ for population $Q$:
+
+\begin{equation}
+\gamma_P = \frac{\sigma_{X_P,V_P}}{\sigma_{V_P}^2} \,\,\,\, \text{and} \,\,\,\,
+\gamma_Q = \frac{\sigma_{Y_Q,V_Q}}{\sigma_{V_Q}^2}.
+(\#eq:gammatuck1)
+\end{equation}
+
+The Tucker method assumes that across populations: 1) the coefficients resulting from a regression of $X$ on $V$ are the same, and 2) the conditional variance of $X$ given $V$ is the same. These assumptions apply to the regression of $Y$ on $V$ and the covariance of $Y$ given $V$ as well. They also apply to the regression of $X$ or $Y$ on multiple anchor tests and external covariates [e.g., @angoff1984scales]; see Appendix \@ref(sec:appendTucker) for details.
+
+```{r typesmethods, echo = FALSE}
+knitr::kable(data.frame(type = c("mean", "linear", "general linear", "equipercentile", "circle-arc", "multiple anchors"),
+  nominal = c("X", "", "X", "", "X", "X"),
+  tucker = c("X", "X", "X", "", "X", "X"),
+  levine = c("X", "X", "X", "", "X", ""),
+  braun = c("X", "X", "X", "", "X", "X"),
+  frequency = c("", "", "", "X", "", "X"),
+  chained = c("X", "X", "", "X", "X", "")),
+  caption = "Applicable equating types and methods.")
+```
+
+## Nominal weights
+
+Nominal weights equating is a simplified version of the Tucker method where the total and anchor tests are assumed to have similar statistical properties and to correlate perfectly within populations $P$ and $Q$. In this case the $\gamma$ terms can be approximated by the ratios
+
+\begin{equation}
+\gamma_P = \frac{K_X}{K_V} \,\,\,\, \text{and} \,\,\,\, \gamma_Q = \frac{K_Y}{K_V},
+(\#eq:gammanom1)
+\end{equation}
+
+where $K$ is the number of items on the test. See @babcock2012nominal for a description and examples with a single anchor. When using multiple anchor tests, a $\gamma$ term is again estimated for each anchor test, as in the multi-anchor Tucker method; see Appendix \@ref(sec:appendNominal).
+
+## Levine
+
+Assumptions for the Levine [@levine1955equating] observed-score method are stated in terms of true scores (though only observed scores are used), where, across both populations: 1) the correlation between true scores on $X$ and $V$ is 1, as is the correlation between true scores on $Y$ and $V$; 2) the coefficients resulting from a linear regression of true scores for $X$ on $V$ are the same, as with true scores for $Y$ on $V$; and 3) measurement error variance is the same (across populations) for $X$, $Y$, and $V$. These assumptions make possible the estimation of $\gamma$ as
+
+\begin{equation}
+\gamma_P = \frac{\sigma_{X_P}^2}{\sigma_{X_P,V_P}} \,\,\,\, \text{and} \,\,\,\,
+\gamma_Q = \frac{\sigma_{Y_Q}^2}{\sigma_{Y_Q,V_Q}},
+(\#eq:gammalev1)
+\end{equation}
+
+which are the inverses of the respective regression slopes for $V$ on $X$ and $V$ on $Y$. The Levine true-score method is based on the same assumptions as the observed-score method; however, it uses a slightly different linear equating function in place of Equation \@ref(eq:le1):
+
+\begin{equation}
+lin_Y(x) = \frac{\gamma_Q}{\gamma_P}X(x - \mu_{X_P}) + \mu_{Y_Q} + \gamma_Q(\mu_{V_P} - \mu_{V_Q}),
+\end{equation}
+
+with $\gamma$ defined by Equation \@ref(eq:gammalev1). @hanson1991note and @kolen2014test provide justifications for using the Levine true-score method.
+
+## Frequency estimation
+
+The frequency estimation or poststratification method is used in equipercentile equating under the nonequivalent-groups design. It is similar to the methods described above in that it involves a synthetic population. However, in this method full score distributions for the synthetic population taking forms $X$ and $Y$ are required. When the assumptions are made that 1) the conditional distribution of total scores on $X$ for a given score point in $V$ is the same across populations, and 2) the conditional distribution of total scores on $Y$ for a given score point in $V$ is the same across populations, the synthetic distributions can be obtained as
+
+\begin{equation}
+\text{Pr}(x) = w_P\text{Pr}_P(x) + w_Q\sum \text{Pr}_P(x|v)\text{Pr}_Q(v)
+(\#eq:synthdistx1)
+\end{equation}
+
+and
+
+\begin{equation}
+\text{Pr}(y) = w_Q\text{Pr}_Q(y) + w_P\sum \text{Pr}_Q(y|v)\text{Pr}_P(v).
+(\#eq:synthdisty1)
+\end{equation}
+
+Here, $\text{Pr}(x)$, $\text{Pr}(y)$, and $\text{Pr}(v)$ denote the distribution functions for forms $X$, $Y$, and $V$ respectively. Percentile ranks can be taken for the cumulative versions of Equations \@ref(eq:synthdistx1) and \@ref(eq:synthdisty1) to obtain Equation \@ref(eq:equip). The frequency estimation method can also accommodate multiple anchors and external covariates; see Appendix \@ref(sec:appendFreq).
+
+## Braun/Holland
+
+As a kind of extension of the frequency estimation method, the Braun/Holland method [@braun1982observed] defines a linear function relating $X$ and $Y$ that is based on the means and standard deviations of the synthetic distributions obtained via frequency estimation. Thus the full synthetic distributions are estimated, as with frequency estimation, but only in order to obtain their means and standard deviations.
+
+## Chained
+
+Finally, chained equating [@livingston1990combination] can be applied to both linear and equipercentile equating under the nonequivalent-groups with anchor test design. The chained method differs from all other methods discussed here in that it does not explicitly reference a synthetic population. Instead, it introduces an additional equating function in the process of estimating score equivalents; see Appendix \@ref(sec:appendChain) for details. For both linear and equipercentile equating the steps are as follows:
+  
+1. Define the function relating $X$ to $V$ for population P, $link_{V_P}(x)$,  
+2. Define the function relating $V$ to $Y$ for population Q, $link_{Y_Q}(v)$,  
+3. Equate $X$ to the scale of $Y$ using both functions, where $chain_Y(x) = link_{Y_Q}[link_{V_P}(x)]$.  
+  
+Chained methods are based on the assumptions that 1) the equating of $X$ to $V$ is the same for $P$ and $Q$, and 2) the equating of $V$ to $Y$ is the same for $P$ and $Q$.
+
+## Methods for the general linear function
+
+The general linear equating function can be utilized with any combination of weighted means and standard deviations from Equations \@ref(eq:synthmx1) through \@ref(eq:synthvy1). Thus, any methods for nonequivalent groups that estimate means or means and standard deviations for the synthetic population can be implemented within the general linear function. In the equate package, these methods are currently Tucker, nominal-weights, Levine observed-score, and Braun/Holland. See @albano2015general for examples. Composites of these methods can also be obtained.
+
+## Methods for the circle-arc function
+
+As discussed above, the circle-arc equating function combines a linear with a curvilinear component based on three points in the $X$ and $Y$ score distributions. Although all three points can be obtained using the general linear function, the first and third of these points are typically determined by the score scale whereas the midpoint is estimated. Equating methods used with circle-arc equating in the nonequivalent-groups design apply only to estimation of this midpoint. @livingston2009circle demonstrated chained linear equating of means, under a nonequivalent-groups design. The midpoint could also be estimated using other linear methods, such as Tucker or Levine.
+
+Note that circle-arc equating is defined here as an equating *type*, and equating *methods* are used to estimate the midpoint. When groups are considered equivalent (i.e., an anchor test is not used) equating at the midpoint is simply mean equating, as mentioned above (replace $x$ with $\mu_X$ in Equation \@ref(eq:le1) to see why this is the case). With scores on an anchor test, both Tucker and Levine equating at the midpoint also reduce to mean equating. However, chained linear equating at the midpoint differs from chained mean (see Appendix \@ref(sec:appendChain)).
+
+# Using the equate package {#sec:applications}
+
+## Sample data {#sec:data}
+
+The equate package includes three sample data sets. The first, `ACTmath`, comes from two administrations of the ACT mathematics test, and is used throughout @kolen2014test. The test scores are based on an equivalent-groups design and are contained in a three-column data frame where column one is the 40-point score scale and columns two and three are the number of examinees for $X$ and $Y$ obtaining each score point.
+
+The second data set, `KBneat`, is also used in @kolen2014test. It contains scores for two forms of a 36-item test administered under a nonequivalent-groups design. A 12-item anchor test is internal to the total test, where anchor scores contribute to an examinee's total score. The number of non-anchor items that are unique to each form is 24, and the highest possible score is 36. `KBneat` contains a separate total and anchor score for each examinee. It is a list of length two where the list elements `x` and `y` each contain a two-column data frame of scores on the total test and scores on the anchor test.
+
+The third data set, `PISA`, contains scored cognitive item response data from the 2009 administration of the Programme for International Assessment (PISA). Four data frames are included in `PISA`: `PISA$students` contains scores on the cognitive assessment items in math, reading, and science for all 5233 students in the USA cohort; `PISA$booklets` contains information about the structure of the test design, where multiple item sets, or clusters, were administered across 13 test booklets; `PISA$items` contains the cluster, subject, maximum possible score, item format, and number of response options for each item; and `PISA$totals` contains a list of cluster total scores for each booklet, calculated using `PISA$students` and `PISA$booklets`. For additional details, see the `PISA` help file which includes references to technical documentation.
+
+## Preparing score distributions {#sec:preparing}
+
+The equate package analyzes score distributions primarily as frequency table objects with class `freqtab`. For example, to equate the `ACTmath` forms, they must first be converted to frequency tables as follows.
+
+```{r}
+library("equate")
+act.x <- as.freqtab(ACTmath[, 1:2])
+act.y <- as.freqtab(ACTmath[, c(1, 3)])
+```
+
+The `freqtab` class stores frequency distributions as table arrays, with a dimension for each of the variables included in the distribution. The function `as.freqtab` is used above because `ACTmath` already contains tabulated values; this code simply restructures the scales and counts for the two test forms and gives them the appropriate attributes. When printed to the console, `freqtab` objects are converted to `data.frame`. They are summarized with the `summary` method.
+
+```{r}
+head(act.x)
+rbind(x = summary(act.x), y = summary(act.y))
+```
+
+The constructor `freqtab` creates a frequency table from a vector or data frame of observed scores. With an anchor test, this becomes a bivariate frequency table. Bivariate distributions contain counts for all possible score combinations for the total and anchor scores. Multivariate distributions, e.g., containing scores on multiple anchor tests and external covariates, are also supported.
+
+```{r}
+neat.x <- freqtab(KBneat$x, scales = list(0:36, 0:12))
+neat.y <- freqtab(KBneat$y, scales = list(0:36, 0:12))
+```
+
+Finally, `freqtab` can also be used to sum scored item responses, and then tabulate the resulting total scores. In this case, the list `items` must contain vectors of the columns over which total scores should be calculated. For example, the following syntax creates a frequency table using four reading clusters from PISA booklet 6, with clusters R3 and R6 containing the unique items and clusters R5 and R7 containing the anchor items. The `design` argument is used to specify the single-group equating design, as the default when creating a bivariate frequency table is the nonequivalent-groups design.
+
+```{r}
+attach(PISA)
+r3items <- paste(items$itemid[items$clusterid == "r3a"])
+r6items <- paste(items$itemid[items$clusterid == "r6"])
+r5items <- paste(items$itemid[items$clusterid == "r5"])
+r7items <- paste(items$itemid[items$clusterid == "r7"])
+pisa <- freqtab(students[students$book == 6, ],
+items = list(c(r3items, r6items), c(r5items, r7items)),
+scales = list(0:31, 0:29), design = "sg")
+round(data.frame(summary(pisa),
+row.names = c("r3r6", "r5r7")), 2)
+```
+
+A basic plot method is provided in the `freqtab` class. Univariate frequencies are plotted as vertical lines for the argument `x`, similar to a bar chart, and as superimposed curves for the argument `y`. When `y` is a matrix, each column of frequencies is added to the plot as a separate line. This feature is useful when examining smoothed frequency distributions, as demonstrated below. When `x` is a bivariate frequency table, a scatter plot with marginal frequency distributions is produced. See Figure \@ref(fig:plotunivar) for an example of a univariate plot, and Figure \@ref(fig:plotbivar) for an example of a bivariate plot.
+
+```{r plotunivar, fig.cap = "Univariate plot of ACTmath total scores for form X."}
+plot(x = act.x, lwd = 2, xlab = "Score", ylab = "Count")
+```
+
+```{r plotbivar, fig.cap = "Bivariate plot of KBneat total and anchor distributions."}
+plot(neat.x)
+```
+
+## Presmoothing
+
+The distributions in Figures \@ref(fig:plotunivar) and \@ref(fig:plotbivar) contain irregularities in their shapes that likely result, to some extent, from sampling error. The population distributions that these samples estimate are expected to be smoother, with less jaggedness between adjacent scores. Three methods are available for smoothing sample distributions with the objective of reducing these irregularities. The first, frequency averaging [@moses2008notes] replaces scores falling below `jmin` with averages based on adjacent scores. This is implemented with `smoothmethod = "average"` in the `presmoothing` function. The second, adds a small relative frequency (again, `jmin`) to each score point while adjusting the probabilities to sum to one [as described by @kolen2014test, p. 46]. This is implemented using `smoothmethod = "bump"` in the `presmoothing` function.
+
+The third method of reducing irregularities in sample distributions is polynomial loglinear smoothing. Appendix \@ref(sec:appendLoglin) contains details on the model formula itself. In the equate package, loglinear models are fit using the `presmoothing` function with `smoothmethod = "loglinear"`, which calls on the generalized linear model (`glm`) function in R. Models can be fit in three different ways. The first way is with a `formula` object, as follows.
+
+```{r, eval = FALSE}
+presmoothing(~ poly(total, 3, raw = T) + poly(anchor, 3, raw = T) +
+total:anchor, data = neat.x)
+```
+
+This is similar to the approach used in other modeling functions in R, but with two restrictions: 1) the dependent variable, to the left of the `~`, is set to be the score frequencies contained in `data`, and it does not need to be specified in the formula; and 2) the intercept is required and will be added if it has been explicitly removed in the formula.
+
+The formula smoothing method is efficient to write for simpler models, but it can be cumbersome for more complex models containing multiple interaction terms. The second way to specify the model is with a matrix of score functions (`scorefun`) similar to a `model.matrix` in R, where each column is a predictor variable in the model, as follows.
+
+```{r, eval = FALSE}
+neat.xsf <- with(as.data.frame(neat.x), cbind(total, total^2,
+total^3, anchor, anchor^2, anchor^3, total*anchor))
+presmoothing(neat.x, smooth = "loglinear", scorefun = neat.xsf)
+```
+
+The object `neat.xsf` is a matrix containing the total and anchor score scales to the first, second, and third powers, and the interaction between the two. The presmoothing results based on this score function are the same as those for the formula method above. One benefit of creating the score function externally is that it can be easily modified and used with other models. It can also include variables not contained within the raw frequency table, `neat.x`, in this example. The formula interface is limited in this respect, as the `data} argument must be a frequency table, and it cannot include variables besides the total and anchor scores.
+
+The most efficient approach to specify a loglinear model in the `presmoothing` function is by including the degrees of the highest polynomial terms for each variable at each level of interaction. For example, in the formula and score function methods above, terms are included for both the total and anchor tests up to the third power and for the two-way interaction to the first power. This is specified compactly using `degrees = list(c(3, 3), c(1, 1))`, which can be reduced to `degrees = list(3, 1)`.
+
+```{r}
+neat.xs <- presmoothing(neat.x, smooth = "log", degrees = list(3, 1))
+```
+
+This functionality extends to multivariate distributions. For example, three way interactions would be specified by including a third vector in the `degrees` list.
+
+For the bivariate example, the smoothed distributions in Figure \@ref(fig:plotbivarsmooth1) can be compared to the unsmoothed ones in Figure \@ref(fig:plotbivar). Figure \@ref(fig:plotbivarsmooth2) superimposes the smoothed frequencies on the unsmoothed marginal distributions for a more detailed comparison of the different models. Descriptive statistics show that the smoothed distributions match the unsmoothed in the first three moments.
+
+```{r plotbivarsmooth1, fig.cap = "Bivariate plot of smoothed KBneat total and anchor distributions."}
+neat.xsmat <- presmoothing(neat.x, smooth = "loglinear",
+degrees = list(3, 1), stepup = TRUE)
+plot(neat.xs)
+```
+
+```{r plotbivarsmooth2, fig.cap = "Bivariate plot of KBneat total and anchor distributions with smoothed frequencies superimposed."}
+plot(neat.x, neat.xsmat, ylty = 1:5)
+round(rbind(x = summary(neat.x), xs = summary(neat.xs)), 2)
+```
+
+The `presmoothing` function is used above to compare results from a sequence of nested models. The argument `stepup = TRUE` returns a matrix of fitted frequencies for models based on subsets of columns in `scorefun`, where the columns for each model can be specified with the argument `models`. The `presmoothing` function can also infer nested models when the `degrees` argument is used. In this case, terms are added sequentially for all variables within each level of interaction. For the example above, the first model in `neat.xsmat` includes the total and anchor scales to the first power, the second additionally includes both scales to the second power, and the third includes both to the third power. A fourth model contains the interaction term. The smoothed curves in the marginal distributions of Figure \@ref(fig:plotbivarsmooth2) show the loglinear smoothing results for each nested model that is fit in `neat.xsmat`. The legend text defines each smoothing curve using two numbers, the first for the level of interaction (1 for the first three models, and 2 for the fourth), and the second for the highest power included in a model (1, 2, and 3 for the main effects, and 1 for the interaction).
+
+Using the argument `compare = TRUE` in `presmoothing`, an ANOVA table of deviance statistics is returned for sequentially nested models. Model fit is compared using functions from the base packages in R [@r2020], which provide $AIC$ (Akaike's Information Criterion), $BIC$ (Bayesian Information Criterion), and likelihood ratio $\chi^2$ tests. In the output below, $AIC$ and $BIC$ are smallest for the most complex model, labeled Model 4, which also results in the largest decrease in deviance. The models being compared are the same as those contained in `neat.xsmat`.
+
+```{r}
+presmoothing(neat.x, smooth = "loglinear",
+degrees = list(c(3, 3), c(1, 1)), compare = TRUE)
+```
+
+Finally, with `choose = TRUE`, the `presmoothing` function will automatically select the best fitting model and return a smoothed frequency distribution based on that model. The deviance statistic for selection is indicated in the argument `choosemethod`, with options chi-square (`"chi"`), AIC (`"aic"`), and BIC (`"bic"`). For `"aic"` and `"bic"`, the model with the smallest value is chosen. For `"chi"`, the most complex model with $p$-value less than the argument `chip` is chosen, with default of $1 - (1 - .05)^(1/(\# models - 1))$. This automatic model selection is useful in simulation and resampling studies where unique presmoothing models must be fit at each replication.
+
+## The equate function
+
+Most of the functionality of the equate package can be accessed via the function `equate`, which integrates all of the equating types and methods introduced above. The equivalent-groups design provides a simple example: besides the $X$ and $Y$ frequency tables, only the equating `type`, i.e., the requested equating function, is required.
+
+```{r}
+equate(act.x, act.y, type = "mean")
+```
+
+The nonequivalent-groups design is specified with an equating `method`, and smoothing with a `smoothmethod`.
+
+```{r}
+neat.ef <- equate(neat.x, neat.y, type = "equip",
+method = "frequency estimation", smoothmethod = "log")
+```
+
+Table \@ref(tab:typesmethods) lists the equating methods that apply to each equating type in the nonequivalent-groups design. Levine true-score equating (`lts`) is performed by including the additional argument `lts = TRUE`.
+
+An equating object such as `neat.ef` contains basic information about the type, method, design, smoothing, and synthetic population weighting for the equating, in addition to the conversion table of equated scores and the original frequency distributions given for `x` and `y`. The `summary` method creates separate tables for all of the frequency distributions utilized in the equating, and calculates descriptive statistics for each one.
+
+```{r}
+summary(neat.ef)
+```
+
+The `equate` function can also be used to convert scores from one scale to another based on the function defined in a previous equating. For example, scores on $Y$ for a new sample of examinees taking `KBneat` form $X$ could be obtained.
+
+```{r}
+cbind(newx = c(3, 29, 8, 7, 13),
+yx = equate(c(3, 29, 8, 7, 13), y = neat.ef))
+```
+
+Here, the argument `y` passed to `equate` is the frequency estimation equipercentile equating object from above, which is an object of class equate. Since the equating function from `neat.ef` relates scores on $X$ to the scale of $Y$, anchor test scores are not needed for the examinees in `newx`. This feature provides a quick way to convert a score vector of any size from $X$ to $Y$. Because this feature does not rely on the discrete concordance table (i.e., conversion table) within the equating output, it can also be utilized with scores on $X$ that were not specified in the original equating, for example, non-integer values on $X$. The discrete concordance table can also be obtained. For some equating designs and methods, the concordance table will additionally include analytic standard errors.
+
+```{r}
+head(neat.ef$concordance)
+```
+
+Finally, composite linkings are created using the `composite` function. For example, the identity and Tucker linear functions equating `neat.x` to `neat.y` could be combined as a weighted average.
+
+```{r plotcomposite, fig.cap = "Identity, Tucker linear, and a composite of the two functions for equating KBneat."}
+neat.i <- equate(neat.x, neat.y, type = "ident")
+neat.lt <- equate(neat.x, neat.y, type = "linear",
+method = "tucker")
+neat.comp <- composite(list(neat.i, neat.lt), wc = .5,
+symmetric = TRUE)
+plot(neat.comp, addident = FALSE)
+```
+
+`neat.comp` represents what @kim2008small refer to as synthetic linear linking. The argument `symmetric = TRUE` is used to adjust the weighting system so that the resulting function is symmetric. Figure \@ref(fig:plotcomposite) shows the composite line in relation to the identity and linear components.
+
+## Linking with different scale lengths and item types
+
+Procedures for linking scales of different lengths and item types are demonstrated here using `PISA` data. A frequency table containing four clusters, or item sets, from the PISA reading test was created above as `pisa`. This frequency table combines total scores on two item sets to create one form, R3R6, and total scores on two other item sets to create another form, R5R7. Because the same group of examinees took all of the item sets, the forms are contained within a single bivariate frequency table.
+
+The two forms differ in length and item type. R3R6 contains 30 items, one of which has a maximum possible score of 2, and the remainder of which are scored dichotomously. This results in a score scale ranging from 0 to 31. However, 14 of the 30 items in R3R6 were multiple-choice, mostly with four response options. The remaining items were either constructed-response or complex multiple-choice, where examinees were unlikely to guess the correct response. Thus, the lowest score expected by chance for R3R6 is $14/4 = 3.5$. R5R7 contains 29 items, all of which are scored dichotomously. Eight of these items are multiple-choice with four response options and the remainder are constructed-response or complex multiple-choice, resulting in a lowest expected chance score of $8/4 = 2$. The summary statistics above show that, despite having a slightly smaller score scale, the mean for R5R7 is slightly higher than for R3R5.
+
+Results for linking R3R6 to R5R7 are compared here for five linking types: identity, mean, linear, circle-arc, and equipercentile with loglinear presmoothing (using the default `degrees}). By default, the identity linking component of each linear function is based on the minimum and maximum possible points for each scale, that is, $(0, 0)$ and $(31, 29)$. The low points were modified to be $(3.5, 2)$ to reflect the lowest scores expected by chance.
+
+```{r plotstudy2, fig.cap = "Five functions linking R3R6 to R5R7."}
+pisa.i <- equate(pisa, type = "ident", lowp = c(3.5, 2))
+pisa.m <- equate(pisa, type = "mean", lowp = c(3.5, 2))
+pisa.l <- equate(pisa, type = "linear", lowp = c(3.5, 2))
+pisa.c <- equate(pisa, type = "circ", lowp = c(3.5, 2))
+pisa.e <- equate(pisa, type = "equip", smooth = "log",
+lowp = c(3.5, 2))
+plot(pisa.i, pisa.m, pisa.l, pisa.c, pisa.e, addident = FALSE,
+xpoints = pisa, morepars = list(ylim = c(0, 31)))
+```
+
+The identity, mean, linear, circle-arc, and equipercentile linking functions are plotted in Figure \@ref(fig:plotstudy2). With a single-group design the linking lines can be plotted over the observed total scores for each form. In this way, the results can be compared in terms of how well each linking captures the observed difficulty difference from R3R6 to R5R7. Based on the scatterplot in Figure \@ref(fig:plotstudy2), scores on R5R7 tend to be higher, but this difference is not linear across the score scale. Instead, the difficulty difference appears curvilinear. Circle-arc linking appears to underestimate this nonlinearity, whereas equipercentile linking appears to estimate it well.
+
+## Linking with multiple anchors and covariates
+
+The PISA data are used here to demonstrate linking with multiple anchor tests. As noted above, the PISA data come from a cluster rotation design, where different groups of students, organized by test booklet, saw different clusters of math, reading, and science items. Data from booklet 4 are used here to create two pseudo forms for a NEAT design with an external covariate. The unique reading items for each form come from clusters R3 and R4, the anchor comes from reading cluster R2, and the covariate from science cluster S2.
+
+```{r}
+pisa.x <- freqtab(totals$b4[1:200, c("r3a", "r2", "s2")],
+scales = list(0:15, 0:17, 0:18))
+pisa.y <- freqtab(totals$b4[201:400, c("r4a", "r2", "s2")],
+scales = list(0:16, 0:17, 0:18))
+```
+
+Note that the first 200 students taking booklet 4 are used in `pisa.x` and the second 200 students are in `pisa.y`. One student in `pisa.x` had missing data and was excluded.
+
+If multiple anchors and/or covariates are contained within a frequency table, they are automatically used by the `equate` function for any methods that support multi-anchor equating, and they are ignored for methods that do not support them. The following code conducts linking with covariates using the nominal weights, Tucker, and frequency estimation methods.
+
+```{r}
+pisa.mnom <- equate(pisa.x, pisa.y, type = "mean",
+method = "nom")
+pisa.mtuck <- equate(pisa.x, pisa.y, type = "linear",
+method = "tuck")
+pisa.mfreq <- equate(pisa.x, pisa.y, type = "equip",
+method = "freq", smooth = "loglin")
+```
+
+Single-anchor linking can also be performed by removing the science test from each frequency table. The `margin` function from the equate package is used here to extract only the bivariate distributions for the total and reading test anchor scales.
+
+```{r}
+pisa.snom <- equate(margin(pisa.x, 1:2), margin(pisa.y, 1:2),
+type = "mean", method = "nom")
+pisa.stuck <- equate(margin(pisa.x, 1:2), margin(pisa.y, 1:2),
+type = "linear", method = "tuck")
+pisa.sfreq <- equate(margin(pisa.x, 1:2), margin(pisa.y, 1:2),
+type = "equip", method = "freq", smooth = "loglin")
+```
+
+Figure \@ref(fig:plotstudy3), based on the code below, compares the single-anchor functions (solid lines) with the multi-anchor functions for each method (dashed lines).
+
+```{r plotstudy3, fig.cap = "Comparing single-anchor and covariate linking with PISA."}
+plot(pisa.snom, pisa.stuck, pisa.sfreq,
+pisa.mnom, pisa.mtuck, pisa.mfreq,
+col = rep(rainbow(3), 2), lty = rep(1:2, each = 3))
+```
+
+## Bootstrapping
+
+All but the identity linking and equating functions estimate a statistical relationship between score scales. Like any statistical estimate, equated scores are susceptible to bias and random sampling error, for example, as defined in Appendix \@ref(sec:appendError). Standard error ($SE$), $bias$, and root mean square error ($RMSE$) can be estimated in the equate package using empirical and parametric bootstrapping.
+
+With the argument `boot = TRUE`, the `equate` function will return bootstrap standard errors based on sample sizes of `xn` and `yn` taken across `reps = 100` replications from `x` and `y`. Individuals are sampled with replacement, and the default sample sizes `xn` and `yn` will match those observed in `x` and `y`. Equating is performed at each replication, and the estimated equating functions are saved. $Bias$ and $RMSE$ can be obtained by including a vector of criterion equating scores via `crit`. Finally, the matrix of estimated equatings at each replication can be obtained with `eqs = TRUE`.
+
+Parametric bootstrapping involves resampling as described above, but from a smoothed score distribution that is assumed to produce more reliable results with small samples [@kolen2014test]. In simulation studies this smoothed distribution is sometimes treated as a pseudo-population. Parametric bootstrapping is performed within the `equate` function by providing the optional frequency distributions `xp` and `yp`. These simply replace the sample distributions `x` and `y` when the bootstrap resampling is performed. Additionally, the `bootstrap` function can be used directly to perform multiple equatings at each bootstrap replication. $SE$, $bias$, and $RMSE$ can then be obtained for each equating function using the same bootstrap data.
+
+Note that the number of bootstrap replications, specified via the `reps` argument, can impact the stability of the results, with error estimates varying noticeably for replications below 100. Bootstrapping studies vary widely in the number of replications utilized. It is recommended that no fewer than 100 be used. For more stable results, 500 to 1000 replications may be necessary, as computing time permits.
+
+Parametric bootstrapping using the `bootstrap` function is demonstrated here for eight equatings of form $X$ to $Y$ in `KBneat`: Tucker and chained mean, Tucker and chained linear, frequency estimation and chained equipercentile, and Tucker and chained-linear circle-arc. Identity equating is also included. Smoothed population distributions are first created. Based on model fit comparisons, loglinear models were chosen to preserve 4 univariate and 2 bivariate moments in the smoothed distributions of $X$ and $Y$. Plots are shown in Figures \@ref(fig:plotstudy1x) and \@ref(fig:plotstudy1y).
+
+```{r}
+neat.xp <- presmoothing(neat.x, "loglinear", degrees = list(4, 2))
+neat.xpmat <- presmoothing(neat.x, "loglinear", degrees = list(4, 2),
+stepup = TRUE)
+neat.yp <- presmoothing(neat.y, "loglinear", degrees = list(4, 2))
+neat.ypmat <- presmoothing(neat.y, "loglinear", degrees = list(4, 2),
+stepup = TRUE)
+```
+
+```{r plotstudy1x, fig.cap = "Smoothed population distributions for $X$ used in parametric bootstrapping."}
+plot(neat.x, neat.xpmat)
+```
+
+```{r plotstudy1y, fig.cap = "Smoothed population distributions for $Y$ used in parametric bootstrapping."}
+plot(neat.y, neat.ypmat)
+```
+
+Next, the number of replications is set to 100, bootstrap sample sizes are set to 100 for $X$ and $Y$, and a criterion equating function is defined, for demonstration purposes, as the chained equipercentile equating in the population.
+
+```{r}
+set.seed(131031)
+reps <- 100
+xn <- 100
+yn <- 100
+crit <- equate(neat.xp, neat.yp, "e", "c")$conc$yx
+```
+
+Finally, to run multiple equatings in a single bootstrapping study, the arguments for each equating must be combined into a single object. Here, each element in `neat.args` is a named list of arguments for each equating. This object is then used in the `bootstrap` function, which carries out the bootstrapping.
+
+```{r}
+neat.args <- list(i = list(type = "i"),
+mt = list(type = "mean", method = "t"),
+mc = list(type = "mean", method = "c"),
+lt = list(type = "lin", method = "t"),
+lc = list(type = "lin", method = "c"),
+ef = list(type = "equip", method = "f", smooth = "log"),
+ec = list(type = "equip", method = "c", smooth = "log"),
+ct = list(type = "circ", method = "t"),
+cc = list(type = "circ", method = "c", chainmidp = "lin"))
+bootout <- bootstrap(x = neat.xp, y = neat.yp, xn = xn, yn = yn,
+reps = reps, crit = crit, args = neat.args)
+```
+
+A plot method is available for visualizing output from the `bootstrap` function, as demonstrated below. Figures \@ref(fig:plotstudy1means) through \@ref(fig:plotstudy1rmse) contain the mean equated scores across replications for each method, the $SE$, $bias$, and $RMSE$. In Figure \@ref(fig:plotstudy1means), the mean equated scores appear to be similar across much of the scale. Chained mean equating (the light orange line) consistently produces the highest mean equated scores. Mean equated scores for the remaining methods fall below those of chained mean and above those of identity equating (the black line). In Figure \@ref(fig:plotstudy1se), standard errors tend to be highest for the equipercentile methods, especially chained equipercentile (the dark blue line), followed by the linear methods (green lines). $SE$ are lowest for the circle-arc methods (purple and pink), especially in the tails of the score scale where the identity function has more of an influence. In Figure \@ref(fig:plotstudy1bias), $bias$ is highest for chained mean equating, and is negative for the identity function; otherwise, $bias$ for the remaining methods falls roughly between -0.5 and 0.5. Finally, in Figure \@ref(fig:plotstudy1rmse), $RMSE$ tends to be highest for chained mean and the linear and equipercentile methods. $RMSE$ for Tucker mean and the circle-arc methods tended to fall at or below 0.5.
+
+```{r plotstudy1means, fig.cap = "Parametric bootstrapped mean equated scores for eight methods."}
+plot(bootout, addident = FALSE, col = c(1, rainbow(8)))
+```
+
+```{r plotstudy1se, fig.cap = "Parametric bootstrapped $SE$ for eight methods."}
+plot(bootout, out = "se", addident = FALSE,
+col = c(1, rainbow(8)), legendplace = "top")
+```
+
+```{r plotstudy1bias, fig.cap = "Parametric bootstrapped $bias$ for eight methods."}
+plot(bootout, out = "bias", addident = FALSE, legendplace = "top",
+col = c(1, rainbow(8)), morepars = list(ylim = c(-.9, 3)))
+```
+
+```{r plotstudy1rmse, fig.cap = "Parametric bootstrapped $RMSE$ for eight methods."}
+plot(bootout, out = "rmse", addident = FALSE, legendplace = "top",
+col = c(1, rainbow(8)), morepars = list(ylim = c(0, 3)))
+```
+
+A summary method is also available for output from the `bootstrap` function. Mean $SE$, $bias$, and $RMSE$, and weighted and absolute means, when applicable, are returned for each equating. Weighted means are calculated by multiplying the error estimate at each score point with the corresponding relative frequency in $X$, and absolute means are based on absolute error values. The output below summarizes what is shown in Figures \@ref(fig:plotstudy1means) through \@ref(fig:plotstudy1rmse): mean $SE$ is lowest for identity and the circle-arc methods; mean $bias$ is low for a few different methods but, in terms of absolute bias, it is lowest for chained equipercentile; and mean $RMSE$ is lowest for Tucker circle-arc. Overall, Tucker circle-arc outperforms the other methods in terms of error reduction, with mean $RMSE$ of 0.39. Mean $RMSE$ for the remaining methods are between 0.43 (chained circle-arc) and 1.56 (chained mean).
+
+```{r}
+round(summary(bootout), 2)
+```
+
+```{r, echo = FALSE}
+detach(PISA)
+options(op)
+```
+
+# Summary
+
+This paper presents some basic concepts and procedures for observed-score linking and equating of measurement scales. Linear and nonlinear functions are discussed, and various methods for applying them to nonequivalent groups are reviewed. Finally, the equate package is introduced, and its basic functionality is demonstrated using three data sets.
+
+The equate package is designed to be a resource for teaching, research, and applied observed-score linking and equating procedures. A simple interface, via the `equate` function, can be used to control most of the necessary functionality, including data preparation, presmoothing, linking and equating, and managing output. Summary and plot methods facilitate the comparison of results. Future versions of the equate package will be extended to support additional procedures, for example, postsmoothing [e.g., @kolen1991smoothing], nonlinear continuization [@vondavier2004kernel], additional asymptotic standard errors of equating, and new linking and equating functions as they are developed.
+
+# References
+
+<div id="refs"></div>
+
+# Appendix
+
+## Equating methods for multiple anchors {#sec:appendMulti}
+
+The assumptions presented above for the Tucker, nominal weights, and frequency estimation methods are extended here to the total score distributions $X_P$ and $Y_Q$ and two or more anchor tests $V_1, V_2, \dots, V_m$.
+
+### Tucker {#sec:appendTucker}
+
+Tucker equating with multiple anchor tests involves a linear regression of total scores $X$ or $Y$ on a matrix of anchor scores $\mathbf{V}$. For population $P$ taking $X$, the regression model can be expressed in matrix notation as
+
+\begin{equation}
+\mathbf{x}_P = \delta_{X} + \mathbf{V}_P\boldsymbol{\gamma}_{X} + \mathbf{e}_{X_P},
+(\#eq:reg1)
+\end{equation}
+
+where $\mathbf{x}_P$ is an $n \times 1$ column vector of total scores on $X$ for $n$ individuals, the scalar $\delta_{X}$ is the intercept, $\mathbf{V}_P$ is an $n \times m$ matrix containing scores across $m$ anchor tests, $\boldsymbol{\gamma}_{X}$ is an $m \times 1$ column vector of regression slopes, and $\mathbf{e}_{X_P}$ is the $n \times 1$ column vector of residuals. Equation \@ref(eq:reg1) is used here to derive the unobserved components of Equations \@ref(eq:synthmx2) and \@ref(eq:synthvx2) as functions of $\boldsymbol{\gamma}_X$ and the observed means and standard deviations on $X$ and $\mathbf{V}$. Similar procedures are used to derive the unobserved values for $Y$ in $P$.
+
+Note that in Equation \@ref(eq:reg1) there are no population subscripts on the regression coefficients $\delta_{X}$ and $\boldsymbol{\gamma}_{X}$. The Tucker method assumes that these coefficients are the same in $P$ as in $Q$. As a result, the total score means for $X$ can be expressed as
+
+\begin{equation}
+\mu_{X_P} = \delta_{X} + \boldsymbol{\mu}_{V_P}^{\prime}\boldsymbol{\gamma}_{X}
+(\#eq:mxp)
+\end{equation}
+
+and
+
+\begin{equation}
+\mu_{X_Q} = \delta_{X} + \boldsymbol{\mu}_{V_Q}^{\prime}\boldsymbol{\gamma}_{X},
+(\#eq:mxq1)
+\end{equation}
+
+where the means of $\mathbf{e}_{X_P}$ and $\mathbf{e}_{X_Q}$ are 0. The unobserved mean on $X$ for $Q$ can then be obtained through substitution and some rearranging as
+
+\begin{align}
+\mu_{X_Q} &= \delta_{X} + \boldsymbol{\mu}_{V_Q}^{\prime}\boldsymbol{\gamma}_{X} \nonumber \\
+  &= \mu_{X_P} - \boldsymbol{\mu}_{V_P}^{\prime}\boldsymbol{\gamma}_{X} + \boldsymbol{\mu}_{V_Q}^{\prime}\boldsymbol{\gamma}_{X} \nonumber \\
+  &= \mu_{X_P} + (\boldsymbol{\mu}_{V_Q}^{\prime} - \boldsymbol{\mu}_{V_P}^{\prime})\boldsymbol{\gamma}_{X}.
+  (\#eq:mxq2)
+\end{align}
+
+The unobserved mean on $Y$ for $P$ is obtained through a similar process as
+
+\begin{equation}
+\mu_{Y_P} = \mu_{Y_Q} + (\boldsymbol{\mu}_{V_P}^{\prime} - \boldsymbol{\mu}_{V_Q}^{\prime})\boldsymbol{\gamma}_{Y}.
+(\#eq:myp)
+\end{equation}
+
+These values can then be used in Equations \@ref(eq:synthmx1) and \@ref(eq:synthmy1) to estimate $\mu_{X}$ and $\mu_{Y}$.
+
+Next, it is assumed that the residual variance for each regression model is equal across populations. With $\sigma_{E_X}^2$ representing the residual variance for both $P$ and $Q$, assuming these variances are equal, the total score variances on $X$ can be expressed as
+
+\begin{equation}
+\sigma_{X_P}^2 = \boldsymbol{\gamma}_{X}^{\prime}\boldsymbol{\Sigma}_{V_P}\boldsymbol{\gamma}_{X} + \sigma_{E_X}^2 (\#eq:vxp)
+\end{equation}
+
+and
+
+\begin{equation}
+\sigma_{X_Q}^2 = \boldsymbol{\gamma}_{X}^{\prime}\boldsymbol{\Sigma}_{V_Q}\boldsymbol{\gamma}_{X} + \sigma_{E_X}^2,
+(\#eq:vxq1)
+\end{equation}
+
+where $\boldsymbol{\Sigma}_{V_P}$ and $\boldsymbol{\Sigma}_{V_Q}$ are the $m \times m$ variance-covariance matrices for the anchor tests, and $\boldsymbol{\gamma}_{X}^{\prime}$ is the row vector of $m$ anchor test slopes. The unobserved variance on $X$ for $Q$ can then be obtained through substitution and some rearranging as
+
+\begin{align}
+  \sigma_{X_Q}^2 &= \boldsymbol{\gamma}_{X}^{\prime}\boldsymbol{\Sigma}_{V_Q}\boldsymbol{\gamma}_{X} + \sigma_{E_X}^2 (\#eq:vxq2) \nonumber \\
+  &= \boldsymbol{\gamma}_{X}^{\prime}\boldsymbol{\Sigma}_{V_Q}\boldsymbol{\gamma}_{X} + \sigma_{X_P}^2 - \boldsymbol{\gamma}_{X}^{\prime}\boldsymbol{\Sigma}_{V_P}\boldsymbol{\gamma}_{X} \\
+  &= \sigma_{X_P}^2 + \boldsymbol{\gamma}_{X}^{\prime}(\boldsymbol{\Sigma}_{V_Q} - \boldsymbol{\Sigma}_{V_P})\boldsymbol{\gamma}_{X}. \nonumber
+\end{align}
+
+The unobserved variance on $Y$ for $P$ can be obtained similarly as
+
+\begin{equation}
+\sigma_{Y_P}^2 = \sigma_{Y_Q}^2 + \boldsymbol{\gamma}_{Y}^{\prime}(\boldsymbol{\Sigma}_{V_P} - \boldsymbol{\Sigma}_{V_Q})\boldsymbol{\gamma}_{Y}.
+(\#eq:vyp)
+\end{equation}
+
+Equations \@ref(eq:vxq2) and \@ref(eq:vyp) can then be used within Equations \@ref(eq:synthvx2) and \@ref(eq:synthvy2) to obtain $\sigma_{X}^2$ and $\sigma_{Y}^2$. These derivations for the Tucker method are simple extensions of equations presented for a single anchor [e.g., @kolen2014test]. Tucker equating with multiple anchors was first discussed by @gulliksen1950theory.
+
+### Nominal weights {#sec:appendNominal}
+
+Nominal weights mean equating with a single anchor [@babcock2012nominal] can also be extended to accommodate multiple anchor tests. Test $X$ is presented as an example. The column vector of total scores $\mathbf{x}_P$ is first expressed as
+
+\begin{equation}
+  \mathbf{x}_P = \begin{bmatrix}
+  \mu_{x_P1}K_X \\
+  \mu_{x_P2}K_X \\
+  \vdots \\
+  \mu_{x_Pn}K_X
+  \end{bmatrix}
+  =
+  \boldsymbol{\mu}_{x_{P}}K_X, (\#eq:meanpropx)
+\end{equation}
+
+where $x_P$ represents an item response on $X$, $\mu_{x_P}$ is a mean item score or proportion correct taken across all items for an individual, and $\boldsymbol{\mu}_{x_P}$ is a column vector of mean proportion correct for $n$ individuals. Total scores on the anchor tests are expressed similarly as
+
+\begin{align}
+  \mathbf{V}_P &= \begin{bmatrix}
+  \mu_{v_P11}K_{V_1} & \mu_{v_P12}K_{V_2} & \cdots & \mu_{v_P1m}K_{V_m} \\
+  \mu_{v_P21}K_{V_1} & \mu_{v_P22}K_{V_2} & \cdots & \mu_{v_P2m}K_{V_m} \\
+  \vdots & \vdots & \ddots & \vdots \\
+  \mu_{x_Pn1}K_{V_1} & \mu_{v_Pn2}K_{V_2} & \cdots & \mu_{v_Pnm}K_{V_m}
+  \end{bmatrix} \nonumber \\
+  &= \begin{bmatrix}
+  \mu_{v_P11} & \mu_{v_P12} & \cdots & \mu_{v_P1m} \\
+  \mu_{v_P21} & \mu_{v_P22} & \cdots & \mu_{v_P2m} \\
+  \vdots & \vdots & \ddots & \vdots \\
+  \mu_{x_Pn1} & \mu_{v_Pn2} & \cdots & \mu_{v_Pnm}
+  \end{bmatrix}
+  \begin{bmatrix}
+  K_{V_1} & 0 & \cdots & 0 \\
+  0 & K_{V_2} & \cdots & 0 \\
+  \vdots & \vdots & \ddots & \vdots \\
+  0 & 0 & \cdots & K_{V_m}  
+  \end{bmatrix} \nonumber \\
+  &= \boldsymbol{\mu}_{v_P}\mathbf{K}_V, (\#eq:meanpropv)
+\end{align}
+
+where $v_P$ represents an item response on $V$, $\boldsymbol{\mu}_{v_P}$ is an $n \times m$ matrix of mean proportion corrects for $n$ individuals on $m$ anchor tests, and $\mathbf{K}_V$ is a diagonal matrix containing the numbers of items on each anchor test.
+
+Next, the mean proportion correct versions of $\mathbf{x}_P$ and $\mathbf{V}_P$ in Equations \@ref(eq:meanpropx) and \@ref(eq:meanpropv) are used to obtain the regression slopes in Equation \@ref(eq:reg1). With $\mathbf{x}_P$ and $\mathbf{V}_P$ expressed in deviation scores, solving Equation \@ref(eq:reg1) for $\boldsymbol{\gamma}_X$ results in the following familiar equation:
+
+\begin{equation}
+\boldsymbol{\gamma}_X = (\mathbf{V}_P^{\prime}\mathbf{V}_P)^{-1}\mathbf{V}_P^{\prime}\mathbf{x}_P. (\#eq:reg2)
+\end{equation}
+
+Substituting Equations \@ref(eq:meanpropx) and \@ref(eq:meanpropv) into \@ref(eq:reg2) then results in
+
+\begin{equation}
+\boldsymbol{\gamma}_X = (\mathbf{K}_V^{\prime}\boldsymbol{\mu}_{v_P}^{\prime}\boldsymbol{\mu}_{v_P}\mathbf{K}_V)^{-1}\mathbf{K}_V^{\prime}\boldsymbol{\mu}_{v_P}^{\prime}\boldsymbol{\mu}_{x_P}K_X.
+(\#eq:reg3)
+\end{equation}
+
+The nominal weights method for a single anchor test assumes that, after accounting for the number of items on the total and anchor tests, mean performance on each test is equal in terms of proportion correct. This assumption is simply extended here to multiple anchors, where mean performance in terms of proportion correct is assumed to be equal for each individual across all anchors and the total test.
+
+Postmultiplying $\boldsymbol{\mu}_{x_P}$ by a row vector of 1s with length $m$, denoted by $\mathbf{1}^{\prime}$, produces an $n \times m$ matrix where each column contains the mean proportion correct for each individual on $X$. Under the assumption of equivalent mean proportion correct, $\boldsymbol{\mu}_{x_P}\mathbf{1}^{\prime} = \boldsymbol{\mu}_{v_P}$, which leads to
+
+\begin{align}
+\boldsymbol{\gamma}_X\mathbf{1}^{\prime} &= (\mathbf{K}_V^{\prime}\boldsymbol{\mu}_{v_P}^{\prime}\boldsymbol{\mu}_{v_P}\mathbf{K}_V)^{-1}\mathbf{K}_V^{\prime}\boldsymbol{\mu}_{v_P}^{\prime}\boldsymbol{\mu}_{x_P}\mathbf{1}^{\prime}K_X \nonumber \\
+  &= (\mathbf{K}_V^{\prime}\boldsymbol{\mu}_{v_P}^{\prime}\boldsymbol{\mu}_{v_P}\mathbf{K}_V)^{-1}\mathbf{K}_V^{\prime}\boldsymbol{\mu}_{v_P}^{\prime}\boldsymbol{\mu}_{v_P}K_X. (\#eq:reg4)
+\end{align}
+
+Postmultiplying by $\mathbf{K}_V\mathbf{K}_V^{-1}$ then reduces Equation \@ref(eq:reg4) to
+
+\begin{align}
+  \boldsymbol{\gamma}_X\mathbf{1}^{\prime} &= (\mathbf{K}_V^{\prime}\boldsymbol{\mu}_{v_P}^{\prime}\boldsymbol{\mu}_{v_P}\mathbf{K}_V)^{-1}\mathbf{K}_V^{\prime}\boldsymbol{\mu}_{v_P}^{\prime}\boldsymbol{\mu}_{v_P}\mathbf{K}_V\mathbf{K}_V^{-1}K_X \nonumber \\
+  &= \mathbf{K}_V^{-1}K_X, (\#eq:reg5)
+\end{align}
+
+which can be simplified further by postmultiplying by a column vector of length $m$ containing only $\frac{1}{m}$, i.e., $\mathbf{1}\frac{1}{m}$, as
+
+\begin{align}
+  \boldsymbol{\gamma}_X\mathbf{1}^{\prime}\mathbf{1}\frac{1}{m} &= \mathbf{K}_V^{-1}\mathbf{1}\frac{K_X}{m} \nonumber \\
+  \boldsymbol{\gamma}_X &= \begin{bmatrix}
+  K_X/(K_{V_1}m) \\
+  K_X/(K_{V_2}m) \\
+  \vdots \\
+  K_X/(K_{V_m}m)
+  \end{bmatrix}. (\#eq:multinominalb)
+\end{align}
+
+Equation \@ref(eq:multinominalb), and the equivalent for $Y$, provide the nominal weights $\gamma$ terms needed to estimate the unobserved means in \@ref(eq:mxq2) and \@ref(eq:myp).
+
+### Frequency estimation {#sec:appendFreq}
+
+When using frequency estimation with multiple anchors, the multivariate score distribution of $X$ and $V_1, V_2, \dots, V_m$ for the synthetic population is obtained as
+
+\begin{equation}
+\text{Pr}(x, v_1, v_2, \dots, v_m) = w_P\text{Pr}_P(x, v_1, v_2, \dots, v_m) + w_Q\text{Pr}_Q(x, v_1, v_2, \dots, v_m),
+(\#eq:synthdistx2)
+\end{equation}
+
+and the distribution of $Y$ and $\mathbf{V}$ is obtained similarly as
+
+\begin{equation}
+\text{Pr}(y, v_1, v_2, \dots, v_m) = w_P\text{Pr}_P(y, v_1, v_2, \dots, v_m) + w_Q\text{Pr}_Q(y, v_1, v_2, \dots, v_m).
+(\#eq:synthdisty2)
+\end{equation}
+
+Like in the single anchor case, the distributions $\text{Pr}_Q(x, v_1, v_2, \dots, v_m)$ and $\text{Pr}_Q(y, v_1, v_2, \dots, v_m)$ are unavailable, and must be estimated indirectly. This estimation is made possible by assuming that the conditional distributions of $X$ given the anchors and $Y$ given the anchors are population invariant. This results in
+
+\begin{equation}
+\text{Pr}_Q(x, v_1, v_2, \dots, v_m) = \frac{\text{Pr}_P(x, v_1, v_2, \dots, v_m)}{\text{Pr}_P(v_1, v_2, \dots, v_m)}\text{Pr}_Q(v_1, v_2, \dots, v_m),
+(\#eq:xq)
+\end{equation}
+
+and
+
+\begin{equation}
+\text{Pr}_P(y, v_1, v_2, \dots, v_m) = \frac{\text{Pr}_Q(y, v_1, v_2, \dots, v_m)}{\text{Pr}_Q(v_1, v_2, \dots, v_m)}\text{Pr}_P(v_1, v_2, \dots, v_m),
+(\#eq:yp)
+\end{equation}
+
+which are used in Equations \@ref(eq:synthdistx2) and \@ref(eq:synthdisty2) to obtain the multivariate synthetic distributions. Note that Equations \@ref(eq:xq) and \@ref(eq:yp) are simple generalizations of equations for equating with one anchor [e.g., @kolen2014test; vondavier2004kernel] and equating with two [@moses2010use] and three anchors [@angoff1984scales].
+
+## Chained linear equating {#sec:appendChain}
+
+Chained linear equating involves two separate linear functions. In the equations below the anchor test $V$ is distinguished by population ($P$ taking form $X$ and $Q$ taking form $Y$), though the items on $V$ do not change. The first linear function in slope-intercept form converts $X$ to the scale of $V_P$:
+
+\begin{equation}
+link_{V_P}(x) = \frac{\sigma_{V_P}}{\sigma_X}x - \frac{\sigma_{V_P}}{\sigma_{X}}\mu_{X} + \mu_{V_P}.
+\end{equation}
+
+The second function converts $V_Q$ to the scale of $Y$:
+
+\begin{equation}
+link_{Y_Q}(v_Q) = \frac{\sigma_Y}{\sigma_{V_Q}}v_Q - \frac{\sigma_{Y}}{\sigma_{V_Q}}\mu_{V_Q} + \mu_Y.
+\end{equation}
+
+These functions are combined, where the first, $link_{V_P}(x)$, takes the place of $v_Q$ in the second to obtain:
+
+\begin{equation}
+lchain_Y(x) = \frac{\sigma_Y}{\sigma_{V_Q}} \left[\frac{\sigma_{V_P}}{\sigma_X}x - \frac{\sigma_{V_P}}{\sigma_X}\mu_X + \mu_{V_P}\right] - \frac{\sigma_Y}{\sigma_{V_Q}}\mu_{V_Q} + \mu_Y,
+\end{equation}
+
+or, in slope-intercept form, after some rearranging:
+
+\begin{equation}
+lchain_Y(x) = \frac{\sigma_Y}{\sigma_{V_Q}} \frac{\sigma_{V_P}}{\sigma_X}x + \frac{\sigma_Y}{\sigma_{V_Q}}\left[\mu_{V_P} - \frac{\sigma_{V_P}}{\sigma_X}\mu_X - \mu_{V_Q}\right] + \mu_Y.
+\end{equation}
+
+Finally, for chained mean equating this reduces to:
+
+\begin{equation}
+mchain_Y(x) = x + \mu_{V_P} - \mu_X - \mu_{V_Q} + \mu_Y.
+\end{equation}
+
+When used to obtain the midpoint coordinates in circle-arc equating, the chained method reduces even further, since $x$ is $\mu_X$. Here, the linear and mean functions simplify to
+
+\begin{equation}
+lchain_Y(\mu_X) = \frac{\sigma_Y}{\sigma_{V_Q}}\mu_{V_P} - \frac{\sigma_{Y}}{\sigma_{V_Q}}\mu_{V_Q} + \mu_Y,
+\end{equation}
+
+and
+
+\begin{equation}
+mchain_{Y}(\mu_X) = \mu_{V_P} - \mu_{V_Q} + \mu_Y.
+\end{equation}
+
+## Loglinear presmoothing {#sec:appendLoglin}
+
+Polynomial loglinear modeling is a flexible procedure for smoothing distributions of various shapes to varying degrees. The structure of a distribution can either be maintained or ignored depending on the complexity of the model, where the degree of the polynomial term included determines the moment of the raw score distribution to be preserved. For example, a model with terms to the first, second, and third powers would create a smoothed distribution which matches the raw in mean, variance, and skewness. As shown below, the log of the expected relative frequency $p$ for score point $x$ is modeled as a function of a normalizing constant (the intercept $\beta_0$) and the observed-score value to the first, second, and third powers:
+
+\begin{equation}
+log(p) = \beta_0 + \beta_1x^1 + \beta_2x^2 + \beta_3x^3.
+\end{equation}
+
+Indicator variables may also be included to preserve specific moments for subsets of score points. In the next model, the mean and variance of a sub-distribution are preserved, in addition to the first three moments of the full distribution. When $S = 1$, score point $x$ is included in this sub-distribution, and when $S = 0$, it is ignored:
+
+\begin{equation}
+log(p) = \beta_0 + \beta_1x^1 + \beta_2x^2 + \beta_3x^3 + \beta_{0S}S + \beta_{1S}x^1S + \beta_{2S}x^2S.
+\end{equation}
+
+An acceptable degree of smoothing is typically achieved by comparing multiple models with different numbers of polynomial terms based on their fit to the data [@kolen2014test]. The `loglinear` function in equate is a wrapper for the `glm` function in the stats R package. It can be used to fit and compare nested models up to specified maximum polynomial terms. For additional details, see the `presmoothing` help file.
+
+## Error in equating {#sec:appendError}
+
+In simulation and resampling studies, equating functions are typically compared based on both random and systematic error (or differences), where the first is estimated by the standard error of equating $SE$ and the second by the $bias$. In the equate package, error is estimated in terms of the criterion equating function $link_Y(x)$ and estimate $\widehat{link}_{Yr}(x)$ for samples $r = 1, 2, \dots, R$. Systematic error is estimated as
+
+\begin{equation}
+bias = \widehat{\overline{link}}_{Y}(x) - link_Y(x),
+\end{equation}
+
+where
+
+\begin{equation}
+\widehat{\overline{link}}_{Y}(x) = \frac{1}{R}\sum_{r=1}^{R}\widehat{link}_{Yr}(x)
+\end{equation}
+
+is the average estimated equated score over $R$ samples. The random error is estimated as
+
+\begin{equation}
+SE = \sqrt{\frac{1}{R}\sum_{r=1}^{R}[\widehat{link}_{Yr}(x) - \widehat{\overline{link}}_Y(x)]^2}.
+\end{equation}
+
+Combining both systematic error and random error, the root mean squared error is estimated as
+
+\begin{equation}
+RMSE = \sqrt{bias^2 + SE^2}.
+\end{equation}
