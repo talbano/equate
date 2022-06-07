@@ -1,3 +1,7 @@
+# equate_2.0.8.9000 (##########)
+
+* To-do - fix typos in vignette.
+
 # equate_2.0.8 (2022-06-05)
 
 * Added sample method for freqtab object, useful for bootstrapping.  

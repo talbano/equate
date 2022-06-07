@@ -1,6 +1,6 @@
 Package: equate
 Type: Package
-Version: 2.0.8
+Version: 2.0.8.9000
 Title: Observed-Score Linking and Equating
 Author: Anthony Albano <tony.d.albano@gmail.com>
 Maintainer: Anthony Albano <tony.d.albano@gmail.com>
