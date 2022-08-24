@@ -2,6 +2,8 @@
 
 * To-do - fix typos in vignette.
 
+* Fixed deparse issue when using equate via do.call (github issue #4)
+
 # equate_2.0.8 (2022-06-05)
 
 * Added sample method for freqtab object, useful for bootstrapping.  

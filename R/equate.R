@@ -402,13 +402,13 @@ equate.freqtab <- function(x, y, type = c("identity",
 		if(missing(name)) {
 			name <- ifelse(method == "none", type,
 				paste(method, type))
-			xname <- ifelse(exists(deparse(substitute(x)), 1,
-				inherits = FALSE), deparse(substitute(x)), "x")
+			xname <- ifelse(exists(deparse1(substitute(x)), 1,
+				inherits = FALSE), deparse1(substitute(x)), "x")
 			if(margins(y) == margins(x))
 			  name <- paste(gsub("\\b(\\w)", "\\U\\1", name,
 			    perl = TRUE), "Equating:", xname, "to",
-			    ifelse(exists(deparse(substitute(y)), 1,
-			      inherits = FALSE), deparse(substitute(y)), "y"))
+			    ifelse(exists(deparse1(substitute(y)), 1,
+			      inherits = FALSE), deparse1(substitute(y)), "y"))
 			else name <- paste(gsub("\\b(\\w)", "\\U\\1", name,
 			  perl = TRUE), "Equating:", xname)
 		}
