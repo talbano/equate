@@ -304,9 +304,10 @@ loglinear <- function(x, scorefun, degrees = list(4, 2, 2), grid,
   if (compare) {
     atab <- aovtab(out, x)
     if (choose) {
+      choosemethod <- match.arg(choosemethod)
       glmi <- glmselect(atab, choosemethod, chip)
       stab <- as.freqtab(cbind(xd[, 1:nx], out[[glmi]]$fitted),
-        scales = scales(x, 1:nx), design = design(x))
+        scales = scales(x, 1:nx), design = desi)
       attr(stab, "anova") <- atab
       attr(stab, "model") <- glmi
       return(stab)
