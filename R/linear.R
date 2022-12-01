@@ -204,6 +204,8 @@ lse <- function(x, type, method) {
 }
 
 # Equivalent groups
+# Braun and Holland (1982) Observed-score test equating: A mathematical
+# analysis of some ETS equating procedures
 eglse <- function(x, y) {
   nx <- sum(x)
   ny <- sum(y)
@@ -211,8 +213,9 @@ eglse <- function(x, y) {
   kurtterm <- (kurt.freqtab(x) - 1)/(4 * nx) +
     (kurt.freqtab(y) - 1)/(4 * ny)
   xz <- (scales(x) - mean(x))/sd.freqtab(x)
-  return(var.freqtab(y) * (1/nx + 1/ny + skewterm * xz +
+  out <- sqrt(var.freqtab(y) * (1/nx + 1/ny + skewterm * xz +
     kurtterm * xz^2))
+  return(out)
 }
 
 # Single group
