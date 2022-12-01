@@ -262,14 +262,14 @@ bootstrap bias and RMSE.
 }
 \section{Methods (by class)}{
 \itemize{
-\item \code{list}: Equating a list of frequency tables.
+\item \code{equate(list)}: Equating a list of frequency tables.
 
-\item \code{freqtab}: Equating frequency distributions in \code{x} and \code{y}.
+\item \code{equate(freqtab)}: Equating frequency distributions in \code{x} and \code{y}.
 
-\item \code{default}: Default equating method for a vector of raw scores \code{x}
+\item \code{equate(default)}: Default equating method for a vector of raw scores \code{x}
 and equating output in \code{y}.
-}}
 
+}}
 \examples{
 
 # See vignette("equatevignette") and Albano (2016) for a

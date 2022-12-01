@@ -56,16 +56,16 @@ functions. See Holland and Strawderman (2011) for details.
 }
 \section{Methods (by class)}{
 \itemize{
-\item \code{default}: Default method for a matrix of equating functions,
+\item \code{composite(default)}: Default method for a matrix of equating functions,
 one per column.
 
-\item \code{equate.list}: Create composite across functions in
+\item \code{composite(equate.list)}: Create composite across functions in
 \dQuote{\code{equate.list}} object.
 
-\item \code{list}: Create composite across functions in
+\item \code{composite(list)}: Create composite across functions in
 \dQuote{\code{list}} object.
-}}
 
+}}
 \examples{
 # See vignette("equatevignette") for additional examples
 

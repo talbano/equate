@@ -184,11 +184,11 @@ minimum \code{jmin} with averages of adjacent values.
 }
 \section{Methods (by class)}{
 \itemize{
-\item \code{default}: Default method for frequency tables.
+\item \code{presmoothing(default)}: Default method for frequency tables.
 
-\item \code{formula}: Method for \dQuote{\code{formula}} objects.
+\item \code{presmoothing(formula)}: Method for \dQuote{\code{formula}} objects.
+
 }}
-
 \examples{
 
 set.seed(2010)

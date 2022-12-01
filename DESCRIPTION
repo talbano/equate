@@ -23,7 +23,7 @@ Description: Contains methods for observed-score linking
 LazyLoad: yes
 LazyData: yes
 License: GPL-3
-RoxygenNote: 7.2.0
+RoxygenNote: 7.2.1
 Suggests: 
     knitr,
     rmarkdown,

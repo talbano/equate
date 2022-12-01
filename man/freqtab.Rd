@@ -134,12 +134,12 @@ with the \code{\link{equate}} function, and descriptive statistics with the
 }
 \section{Methods (by class)}{
 \itemize{
-\item \code{default}: Default method for a \code{data.frame} of item responses,
+\item \code{freqtab(default)}: Default method for a \code{data.frame} of item responses,
 a \code{data.frame} of total and anchor scores, or a vector of total scores.
 
-\item \code{table}: Method for \code{table}s.
-}}
+\item \code{freqtab(table)}: Method for \code{table}s.
 
+}}
 \examples{
 
 # Univariate distribution with score scale

@@ -113,15 +113,15 @@ bias, and rmse, and weighted means, as applicable.
 }
 \section{Methods (by class)}{
 \itemize{
-\item \code{default}: Default bootstrap method for
+\item \code{bootstrap(default)}: Default bootstrap method for
 \dQuote{\code{\link{freqtab}}} objects.
 
-\item \code{equate}: Method for \dQuote{\code{\link{equate}}} objects.
+\item \code{bootstrap(equate)}: Method for \dQuote{\code{\link{equate}}} objects.
 
-\item \code{freqtab}: Bootstrap method for \dQuote{\code{\link{freqtab}}}
+\item \code{bootstrap(freqtab)}: Bootstrap method for \dQuote{\code{\link{freqtab}}}
 objects.
-}}
 
+}}
 \examples{
 
 # Parametric bootstrapping using smoothed
