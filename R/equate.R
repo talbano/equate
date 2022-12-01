@@ -309,19 +309,19 @@ equate <- function(x, ...) UseMethod("equate")
 #' @export
 equate.list <- function(x, args, ...) {
 	
-	if(length(x) < 2)
+	if (length(x) < 2)
 		stop("'x' must contain at least 2 data sets")
-	if(length(x) == 2 & (is.null(names(x)) |
+	if (length(x) == 2 & (is.null(names(x)) |
 		any(names(x) == "")))
 		names(x) <- c("x", "y")
-	if(is.null(names(x)) | any(names(x) == ""))
+	if (is.null(names(x)) | any(names(x) == ""))
 		stop("all elements of 'x' must be named")
-	if(!is.list(args))
+	if (!is.list(args))
 		stop("'args' must be a list")
-	if(!all(sapply(args, is.list)))
+	if (!all(sapply(args, is.list)))
 		stop("each element in 'args' must be a list")
-	if(length(x) > 2) {
-		if(!all(unlist(lapply(args, function(z)
+	if (length(x) > 2) {
+		if (!all(unlist(lapply(args, function(z)
 			"x" %in% names(z)))))
 			stop("'args' must include 'x' for each equating")
 	}
@@ -329,12 +329,12 @@ equate.list <- function(x, args, ...) {
 	neq <- length(args)
 	
 	out <- vector("list", length = neq)
-	for(i in 1:neq) {
+	for (i in 1:neq) {
 		eqargs <- args[[i]]
 		eqargs[names(dots)] <- dots
-		if(is.null(eqargs$x))
+		if (is.null(eqargs$x))
 			eqargs$x <- names(x)[1]
-		if(is.null(eqargs$y))
+		if (is.null(eqargs$y))
 			eqargs$y <- names(x)[2]
 		eqargs$x <- x[[eqargs$x]]
 		eqargs$y <- x[[eqargs$y]]
@@ -371,40 +371,40 @@ equate.freqtab <- function(x, y, type = c("identity",
 	"braun/holland"), name, lowp, highp, boot = FALSE,
 	verbose = TRUE, ...) {
 	
-	if(missing(y)) 
-        y <- margin(x, 2)
-	if(missing(lowp))
+	if (missing(y))
+	  y <- margin(x, 2)
+	if (missing(lowp))
 		lowp <- c(min(scales(x)), min(scales(y)))
-	else if(pmatch(lowp[1], "obs", 0))
+	else if (pmatch(lowp[1], "obs", 0))
 		lowp <- c(min(x), min(y))
-	else if(length(lowp) == 1)
+	else if (length(lowp) == 1)
 		lowp[2] <- lowp[1]
-	if(missing(highp))
+	if (missing(highp))
 		highp <- c(max(scales(x)), max(scales(y)))
-	else if(pmatch(highp[1], "obs", 0))
+	else if (pmatch(highp[1], "obs", 0))
 		highp <- c(max(x), max(y))
-	else if(length(highp) == 1)
+	else if (length(highp) == 1)
 		highp[2] <- highp[1]
 	
 	type <- match.arg(type)
 	method <- match.arg(method)
-	if(type %in% c("identity", "mean", "linear", "general linear"))
+	if (type %in% c("identity", "mean", "linear", "general linear"))
 		eqout <- linear(x, y, type = type, method = method,
 			lowp = lowp, highp = highp, verbose = verbose, ...)
-	else if(type == "equipercentile")
+	else if (type == "equipercentile")
 		eqout <- equipercentile(x, y, type = type, method = method,
 			lowp = lowp, highp = highp, verbose = verbose, ...)
-	else if(type == "circle-arc")
+	else if (type == "circle-arc")
 		eqout <- circlearc(x, y, type = type, method = method,
 			lowp = lowp, highp = highp, verbose = verbose, ...)
 
-	if(verbose) {
-		if(missing(name)) {
+	if (verbose) {
+		if (missing(name)) {
 			name <- ifelse(method == "none", type,
 				paste(method, type))
 			xname <- ifelse(exists(deparse1(substitute(x)), 1,
 				inherits = FALSE), deparse1(substitute(x)), "x")
-			if(margins(y) == margins(x))
+			if (margins(y) == margins(x))
 			  name <- paste(gsub("\\b(\\w)", "\\U\\1", name,
 			    perl = TRUE), "Equating:", xname, "to",
 			    ifelse(exists(deparse1(substitute(y)), 1,
@@ -419,7 +419,7 @@ equate.freqtab <- function(x, y, type = c("identity",
 		out <- c(list(name = name, type = type,
 			method = method, design = des), eqout)
 		out <- as.equate(out)
-		if(boot) {
+		if (boot) {
 		  out$bootstraps <- bootstrap.equate(out, ...)
 		  out$concordance$se.b <- out$bootstraps$se
 		}
@@ -434,12 +434,12 @@ equate.freqtab <- function(x, y, type = c("identity",
 #' @export
 equate.default <- function(x, y, ...) {
 
-	if(is.equate(y))
+	if (is.equate(y))
 		yx <- convert(x, y, ...)
-	else if(is.equate.list(y)) {
-		if(is.composite(y[[1]])) {
+	else if (is.equate.list(y)) {
+		if (is.composite(y[[1]])) {
 			yx <- sapply(y[-1], function(z) convert(x, z))
-			wcs <- if(!is.null(y[[1]]$wcs)) y[[1]]$wcs
+			wcs <- if (!is.null(y[[1]]$wcs)) y[[1]]$wcs
 				else y[[1]]$wc
 			yx <- c(yx %*% wcs)
 		}
@@ -453,12 +453,12 @@ equate.default <- function(x, y, ...) {
 
 convert <- function(x, y, ...) {
 	
-	if(!is.equate(y))
+	if (!is.equate(y))
 		stop("'y' must be an 'equate' object")
 		
-	if(y$type == "equipercentile") {
-		if(y$method == "none") {
-			if(y$smoothmethod == "none") {
+	if (y$type == "equipercentile") {
+		if (y$method == "none") {
+			if (y$smoothmethod == "none") {
 				xtab <- y$x
 				ytab <- y$y
 			}
@@ -468,13 +468,13 @@ convert <- function(x, y, ...) {
 			}
 			p <- px(x, xtab)
 		}
-		else if(y$method == "frequency estimation") {
+		else if (y$method == "frequency estimation") {
 			xtab <- margin(y$xsynthetic)
 			ytab <- margin(y$ysynthetic)
 			p <- px(x, xtab)
 		}
 		else {
-			if(y$smoothmethod == "none") {
+			if (y$smoothmethod == "none") {
 				xtab <- margin(y$x)
 				xvtab <- margin(y$x, 2)
 				ytab <- margin(y$y)
@@ -491,7 +491,7 @@ convert <- function(x, y, ...) {
 		}
 		yx <- equip(p, ytab)$yx
 	}
-	else if(y$type == "circle-arc") {
+	else if (y$type == "circle-arc") {
 		yx <- circ(x, y$points[1, ], y$points[2, ],
 			y$points[3, ], y$coef[1], y$coef[2], y$coef[3:4],
 			y$coef[5], simple = y$simple)
@@ -521,7 +521,7 @@ print.equate <- function(x, ...) {
 	cat("\n")
 	cat(x$name, "\n\n")
 	cat("Design:", x$design, "\n\n")
-	if(x$type == "equipercentile") {
+	if (x$type == "equipercentile") {
 		cat("Smoothing Method: ")
 		cat(switch(x$smoothmethod,
 			bump = "adjusted frequency presmoothing",
@@ -529,7 +529,7 @@ print.equate <- function(x, ...) {
 			loglinear = "loglinear presmoothing", "none"),
 			"\n\n")
 	}
-	if(!is.null(x$ws))
+	if (!is.null(x$ws))
 		cat("Synthetic Weighting for x:",
 			x$ws, "\n\n")
 	xm <- margin(x$x)
@@ -541,7 +541,7 @@ print.equate <- function(x, ...) {
 		print(round(stats, 2))
 		cat("\n")
 
-	if(!is.null(x$coef)) {
+	if (!is.null(x$coef)) {
 		cat("Coefficients:\n")
 		print(round(x$coef, 4))
 		cat("\n")
@@ -557,7 +557,7 @@ summary.equate <- function(object, ...) {
   
   xtab <- as.data.frame(margin(object$x))
   ytab <- as.data.frame(margin(object$y))
-  if(object$type == "equipercentile" &&
+  if (object$type == "equipercentile" &&
       object$smoothmethod != "none") {
     xtab <- data.frame(xtab,
       smooth = c(margin(object$xsmooth)))
@@ -565,17 +565,17 @@ summary.equate <- function(object, ...) {
       smooth = c(margin(object$ysmooth)))
   }
   xvtab <- yvtab <- NULL
-  if(object$design == "nonequivalent groups") {
+  if (object$design == "nonequivalent groups") {
     xvtab <- as.data.frame(margin(object$x, 2))
     yvtab <- as.data.frame(margin(object$y, 2))
-    if(object$type == "equipercentile" &&
+    if (object$type == "equipercentile" &&
         object$smoothmethod != "none") {
       xvtab <- data.frame(xvtab,
         smooth = c(margin(object$xsmooth, 2)))
       yvtab <- data.frame(yvtab,
         smooth = c(margin(object$ysmooth, 2)))
     }
-    if(object$type != "composite" && (object$method ==
+    if (object$type != "composite" && (object$method ==
         "frequency estimation" | object$method ==
         "braun/holland")) {
       xtab <- data.frame(xtab,
@@ -593,7 +593,7 @@ summary.equate <- function(object, ...) {
   rownames(yxstats) <- "observed"
   
   xstats <- ystats <- NULL
-  for(i in 2:ncol(xtab)) {
+  for (i in 2:ncol(xtab)) {
     xstats <- rbind(xstats,
       summary(as.freqtab(xtab[, c(1, i)])))
     ystats <- rbind(ystats,
@@ -602,8 +602,8 @@ summary.equate <- function(object, ...) {
   rownames(xstats) <- rownames(ystats) <-
     colnames(xtab)[-1]
   xvstats <- yvstats <- NULL
-  if(object$design == "nonequivalent groups") {
-    for(i in 2:ncol(xvtab)) {
+  if (object$design == "nonequivalent groups") {
+    for (i in 2:ncol(xvtab)) {
       xvstats <- rbind(xvstats,
         summary(as.freqtab(xvtab[, c(1, i)])))
       yvstats <- rbind(yvstats,
@@ -619,9 +619,9 @@ summary.equate <- function(object, ...) {
       yx = yxtab)),
     stats = list(list(x = xstats, y = ystats,
       yx = yxstats)))
-  if(!is.null(object$bootstraps))
+  if (!is.null(object$bootstraps))
     out$error <- summary(object$bootstraps)
-  if(object$design == "nonequivalent groups") {
+  if (object$design == "nonequivalent groups") {
     out$freqtab <- c(out$freqtab, list(xv = xvtab,
       yv = yvtab))
     out$stats <- c(out$stats, list(xv = xvstats,
@@ -646,7 +646,7 @@ print.summary.equate <- function(x, ...) {
   cat("\n")
   cat(x$name, "\n\n")
   cat("Design:", x$design, "\n\n")
-  if(x$type == "equipercentile") {
+  if (x$type == "equipercentile") {
     cat("Smoothing Method: ")
     cat(switch(x$smoothmethod,
       bump = "adjusted frequency presmoothing",
@@ -654,7 +654,7 @@ print.summary.equate <- function(x, ...) {
       loglinear = "loglinear presmoothing", "none"),
       "\n\n")
   }
-  if(x$design == "nonequivalent groups" &&
+  if (x$design == "nonequivalent groups" &&
       x$type != "composite" &&
       x$method != "chained")
     cat("Synthetic Weighting for x:",
@@ -673,7 +673,7 @@ print.summary.equate <- function(x, ...) {
   print(out)
   cat("\n")
   
-  if(!is.null(x$error)) {
+  if (!is.null(x$error)) {
     cat("Mean Error:\n")
     print(round(x$error, 4), row.names = FALSE)
     cat("\n")
