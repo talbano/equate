@@ -3,8 +3,10 @@
 \docType{package}
 \name{equate-package}
 \alias{equate-package}
-\title{Observed-Score Linking and Equating}
+\title{equate: Observed-Score Linking and Equating}
 \description{
+Contains methods for observed-score linking and equating under the single-group, equivalent-groups, and nonequivalent-groups with anchor test(s) designs. Equating types include identity, mean, linear, general linear, equipercentile, circle-arc, and composites of these. Equating methods include synthetic, nominal weights, Tucker, Levine observed score, Levine true score, Braun/Holland, frequency estimation, and chained equating. Plotting and summary methods, and methods for multivariate presmoothing and bootstrap error estimation are also provided.
+
 Contains methods for observed-score linking and equating under the
 single-group, equivalent-groups, and nonequivalent-groups with anchor
 test(s) designs. Equating types include identity, mean, linear, general
@@ -15,8 +17,8 @@ equating. Plotting and summary methods, and methods for multivariate
 presmoothing and bootstrap error estimation are also provided.
 }
 \details{
-\tabular{ll}{ Package: \tab equate\cr Version: \tab 2.0.8\cr Date: \tab
-2022-06-05\cr Depends: \tab R (>= 4.1.0)\cr License: \tab GPL-3\cr }
+\tabular{ll}{ Package: \tab equate\cr Version: \tab 2.0.9\cr Date: \tab
+2026-02-23\cr Depends: \tab R (>= 4.1.0)\cr License: \tab GPL-3\cr }
 
 Index: \tabular{ll}{
 ACTmath \tab ACT Mathematics Test Scores\cr
@@ -40,7 +42,19 @@ descriptions of the supported equating methods and examples. The help page
 for the main function of the package, \code{\link{equate}}, contains
 additional examples.
 }
+\seealso{
+Useful links:
+\itemize{
+  \item \url{https://github.com/talbano/equate}
+  \item Report bugs at \url{https://github.com/talbano/equate/issues}
+}
+
+}
 \author{
+\strong{Maintainer}: Anthony Albano \email{tony.d.albano@gmail.com}
+
+
 Anthony Albano <tony.d.albano@gmail.com>
 }
+\keyword{internal}
 \keyword{package}

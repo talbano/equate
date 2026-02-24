@@ -12,8 +12,11 @@ linear <- function(x, y, type = "linear", method = "none",
 	lowp[2], cx = midp[1], cy = midp[2], internal = TRUE,
 	lts = FALSE, verbose = FALSE, ...) {
 
-	if (missing(y))
-		y <- margin(x, 2)
+	if (missing(y)) {
+	  y <- margin(x, 2)
+	  xsg <- x
+	}
+  else xsg <- NULL
 	if (margins(y) < margins(x))
 		x <- margin(x, 1)
 	xscale <- scales(x)
@@ -104,7 +107,7 @@ linear <- function(x, y, type = "linear", method = "none",
 		if (!method %in% c("none", "chained") & !lts)
 			out <- c(out, synth)
 		if(!lts)
-		  out$concordance$se <- lse(out, type, method)
+		  out$concordance$se <- lse(out, type, method, xsg)
 	}
 	else out <- yx
 
@@ -127,17 +130,21 @@ lin <- function(x, intercept, slope) {
 # The functions dlin, ds, dcl, dp, and omeg are based on code
 # by Zu (2012), copyright Educational Testing Service (www.ets.org)
 
-lse <- function(x, type, method) {
+lse <- function(x, type, method, xsg) {
   if (margins(x$x) > 2 | margins(x$y) > 2) {
     out <- NULL
   } else if (type == "identity") {
     out <- rep(0, length(scales(x$x)))
   } else if (type == "mean") {
-    out <- NULL
+    if (is.design(x$x, "sg"))
+      out <- sgmse(x$x, x$y, xsg)
+    else if (is.design(x$x, "eg") && is.design(x$y, "eg"))
+      out <- egmse(x$x, x$y)
+    else out <- NULL
   } else if (type == "linear") {
     if (method == "none") {
       if (is.design(x$x, "sg"))
-        out <- sglse(x$x, x$y)
+        out <- sglse(x$x, x$y, xsg)
       else if (is.design(x$x, "eg") && is.design(x$y, "eg"))
         out <- eglse(x$x, x$y)
       else if (is.design(x$x, "cb") && is.design(x$y, "cb")) {
@@ -203,7 +210,17 @@ lse <- function(x, type, method) {
   return(out)
 }
 
-# Equivalent groups
+# Single group
+sgmse <- function(x, y, xsg) {
+  return(NULL)
+}
+
+# Mean equivalent groups
+egmse <- function(x, y) {
+  return(NULL)
+}
+
+# Linear equivalent groups
 # Braun and Holland (1982) Observed-score test equating: A mathematical
 # analysis of some ETS equating procedures
 eglse <- function(x, y) {
@@ -218,12 +235,12 @@ eglse <- function(x, y) {
   return(out)
 }
 
-# Single group
-sglse <- function(x, y) {
+# Linear single group
+sglse <- function(x, y, xsg) {
   return(NULL)
 }
 
-# Counterbalanced
+# Linear counterbalanced
 cblse <- function(x, y) {
   xscale <- scales(x, 1)
   sigmax <- sqrt((var.freqtab(x, 1) + var.freqtab(y, 1))/2)

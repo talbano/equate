@@ -62,9 +62,6 @@ M1 for students taking booklet 1.
 \source{
 OECD (2012). PISA 2009 Technical Report, PISA, OECD Publishing.
 http://dx.doi.org/10.1787/9789264167872-en
-
-Addition information can be found at the PISA website:
-\url{https://www.oecd.org/pisa/}
 }
 \usage{
 PISA
@@ -73,7 +70,6 @@ PISA
 This dataset contains scored cognitive item response data from the 2009
 administration of the Programme for International Student Assessment (PISA),
 an international study of education systems. The data, and license
-under which they are released, are available online at
-\url{https://www.oecd.org/pisa/}.
+under which they are released, are available online at https://www.oecd.org.
 }
 \keyword{datasets}

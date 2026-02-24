@@ -1,3 +1,6 @@
+#' @keywords internal 
+"_PACKAGE"
+
 #' Observed-Score Linking and Equating
 #' 
 #' Contains methods for observed-score linking and equating under the
@@ -9,8 +12,8 @@
 #' equating. Plotting and summary methods, and methods for multivariate
 #' presmoothing and bootstrap error estimation are also provided.
 #' 
-#' \tabular{ll}{ Package: \tab equate\cr Version: \tab 2.0.8\cr Date: \tab
-#' 2022-06-05\cr Depends: \tab R (>= 4.1.0)\cr License: \tab GPL-3\cr }
+#' \tabular{ll}{ Package: \tab equate\cr Version: \tab 2.0.9\cr Date: \tab
+#' 2026-02-23\cr Depends: \tab R (>= 4.1.0)\cr License: \tab GPL-3\cr }
 #' 
 #' Index: \tabular{ll}{
 #' ACTmath \tab ACT Mathematics Test Scores\cr
@@ -35,7 +38,6 @@
 #' additional examples.
 #' 
 #' @name equate-package
-#' @docType package
 #' @author Anthony Albano <tony.d.albano@@gmail.com>
 #' @importFrom stats AIC BIC as.formula coef fitted formula glm lm median
 #' model.matrix poisson reformulate sd stat.anova terms deviance df.residual

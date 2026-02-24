@@ -356,7 +356,8 @@ is.equate.list <- function(x) {
 	return(class(x)[1] == "equate.list")
 }
 
-assign("[.equate.list", function(x, i){
+#' @export
+assign("[.equate.list", function(x, i) {
 
 	out <- as.equate.list(NextMethod("["))
 	return(out)

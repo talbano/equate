@@ -1,10 +1,12 @@
-# equate_2.0.8.9000 (##########)
+# equate 2.0.9 (2026-02-23)
 
-* To-do - fix typos in vignette.
+* Fixed deparse issue when using equate via do.call (github issue #4).  
 
-* Fixed deparse issue when using equate via do.call (github issue #4)
+* Small updates to equate.list and linear standard error.  
 
-# equate_2.0.8 (2022-06-05)
+* Small updates to documentation (Description, NEWS, PISA help).  
+
+# equate 2.0.8 (2022-06-05)
 
 * Added sample method for freqtab object, useful for bootstrapping.  
 
@@ -12,11 +14,11 @@
 
 * Small updates throughout.  
 
-# equate_2.0.7 (2018-04-06)
+# equate 2.0.7 (2018-04-06)
 
 * Update to summary method for bootstrap output, to correct the calculation of mean standard error, bias, and root mean square error over score points.  
 
-# equate_2.0-6 (2017-01-09)
+# equate 2.0-6 (2017-01-09)
 
 * bootstrap function can now extract presmoothing arguments, if present, to run presmoothing once for all functions requesting it. Note that, when requested, presmoothed score distributions will be used for all methods.  
 
@@ -30,7 +32,7 @@
 
 * Bug in Levine true score equating, introduced in 2.0.5, was fixed.  
 
-# equate_2.0-5 (2016-10-20)
+# equate 2.0-5 (2016-10-20)
 
 * Support for linear equating in a single-group design with counterbalancing.  
 
@@ -44,7 +46,7 @@
 
 * Vignette updated to match recent JSS publication.  
 
-# equate_2.0-4 (2016-4-26)
+# equate 2.0-4 (2016-4-26)
 
 * Support for equating scales that have inconsistent score increments.  
 
@@ -62,7 +64,7 @@
 
 * Package is now built using RStudio and roxygen2.  
 
-# equate_2.0-3 (2014-11-1)
+# equate 2.0-3 (2014-11-1)
 
 * Functionality has been added for equating under a multiple anchor test design. New methods include nominal weights and Tucker multivariate and multivariate frequency estimation for Braun/Holland and equipercentile equating.  
 
@@ -80,7 +82,7 @@
 
 * Summary method for bootstrap output can take a subset of the score scale. The method was also updated to include weighted mean RMSE.  
 
-# equate_2.0-2 (2014-2-21)
+# equate 2.0-2 (2014-2-21)
 
 * Some minor cleanup.  
 
@@ -88,7 +90,7 @@
 
 * print method was added for bootstrap objects.  
 
-# equate_2.0-1 (2014-2-1)
+# equate 2.0-1 (2014-2-1)
 
 * points.freqtab fixed to handle plotting frequencies that are all the same.  
 
@@ -98,7 +100,7 @@
 
 * Score conversion with equipercentile now works when x only contains values with percentile ranks of 0 or 1. Previously, this produced an error.  
 
-# equate_2.0-0 (2014-1-7)
+# equate 2.0-0 (2014-1-7)
 
 * New "general linear" equating type.  
 
@@ -144,7 +146,7 @@
 
 * "freqtab" function was updated to handle missing data.  
 
-# equate_1.2-0 (2013-9-20)
+# equate 1.2-0 (2013-9-20)
   
 * Package vignette updated.  
 
@@ -160,7 +162,7 @@
 
 * Help files updated.  
 
-# equate_1.1-4 (2011-8-23)
+# equate 1.1-4 (2011-8-23)
 
 * Package vignette updated.  
 
@@ -168,19 +170,19 @@
 
 * equate function fixed for equipercentile conversion of a vector of scores to the scale defined in a previous equating.  
 
-# equate_1.1-3 (2011-2-10)
+# equate 1.1-3 (2011-2-10)
 
 * verbose option added to loglinear smoothing.  
 
 * equate function updated to support conversion of a vector of scores to the scale defined in a previous equating.  
 
-# equate_1.1-2 (2011-1-7)
+# equate 1.1-2 (2011-1-7)
 
 * Circle-arc equating fixed.  
 
 * Package vignette updated.  
 
-# equate_1.1-1 (2010-12-15)
+# equate 1.1-1 (2010-12-15)
 
 * New equating type: synthetic, a combination of any other equating type and identity equating.  
 
@@ -188,7 +190,7 @@
 
 * skew.freqtab and kurt.freqtab fixed.  
 
-# equate_1.1-0 (2010-11-15)
+# equate 1.1-0 (2010-11-15)
 
 * plot.freqtab updated.  
 
@@ -196,7 +198,7 @@
 
 * loglinear smoothing function fixed.  
 
-# equate_1.0-0 (2010-03-24)
+# equate 1.0-0 (2010-03-24)
 
 * New package vignette introduces concepts and demonstrates basic functionality.  
 
@@ -220,7 +222,7 @@
 
 * Rd files updated and consolidated.  
 
-# equate_0.1-1 (2009-11-05)
+# equate 0.1-1 (2009-11-05)
 
 * Functions loglinear and freqbump extended to handle smoothing of bivariate distributions.  
 
@@ -228,6 +230,6 @@
 
 * Updated DESCRIPTION and Rd files.  
 
-# equate_0.1-0 (2009-11-01)
+# equate 0.1-0 (2009-11-01)
 
 * initial release on CRAN.  
